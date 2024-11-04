@@ -19,6 +19,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - rspec matchers for testing?
 - benchmark for validation of a big response
 - examples https://swagger.io/specification/#example-object
+- move coercion error out of Field, handle in ResponseValidator
 - more docs
 
 ## Installation
