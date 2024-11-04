@@ -1,0 +1,16 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.2
+
+Lint/AmbiguousOperatorPrecedence:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude: ['spec/**/*']
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Style:
+  Enabled: false
