@@ -9,16 +9,14 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - route inference
   - apipie/application.rb:28-70
   - apipie/routes_formatter.rb
-- array support
 - additionalProperties
 - OpenAPI export (e.g. `#to_openapi` methods for types)
 - maybe later: apidoc rendering based on export (rails engine?)
-- pagination support (with rails-cursor-pagination? or maybe do this later?)
+- maybe change controller DSL to avoid conflict with apipie?
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
-- add a NoContentType?
 - rspec matchers for testing?
-- benchmark for validation of a big response
 - examples https://swagger.io/specification/#example-object
+- `deprecation`
 - move coercion error out of Field, handle in ResponseValidator
 - more docs
 
@@ -39,41 +37,51 @@ rails generate taro:install [ --dir app/my_types_dir ]
 Example:
 
 ```ruby
-class CarsController < ApplicationController
-  api     'Update a car' # optional description
-  accepts CarInputType   # accepted params
-  returns ok: CarType,   # return types by status code
+class BikesController < ApplicationController
+  api     'Update a bike' # optional description
+  accepts BikeInputType   # accepted params
+  returns ok: BikeType,   # return types by status code
           unprocessable_content: MyErrorType
   def update
-    if car.update(@api_params) # automatically parsed params
-      render json: CarType.render(car), status: :ok
+    if bike.update(@api_params) # automatically parsed params
+      render json: BikeType.render(bike), status: :ok
     else
-      render json: MyErrorType.render(car.errors), status: :unprocessable_entity
+      render json: MyErrorType.render(bike.errors), status: :unprocessable_entity
     end
   end
 end
 
 # ObjectTypes are used to define, render, and validate responses.
-class CarType < ObjectType
+class BikeType < ObjectType
   # Optional type description (for docs and OpenAPI export)
-  self.description = 'A car and all relevant information about it'
+  self.description = 'A bike and all relevant information about it'
 
-  field(:name)     { [String,  null: true, description: 'The name'] }
-  field(:has_name) { [Boolean, null: true, method: :name?] }
-  field(:info)     { [String,  null: true] }
+  # Field nullability must be set, description is optional
+  field(:brand)     { [String,  null: true, description: 'The brand name'] }
 
-  # Field resolvers can be implemented or overridden on the type
+  # Fields can reference other types and arrays of values
+  field(:users)     { [[UserType], null: false] }
+
+  # Pagination is built-in for big lists
+  field(:parts)     { [PartType.page, null: false] }
+
+  # Custom methods can be chosen to resolve fields
+  field(:has_brand) { [Boolean, null: true, method: :brand?] }
+
+  # Field resolvers can also be implemented or overridden on the type
+  field(:info)      { [String,  null: true] }
+
   def info
-    "A car named #{object.name} with #{object.wheels} wheels."
+    "A bike named #{object.name} with #{object.wheels} wheels."
   end
 end
 
 # The usage of dedicated InputTypes is optional.
 # Object types can also be used to define accepted parameters –
 # or parts of them.
-class CarInputType < InputType
-  field(:name)   { [String, null: false, description: 'The name'] }
-  field(:wheels) { [String, null: true, default: 4] }
+class BikeInputType < InputType
+  field(:brand)  { [String, null: false, description: 'The brand name'] }
+  field(:wheels) { [String, null: true, default: 2] }
 end
 ```
 

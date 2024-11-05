@@ -1,3 +1,4 @@
+# Adds the `::field` method to object and input types.
 module Taro::Types::Shared::Fields
   # Fields are defined using blocks. These blocks are evaluated lazily
   # to allow for circular or recursive type references, and to
@@ -26,7 +27,7 @@ module Taro::Types::Shared::Fields
   def evaluate_field_defs
     field_defs.to_h do |name, definition|
       defined_at, block = definition.values_at(:defined_at, :block)
-      type, opts = block.call
+      type, opts = instance_exec(&block)
       validate_block_result(type, opts, name, defined_at)
       field = Taro::Types::Field.new(**opts.to_h, type:, name:, defined_at:)
       [name, field]

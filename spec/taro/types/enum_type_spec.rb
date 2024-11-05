@@ -33,7 +33,7 @@ describe Taro::Types::EnumType do
   it 'raises for empty enums' do
     enum = Class.new(described_class)
     enum.value 1
-    expect { enum.value '2' }.to raise_error(Taro::Error, /mixed enum/i)
+    expect { enum.value '2' }.to raise_error(Taro::Error, /mixed type/i)
   end
 
   it 'inherits values' do

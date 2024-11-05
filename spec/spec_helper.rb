@@ -1,8 +1,10 @@
 require_relative "support/coverage"
 require "rails"
 require "taro"
+require "debug"
 
 # aliases for convenience
+F = Taro::Types::Field
 S = Taro::Types::Scalar
 T = Taro::Types
 

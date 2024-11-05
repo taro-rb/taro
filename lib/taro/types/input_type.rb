@@ -9,7 +9,7 @@ class Taro::Types::InputType < Taro::Types::BaseType
     raise Taro::RuntimeError, 'InputTypes cannot be used as response types'
   end
 
-  def self.nesting
-    super.chomp('_input')
+  def self.default_nesting
+    super.to_s.chomp('_input')
   end
 end

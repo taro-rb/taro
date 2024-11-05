@@ -7,3 +7,7 @@ class Taro::Types::ObjectType < Taro::Types::BaseType
 
   self.openapi_type = :object
 end
+
+module Taro::Types::ObjectTypes
+  Dir[File.join(__dir__, 'object_types', '**', '*.rb')].each { |f| require f }
+end
