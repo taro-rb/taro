@@ -9,7 +9,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - route inference
   - apipie/application.rb:28-70
   - apipie/routes_formatter.rb
-- additionalProperties
+- additionalProperties, FreeFormType
 - OpenAPI export (e.g. `#to_openapi` methods for types)
 - maybe later: apidoc rendering based on export (rails engine?)
 - maybe change controller DSL to avoid conflict with apipie?
@@ -18,6 +18,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - examples https://swagger.io/specification/#example-object
 - `deprecation`
 - move coercion error out of Field, handle in ResponseValidator
+- gemspec
 - more docs
 
 ## Installation
