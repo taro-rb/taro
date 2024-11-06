@@ -14,4 +14,10 @@ describe Taro::Types::Shared::CustomFieldResolvers do
     expect(example.custom_resolvers).to eq(foo: true)
     expect(subclass.custom_resolvers).to eq(foo: true, baz: true)
   end
+
+  it 'raises when trying to implement an #object resolver method' do
+    expect do
+      example.define_method(:object) { 'bar' }
+    end.to raise_error(Taro::ArgumentError, /object/)
+  end
 end

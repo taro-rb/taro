@@ -1,3 +1,4 @@
+# Provides input and response handling for types with fields.
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
     coerce_with_fields(true)

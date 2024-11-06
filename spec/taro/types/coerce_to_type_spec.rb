@@ -16,6 +16,10 @@ describe Taro::Types::CoerceToType do
     end
   end
 
+  it 'casts arrays to list types' do
+    expect(described_class.call([String])).to be < Taro::Types::ListType
+  end
+
   it 'raises for unsupported types' do
     expect do
       described_class.call(Object)

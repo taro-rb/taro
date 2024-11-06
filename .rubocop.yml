@@ -3,11 +3,14 @@ AllCops:
   SuggestExtensions: false
   TargetRubyVersion: 3.2
 
+Layout/LineLength:
+  Enabled: false
+
 Lint/AmbiguousOperatorPrecedence:
   Enabled: false
 
 Metrics/BlockLength:
-  Exclude: ['spec/**/*']
+  Exclude: ['spec/**/*', 'tasks/**/*']
 
 Metrics/ParameterLists:
   Enabled: false

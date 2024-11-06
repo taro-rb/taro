@@ -1,10 +1,11 @@
 # Abstract class.
 class Taro::Types::EnumType < Taro::Types::BaseType
-  require_relative 'enum_type/value_validation'
-  extend ValueValidation
+  extend Taro::Types::Shared::ItemType
 
   def self.value(value)
-    values << validate_value(value)
+    self.item_type = value.class
+    @openapi_type ||= item_type.openapi_type
+    values << value
   end
 
   def self.values
@@ -13,13 +14,13 @@ class Taro::Types::EnumType < Taro::Types::BaseType
 
   def coerce_input
     self.class.raise_if_empty_enum
-    value = self.class.value_type.new(object).coerce_input
+    value = self.class.item_type.new(object).coerce_input
     value if self.class.values.include?(value)
   end
 
   def coerce_response
     self.class.raise_if_empty_enum
-    value = self.class.value_type.new(object).coerce_response
+    value = self.class.item_type.new(object).coerce_response
     value if self.class.values.include?(value)
   end
 
