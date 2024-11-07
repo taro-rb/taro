@@ -1,4 +1,32 @@
+require 'yaml'
+
 describe Taro::Export::OpenAPIv3 do
+  it 'handles Definitions' do
+    definition = Taro::Rails::Definition.new(
+      api: 'My description',
+      accepts: String,
+      returns: Integer,
+      routes: [mock_user_route],
+    )
+    result = described_class.export_definition(definition)
+    expect(result.to_yaml).to eq <<~YAML
+      paths:
+        /users/{id}:
+          get:
+            summary: Returns a list of users.
+            description: Optional extended description in CommonMark or HTML.
+            responses:
+              "200": # status code
+                description: A JSON array of user names
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        type: string
+    YAML
+  end
+
   it 'handles scalar fields' do
     field = F.new(type: String, name: 'foo', null: false)
     expect(subject.export_field(field)).to eq(type: :string)

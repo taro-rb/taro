@@ -11,6 +11,31 @@ class Taro::Export::OpenAPIv3
     @components = {}
   end
 
+  # :api, :accepts, :returns, :routes
+
+  # paths:
+  # /users:
+  #   get:
+  #     summary: Returns a list of users.
+  #     description: Optional extended description in CommonMark or HTML.
+  #     responses:
+  #       "200": # status code
+  #         description: A JSON array of user names
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 type: string
+
+  def export_definitions(definitions)
+    paths = definitions.map { |defi| export_definition(defi) }
+  end
+
+  def export_definition(definition)
+    
+  end
+
   def export_field(field)
     if field.type < Taro::Types::ScalarType
       export_scalar_field(field)
