@@ -3,7 +3,7 @@ class Taro::Export::OpenAPIv3
 
   # TODO:
   # - accept Taro::Rails.definitions as an argument
-  # - get routes, params, status codes, responses etc. from each Definition
+  # - get routes (#openapi_paths), params, status codes, responses etc. from each Definition
   # - use methods below to render their details
   # - support list/array type
   # - use json-schema gem to validate overall result against OpenAPIv3 schema

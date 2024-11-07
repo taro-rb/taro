@@ -1,4 +1,4 @@
-Taro::Rails::Definition = Struct.new(:api, :accepts, :returns) do
+Taro::Rails::Definition = Struct.new(:api, :accepts, :returns, :routes) do
   def accepts=(type)
     validated_type = Taro::Types::CoerceToType.call(type)
     self[:accepts] = validated_type
@@ -15,6 +15,12 @@ Taro::Rails::Definition = Struct.new(:api, :accepts, :returns) do
     hash = params.to_unsafe_h
     hash = hash[accepts.nesting] if Taro.config.input_nesting
     accepts.new(hash).coerce_input
+  end
+
+  def openapi_paths
+    routes.to_a.map do |route|
+      route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
+    end
   end
 
   require 'rack'

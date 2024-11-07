@@ -38,6 +38,14 @@ describe Taro::Rails::Definition do
     end
   end
 
+  describe '#openapi_paths' do
+    it 'returns the paths of the routes in an openapi compatible format' do
+      definition = described_class.new
+      definition.routes = [mock_user_route]
+      expect(definition.openapi_paths).to eq(['/users/{id}'])
+    end
+  end
+
   require 'action_controller'
 
   describe '#parse_params' do

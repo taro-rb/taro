@@ -1,4 +1,5 @@
 require_relative "support/coverage"
+require_relative "support/stub_rails"
 require "rails"
 require "taro"
 require "debug"
@@ -14,5 +15,9 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before(:each) do
+    Taro::Rails.reset
   end
 end

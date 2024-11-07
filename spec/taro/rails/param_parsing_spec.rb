@@ -3,7 +3,7 @@ describe Taro::Rails::ParamParsing do
     controller_class = Class.new
     controller_class.define_singleton_method(:before_action) { |*| nil }
     expect(controller_class).to receive(:before_action).once
-    2.times { described_class.install(controller_class:, method_name: :index) }
+    2.times { described_class.install(controller_class:, action_name: :index) }
   end
 
   it 'does not install the before_action if param parsing is disabled' do
@@ -13,7 +13,7 @@ describe Taro::Rails::ParamParsing do
     controller_class = Class.new
     controller_class.define_singleton_method(:before_action) { |*| nil }
     expect(controller_class).not_to receive(:before_action)
-    described_class.install(controller_class:, method_name: :index)
+    described_class.install(controller_class:, action_name: :index)
   ensure
     Taro.config.parse_params = orig
   end

@@ -88,4 +88,3 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     MSG
   end
 end
-Taro::Types::Field::NOT_GIVEN = Object.new

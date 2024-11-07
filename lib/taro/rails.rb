@@ -7,4 +7,9 @@ module Taro::Rails
 
   extend ActiveDefinitions
   extend DefinitionBuffer
+
+  def self.reset
+    definitions.clear
+    RouteFinder.clear_cache
+  end
 end

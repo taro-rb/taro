@@ -5,8 +5,10 @@ require 'action_controller/test_case'
 describe 'Rails integration' do
   it 'works' do
     # fake railtie and action controller loading
-    Taro::Rails::Railtie.initializers.each(&:run)
+    stub_rails(with_routes: [mock_user_route])
+    Taro::Rails::Railtie.initializers.each { |i| i.run(Rails.application) }
     ActiveSupport.run_load_hooks(:action_controller_base, nil)
+    Rails.application.reloader.prepare!
 
     input_type = Class.new(Taro::Types::InputType)
     input_type.define_singleton_method(:name) { 'UserInputType' }
