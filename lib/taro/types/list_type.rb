@@ -1,7 +1,8 @@
 # Abstract base class for List types (arrays in OpenAPI terms).
 # Unlike other types, this one should not be manually inherited from,
-# but is used indirectly via `SomeType.list` or `[SomeType]`.
+# but is used indirectly via `array_of: SomeType`.
 class Taro::Types::ListType < Taro::Types::BaseType
+  extend Taro::Types::Shared::DerivableType
   extend Taro::Types::Shared::ItemType
 
   self.openapi_type = :array

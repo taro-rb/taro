@@ -1,6 +1,5 @@
 Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :description) do
   def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, description: nil)
-    validate_null_arg(null)
     enum = coerce_to_enum(enum)
     type = Taro::Types::CoerceToType.call(type)
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
@@ -20,11 +19,6 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   private
-
-  def validate_null_arg(arg)
-    arg == true || arg == false ||
-      raise(Taro::ArgumentError, 'null: must be true or false')
-  end
 
   def coerce_to_enum(arg)
     return if arg.nil?

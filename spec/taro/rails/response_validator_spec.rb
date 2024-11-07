@@ -23,8 +23,8 @@ describe Taro::Rails::ResponseValidator do
   context 'if there is a definition' do
     let(:definition) do
       Taro::Rails::Definition.new.tap do |defi|
-        defi.accepts = String
-        defi.returns = { ok: String }
+        defi.accepts = 'String'
+        defi.returns = { ok: 'String' }
       end
     end
     before { Taro::Rails.definitions[controller.class] = { show: definition } }

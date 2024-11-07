@@ -9,6 +9,3 @@ class Taro::Types::Scalar::BooleanType < Taro::Types::ScalarType
     object if object == true || object == false
   end
 end
-
-# define shortcut for use as field type
-Taro::Types::BaseType::Boolean = Taro::Types::Scalar::BooleanType

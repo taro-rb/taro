@@ -3,21 +3,19 @@ describe Taro::Types::CoerceToType do
     expect(described_class.call(S::StringType)).to eq S::StringType
   end
 
-  [
-    ::Date,
-    ::DateTime,
-    ::Float,
-    ::Integer,
-    ::String,
-    ::Time,
+  %w[
+    Boolean
+    Date
+    DateTime
+    Float
+    Integer
+    String
+    Time
+    UUID
   ].each do |type|
-    it "casts the Ruby class #{type} to a Taro type" do
+    it "casts the String #{type} to a Taro type" do
       expect(described_class.call(type)).to be < Taro::Types::BaseType
     end
-  end
-
-  it 'casts arrays to list types' do
-    expect(described_class.call([String])).to be < Taro::Types::ListType
   end
 
   it 'raises for unsupported types' do

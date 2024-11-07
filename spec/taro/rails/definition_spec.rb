@@ -2,22 +2,34 @@ describe Taro::Rails::Definition do
   describe '#accepts=' do
     it 'sets the accepts attribute' do
       definition = described_class.new
-      definition.accepts = String
+      definition.accepts = 'String'
       expect(definition.accepts).to eq(S::StringType)
+    end
+
+    it 'sets the accepts attribute for derived types' do
+      definition = described_class.new
+      definition.accepts = { array_of: 'String' }
+      expect(definition.accepts).to eq(T::ListType.for(S::StringType))
     end
   end
 
   describe '#returns=' do
     it 'sets the returns attribute' do
       definition = described_class.new
-      definition.returns = { ok: String }
+      definition.returns = { ok: 'String' }
       expect(definition.returns).to eq(200 => S::StringType)
+    end
+
+    it 'sets the returns attribute for derived types' do
+      definition = described_class.new
+      definition.returns = { ok: { array_of: 'String' } }
+      expect(definition.returns).to eq(200 => T::ListType.for(S::StringType))
     end
 
     it 'merges further returns attributes' do
       definition = described_class.new
-      definition.returns = { ok: String }
-      definition.returns = { not_found: Float }
+      definition.returns = { ok: 'String' }
+      definition.returns = { not_found: 'Float' }
       expect(definition.returns).to eq(
         200 => S::StringType,
         404 => S::FloatType,
@@ -26,14 +38,14 @@ describe Taro::Rails::Definition do
 
     it 'sets the returns attribute with status numbers' do
       definition = described_class.new
-      definition.returns = { 200 => String }
+      definition.returns = { 200 => 'String' }
       expect(definition.returns).to eq(200 => S::StringType)
     end
 
     it 'raises for bad status' do
       definition = described_class.new
       expect do
-        definition.returns = { 999 => String }
+        definition.returns = { 999 => 'String' }
       end.to raise_error(Taro::Error, /status/)
     end
   end
