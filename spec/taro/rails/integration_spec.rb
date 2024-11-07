@@ -10,22 +10,23 @@ describe 'Rails integration' do
     ActiveSupport.run_load_hooks(:action_controller_base, nil)
     Rails.application.reloader.prepare!
 
-    input_type = Class.new(Taro::Types::InputType)
-    input_type.define_singleton_method(:name) { 'UserInputType' }
-    input_type.field :name, type: 'String', null: false
+    stub_const('UserInputType', Class.new(T::InputType) do
+      field :name, type: 'String', null: false
+    end)
 
-    response_type = Class.new(Taro::Types::ObjectType)
-    response_type.define_singleton_method(:name) { 'UserResponseType' }
-    response_type.field :name, type: 'String', null: false
+    stub_const('UserResponseType', Class.new(T::ObjectType) do
+      self.nesting = 'usr'
+      field :name, type: 'String', null: false
+    end)
 
     controller_class = Class.new(ActionController::Base) do
       def self.name = 'UsersController'
 
       api 'my api'
-      accepts input_type
-      returns ok: response_type
+      accepts 'UserInputType'
+      returns ok: 'UserResponseType'
       def show
-        render json: { name: @api_params[:name].upcase }
+        render json: UserResponseType.render(name: @api_params[:name].upcase)
       end
     end
 
@@ -38,6 +39,6 @@ describe 'Rails integration' do
 
     get(:show, params: { user: { name: 'taro' } })
 
-    expect(response.body).to eq('{"name":"TARO"}')
+    expect(response.body).to eq('{"usr":{"name":"TARO"}}')
   end
 end

@@ -3,7 +3,7 @@ class Taro::Types::EnumType < Taro::Types::BaseType
   extend Taro::Types::Shared::ItemType
 
   def self.value(value)
-    self.item_type = value.class.name
+    self.item_type = Taro::Types::CoerceToType.from_string!(value.class.name)
     @openapi_type ||= item_type.openapi_type
     values << value
   end

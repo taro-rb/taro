@@ -1,31 +1,47 @@
 module Taro::Types::CoerceToType
   class << self
-    def call(arg)
-      case arg
-      when Class  then from_class(arg)
-      when Hash   then from_hash(arg)
-      when String then from_string(arg)
-      end || raise_cast_error(arg)
+    def from_string_or_hash!(arg)
+      from_hash(arg) || from_string(arg) || raise(Taro::ArgumentError, <<~MSG)
+        Unsupported type: #{arg.inspect}. Must be a Hash containining a type name,
+        e.g. { type: "MyType" }, or be the name of a type class
+        (e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}).
+      MSG
+    end
+
+    def from_string!(arg)
+      from_string(arg) || raise(Taro::ArgumentError, <<~MSG)
+        Unsupported type: #{arg.inspect}. Must be the name of a type class,
+        e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}.
+      MSG
+    end
+
+    def from_hash!(arg)
+      from_hash(arg) || raise(Taro::ArgumentError, <<~MSG)
+        Unsupported type: #{arg.inspect}. Must be a hash containing the name
+        of a type class, e.g. { type: "MyType" }.
+      MSG
     end
 
     private
 
     def from_class(arg)
-      arg if arg < Taro::Types::BaseType
+      arg if arg.is_a?(Class) && arg < Taro::Types::BaseType
     end
 
     def from_hash(arg)
+      return unless arg.is_a?(Hash)
+
       if arg[:type]
-        call(arg[:type])
+        from_string(arg[:type])
       elsif (inner_type = arg[:array_of])
-        Taro::Types::ListType.for(call(inner_type))
+        Taro::Types::ListType.for(from_string(inner_type))
       elsif (inner_type = arg[:page_of])
-        Taro::Types::ObjectTypes::PageType.for(call(inner_type))
+        Taro::Types::ObjectTypes::PageType.for(from_string(inner_type))
       end
     end
 
     def from_string(arg)
-      shortcuts[arg] || call(Object.const_get(arg))
+      arg.is_a?(String) && (shortcuts[arg] || from_class(Object.const_get(arg)))
     rescue NameError
       nil
     end
@@ -46,13 +62,6 @@ module Taro::Types::CoerceToType
         'UUID'     => Taro::Types::Scalar::UUIDv4Type,
         # rubocop:enable Layout/HashAlignment - buggy cop
       }.freeze
-    end
-
-    def raise_cast_error(arg)
-      raise Taro::ArgumentError, <<~MSG
-        Unsupported type: #{arg.inspect}. Must inherit from a type class
-        or be one of #{shortcuts.keys.map(&:inspect).join(', ')}.
-      MSG
     end
   end
 end

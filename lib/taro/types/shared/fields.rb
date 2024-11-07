@@ -5,10 +5,9 @@ module Taro::Types::Shared::Fields
   # avoid unnecessary eager loading of all types in dev/test envs.
   def field(name, **kwargs)
     defined_at = caller_locations(1..1)[0].then { "#{_1.path}:#{_1.lineno}" }
-    validate_field_args(name, defined_at:, **kwargs)
-
-    prev = field_defs[name]
-    prev && raise(Taro::ArgumentError, "field #{name} already defined at #{prev[:defined_at]}")
+    validate_name(name, defined_at:)
+    validate_no_redefinition(name, defined_at:)
+    validate_options(name, defined_at:, **kwargs)
 
     field_defs[name] = { name:, defined_at:, **kwargs }
   end
@@ -19,10 +18,12 @@ module Taro::Types::Shared::Fields
 
   private
 
-  def validate_field_args(name, defined_at:, **kwargs)
+  def validate_name(name, defined_at:)
     name.is_a?(Symbol) ||
       raise(Taro::ArgumentError, "field name must be a Symbol, got #{name.class} at #{defined_at}")
+  end
 
+  def validate_options(name, defined_at:, **kwargs)
     [true, false].include?(kwargs[:null]) ||
       raise(Taro::ArgumentError, "null has to be specified as true or false for field #{name} at #{defined_at}")
 
@@ -33,6 +34,11 @@ module Taro::Types::Shared::Fields
       raise(Taro::ArgumentError, "#{type_key} must be a String for field #{name} at #{defined_at}")
   end
 
+  def validate_no_redefinition(name, defined_at:)
+    prev = field_defs[name]
+    prev && raise(Taro::ArgumentError, "field #{name} at #{defined_at} previously defined at #{prev[:defined_at]}")
+  end
+
   TYPE_KEYS = %i[type array_of page_of].freeze
 
   def field_defs
@@ -41,7 +47,7 @@ module Taro::Types::Shared::Fields
 
   def evaluate_field_defs
     field_defs.transform_values do |field_def|
-      type = Taro::Types::CoerceToType.call(field_def)
+      type = Taro::Types::CoerceToType.from_hash!(field_def)
       Taro::Types::Field.new(**field_def.except(*TYPE_KEYS), type:)
     end
   end

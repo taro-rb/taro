@@ -2,8 +2,7 @@
 module Taro::Types::Shared::ItemType
   attr_reader :item_type
 
-  def item_type=(type)
-    new_type = Taro::Types::CoerceToType.call(type)
+  def item_type=(new_type)
     item_type.nil? || new_type == item_type || raise_mixed_types(new_type)
     @item_type = new_type
   end

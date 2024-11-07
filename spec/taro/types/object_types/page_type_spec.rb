@@ -1,5 +1,5 @@
 describe Taro::Types::ObjectTypes::PageType do
-  let(:example) { described_class.for('String') }
+  let(:example) { described_class.for(S::StringType) }
   let(:page_info) do
     { has_previous_page: true, has_next_page: true, start_cursor: 'x', end_cursor: 'y' }
   end

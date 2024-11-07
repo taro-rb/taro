@@ -1,12 +1,11 @@
 Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :description) do
   def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, description: nil)
     enum = coerce_to_enum(enum)
-    type = Taro::Types::CoerceToType.call(type)
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
   end
 
-  def extract_value(object, context: nil, from_input: true, from_hash: true)
-    value = retrieve_value(object, context, from_hash)
+  def extract_value(object, context: nil, from_input: true, object_is_hash: true)
+    value = retrieve_value(object, context, object_is_hash)
     coerce_value(object, value, from_input)
   end
 
@@ -29,11 +28,11 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     enum
   end
 
-  def retrieve_value(object, context, from_hash)
+  def retrieve_value(object, context, object_is_hash)
     if context&.resolve?(method)
       context.public_send(method)
-    elsif from_hash
-      retrieve_value_from_hash(object)
+    elsif object_is_hash
+      retrieve_hash_value(object)
     elsif object.respond_to?(method, false)
       object.public_send(method)
     else
@@ -41,7 +40,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     end
   end
 
-  def retrieve_value_from_hash(object)
+  def retrieve_hash_value(object)
     if object.key?(method.to_s)
       object[method.to_s]
     else

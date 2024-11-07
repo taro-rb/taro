@@ -9,10 +9,10 @@ describe Taro::Export::OpenAPIv3 do
 
     definition = Taro::Rails::Definition.new(
       api: 'My description',
-      accepts: S::StringType,
+      accepts: 'String',
       returns: {
-        200 => S::IntegerType,
-        404 => FailureType,
+        200 => 'Integer',
+        404 => 'FailureType',
       },
       routes: [Taro::Rails::NormalizedRoute.new(mock_user_route)],
     )
@@ -53,27 +53,27 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles scalar fields' do
-    field = F.new(type: 'String', name: 'foo', null: false)
+    field = F.new(type: S::StringType, name: 'foo', null: false)
     expect(subject.export_field(field)).to eq(type: :string)
   end
 
   it 'handles nullable scalar fields' do
-    field = F.new(type: 'String', name: 'foo', null: true)
+    field = F.new(type: S::StringType, name: 'foo', null: true)
     expect(subject.export_field(field)).to eq(type: %i[string null])
   end
 
   it 'handles field defaults' do
-    field = F.new(type: 'String', default: '!', name: 'foo', null: false)
+    field = F.new(type: S::StringType, default: '!', name: 'foo', null: false)
     expect(subject.export_field(field)).to eq(type: :string, default: '!')
   end
 
   it 'handles field descriptions' do
-    field = F.new(type: 'String', name: 'foo', null: false, description: 'bar')
+    field = F.new(type: S::StringType, name: 'foo', null: false, description: 'bar')
     expect(subject.export_field(field)).to eq(type: :string, description: 'bar')
   end
 
   it 'handles fields with inline enums' do
-    field = F.new(type: 'String', name: 'foo', null: false, enum: ['bar', 'baz'])
+    field = F.new(type: S::StringType, name: 'foo', null: false, enum: ['bar', 'baz'])
     expect(subject.export_field(field)).to eq(type: :string, enum: ['bar', 'baz'])
   end
 
@@ -81,7 +81,7 @@ describe Taro::Export::OpenAPIv3 do
     stub_const('ThingType', Class.new(T::ObjectType) do
       field :inner, type: 'String', null: false
     end)
-    field = F.new(type: 'ThingType', name: 'foo', null: false)
+    field = F.new(type: ThingType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/thing")
@@ -103,7 +103,7 @@ describe Taro::Export::OpenAPIv3 do
     stub_const('ThingType', Class.new(T::ObjectType) do
       field :inner, type: 'String', null: false
     end)
-    field = F.new(type: 'ThingType', name: 'foo', null: false, description: 'bar')
+    field = F.new(type: ThingType, name: 'foo', null: false, description: 'bar')
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
@@ -128,7 +128,7 @@ describe Taro::Export::OpenAPIv3 do
       value 'foo'
       value 'bar'
     end)
-    field = F.new(type: 'MyEnumType', name: 'foo', null: false)
+    field = F.new(type: MyEnumType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/my_enum")
