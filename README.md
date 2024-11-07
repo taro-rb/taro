@@ -10,6 +10,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
   - fail openapi generation if not set or not unique across types?
 - additionalProperties, FreeFormType
 - OpenAPI export (e.g. `#to_openapi` methods for types)
+- openapi metadata via Taro.config, e.g. title
 - maybe later: apidoc rendering based on export (rails engine?)
 - maybe change controller DSL to avoid conflict with apipie?
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
@@ -19,6 +20,11 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - move coercion error out of Field, handle in ResponseValidator
 - gemspec
 - more docs
+- consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
+- another alternative: include Taro::ObjectType might be more descriptive
+- rubocop does not like this: https://docs.rubocop.org/rubocop/cops_style.html#stylehashaslastarrayitem
+- list type holds a hash of all items, should be an array
+- controller dsl should take type names as strings instead of raw types
 
 ## Installation
 
