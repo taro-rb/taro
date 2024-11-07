@@ -52,7 +52,7 @@ describe Taro::Rails::Definition do
     it 'coerces the params, expecting nested data by default' do
       input_type = Class.new(T::InputType)
       input_type.define_singleton_method(:name) { 'UserInputType' }
-      input_type.field(:name) { [String, null: false] }
+      input_type.field :name, type: 'String', null: false
       definition = described_class.new(accepts: input_type)
       params = ActionController::Parameters.new(user: { name: 'Alice' })
       coerced = definition.parse_params(params)
@@ -65,7 +65,7 @@ describe Taro::Rails::Definition do
 
       input_type = Class.new(T::InputType)
       input_type.define_singleton_method(:name) { 'UserInputType' }
-      input_type.field(:name) { [String, null: false] }
+      input_type.field :name, type: 'String', null: false
       definition = described_class.new(accepts: input_type)
       params = ActionController::Parameters.new(name: 'Alice')
       coerced = definition.parse_params(params)

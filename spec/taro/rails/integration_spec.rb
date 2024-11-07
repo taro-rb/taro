@@ -12,11 +12,11 @@ describe 'Rails integration' do
 
     input_type = Class.new(Taro::Types::InputType)
     input_type.define_singleton_method(:name) { 'UserInputType' }
-    input_type.field(:name) { [String, null: false] }
+    input_type.field :name, type: 'String', null: false
 
     response_type = Class.new(Taro::Types::ObjectType)
     response_type.define_singleton_method(:name) { 'UserResponseType' }
-    response_type.field(:name) { [String, null: false] }
+    response_type.field :name, type: 'String', null: false
 
     controller_class = Class.new(ActionController::Base) do
       def self.name = 'UsersController'

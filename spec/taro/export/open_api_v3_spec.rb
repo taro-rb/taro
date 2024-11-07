@@ -81,7 +81,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'handles object fields' do
     type = Class.new(T::ObjectType) do
-      field(:inner) { [String, null: false] }
+      field :inner, type: 'String', null: false
       def self.name = 'ThingType'
     end
     field = F.new(type:, name: 'foo', null: false)
