@@ -17,14 +17,13 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - rspec matchers for testing?
 - examples https://swagger.io/specification/#example-object
 - `deprecation`
-- move coercion error out of Field, handle in ResponseValidator
+- move coercion error out of Field, handle in ResponseValidator?
+- ResponseValidator should detect excessive fields (later: only if additionalProperties is false)
 - gemspec
 - more docs
 - consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
 - another alternative: include Taro::ObjectType might be more descriptive
 - rubocop does not like this: https://docs.rubocop.org/rubocop/cops_style.html#stylehashaslastarrayitem
-- list type holds a hash of all items, should be an array
-- controller dsl should take type names as strings instead of raw types
 
 ## Installation
 
