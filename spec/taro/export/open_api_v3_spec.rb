@@ -2,19 +2,17 @@ require 'yaml'
 
 describe Taro::Export::OpenAPIv3 do
   it 'handles Definitions' do
-    failure_type = Class.new(T::ObjectType) do
-      def self.name = 'FailureType'
-
+    stub_const('FailureType', Class.new(T::ObjectType) do
       field :message, type: 'String', null: true
       field :code, type: 'Integer', null: false
-    end
+    end)
 
     definition = Taro::Rails::Definition.new(
       api: 'My description',
       accepts: S::StringType,
       returns: {
         200 => S::IntegerType,
-        404 => failure_type,
+        404 => FailureType,
       },
       routes: [mock_user_route],
     )
@@ -80,11 +78,10 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles object fields' do
-    type = Class.new(T::ObjectType) do
+    stub_const('ThingType', Class.new(T::ObjectType) do
       field :inner, type: 'String', null: false
-      def self.name = 'ThingType'
-    end
-    field = F.new(type:, name: 'foo', null: false)
+    end)
+    field = F.new(type: ThingType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/thing")
@@ -93,6 +90,7 @@ describe Taro::Export::OpenAPIv3 do
       schemas: {
         thing: {
           type: :object,
+          required: [:inner],
           properties: {
             inner: { type: :string }
           }
@@ -102,11 +100,10 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles object fields with description' do
-    type = Class.new(T::ObjectType) do
-      field(:inner) { [String, null: false] }
-      def self.name = 'ThingType'
-    end
-    field = F.new(type:, name: 'foo', null: false, description: 'bar')
+    stub_const('ThingType', Class.new(T::ObjectType) do
+      field :inner, type: 'String', null: false
+    end)
+    field = F.new(type: ThingType, name: 'foo', null: false, description: 'bar')
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
@@ -117,6 +114,7 @@ describe Taro::Export::OpenAPIv3 do
       schemas: {
         thing: {
           type: :object,
+          required: [:inner],
           properties: {
             inner: { type: :string }
           }
@@ -126,12 +124,11 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles enum fields' do
-    type = Class.new(T::EnumType) do
+    stub_const('MyEnumType', Class.new(T::EnumType) do
       value 'foo'
       value 'bar'
-      def self.name = 'MyEnumType'
-    end
-    field = F.new(type:, name: 'foo', null: false)
+    end)
+    field = F.new(type: MyEnumType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/my_enum")

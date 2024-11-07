@@ -1,9 +1,11 @@
-class ExampleObjectType < Taro::Types::ObjectType
-  field :foo, type: 'String', null: false
-  field :bar, type: 'String', null: true
-end
-
 describe Taro::Types::ObjectType do
+  before do
+    stub_const('ExampleObjectType', Class.new(Taro::Types::ObjectType) do
+      field :foo, type: 'String', null: false
+      field :bar, type: 'String', null: true
+    end)
+  end
+
   it 'coerces input' do
     expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_input).to eq(foo: 'FOO', bar: nil)
   end

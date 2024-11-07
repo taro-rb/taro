@@ -94,10 +94,11 @@ class Taro::Export::OpenAPIv3
   end
 
   def build_object_type_ref(type)
+    required = type.fields.values.reject(&:null).map(&:name)
     {
       type: type.openapi_type,
       description: type.description,
-      required: type.fields.values.reject(&:null).map(&:name),
+      required: (required if required.any?),
       properties: type.fields.to_h { |name, f| [name, export_field(f)] },
     }.compact
   end
