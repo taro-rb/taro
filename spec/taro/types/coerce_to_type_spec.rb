@@ -3,6 +3,11 @@ describe Taro::Types::CoerceToType do
     expect(described_class.call(S::StringType)).to eq S::StringType
   end
 
+  it "returns derived types based on Hashes" do
+    expect(described_class.call(page_of: 'String'))
+      .to eq T::ObjectTypes::PageType.for(S::StringType)
+  end
+
   %w[
     Boolean
     Date
@@ -18,9 +23,27 @@ describe Taro::Types::CoerceToType do
     end
   end
 
-  it 'raises for unsupported types' do
+  it 'raises for unsupported Classes' do
     expect do
       described_class.call(Object)
+    end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+  end
+
+  it 'raises for unsupported Hashes' do
+    expect do
+      described_class.call({})
+    end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+  end
+
+  it 'raises for unsupported Strings' do
+    expect do
+      described_class.call('baddy_boy')
+    end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+  end
+
+  it 'raises for unsupported objects' do
+    expect do
+      described_class.call(Object.new)
     end.to raise_error(Taro::ArgumentError, /Unsupported type/)
   end
 end

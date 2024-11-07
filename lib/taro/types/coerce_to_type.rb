@@ -8,6 +8,12 @@ module Taro::Types::CoerceToType
       end || raise_cast_error(arg)
     end
 
+    private
+
+    def from_class(arg)
+      arg if arg < Taro::Types::BaseType
+    end
+
     def from_hash(arg)
       if arg[:type]
         call(arg[:type])
@@ -18,15 +24,10 @@ module Taro::Types::CoerceToType
       end
     end
 
-    private
-
-    def from_class(arg)
-      arg if arg < Taro::Types::BaseType
-    end
-
     def from_string(arg)
-      shortcuts[arg] ||
-        Object.const_defined?(arg) && call(Object.const_get(arg))
+      shortcuts[arg] || call(Object.const_get(arg))
+    rescue NameError
+      nil
     end
 
     # Map some Ruby class names and other shortcuts to built-in types

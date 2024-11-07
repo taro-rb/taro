@@ -41,18 +41,9 @@ module Taro::Types::Shared::Fields
 
   def evaluate_field_defs
     field_defs.transform_values do |field_def|
-      type = Taro::Types::CoerceToType.from_hash(field_def)
+      type = Taro::Types::CoerceToType.call(field_def)
       Taro::Types::Field.new(**field_def.except(*TYPE_KEYS), type:)
     end
-  end
-
-  def validate_block_result(type, opts, name, defined_at)
-    return if type && opts.to_h.key?(:null)
-
-    raise Taro::ArgumentError, <<~MSG
-      field block must return a Type and a Hash with :null key, but returned
-      #{type}, #{opts} for field #{name} defined at #{defined_at}.
-    MSG
   end
 
   def inherited(subclass)
