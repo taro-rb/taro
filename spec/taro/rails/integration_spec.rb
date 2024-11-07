@@ -14,14 +14,18 @@ describe 'Rails integration' do
     input_type.define_singleton_method(:name) { 'UserInputType' }
     input_type.field(:name) { [String, null: false] }
 
+    response_type = Class.new(Taro::Types::ObjectType)
+    response_type.define_singleton_method(:name) { 'UserResponseType' }
+    response_type.field(:name) { [String, null: false] }
+
     controller_class = Class.new(ActionController::Base) do
       def self.name = 'UsersController'
 
       api 'my api'
       accepts input_type
-      returns ok: String
+      returns ok: response_type
       def show
-        render json: @api_params[:name].upcase
+        render json: { name: @api_params[:name].upcase }
       end
     end
 
@@ -34,6 +38,6 @@ describe 'Rails integration' do
 
     get(:show, params: { user: { name: 'taro' } })
 
-    expect(response.body).to eq('TARO')
+    expect(response.body).to eq('{"name":"TARO"}')
   end
 end

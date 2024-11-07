@@ -1,4 +1,4 @@
-# Buffers api definitions in rail controllers (e.g. `accepts MyType`)
+# Buffers api definitions in rails controllers (e.g. `accepts MyType`)
 # until the next action method is defined (e.g. `def create`).
 module Taro::Rails::DefinitionBuffer
   def buffered_definition(controller_class)
