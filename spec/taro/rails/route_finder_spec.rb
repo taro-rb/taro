@@ -6,7 +6,8 @@ describe Taro::Rails::RouteFinder do
   it 'returns matching routes' do
     route = mock_user_route
     allow(described_class).to receive(:routes).and_return([route])
-    expect(described_class.call(controller_class:, action_name: 'show')).to eq([route])
+    taro_routes = described_class.call(controller_class:, action_name: 'show')
+    expect(taro_routes.map(&:rails_route)).to eq([route])
   end
 
   it 'returns an empty Array when no routes are found' do

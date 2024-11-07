@@ -14,7 +14,7 @@ describe Taro::Export::OpenAPIv3 do
         200 => S::IntegerType,
         404 => FailureType,
       },
-      routes: [mock_user_route],
+      routes: [Taro::Rails::NormalizedRoute.new(mock_user_route)],
     )
 
     result = subject.export_definitions([definition])

@@ -14,23 +14,18 @@ class Taro::Export::OpenAPIv3
   def export_definitions(definitions)
     definitions.each_with_object({ paths: {} }) do |definition, result|
       definition.routes.each do |route|
-        result[:paths][openapi_path(route)] = export_route(route, definition)
+        result[:paths][route.openapi_path] = export_route(route, definition)
       end
     end.merge(components:)
   end
 
   def export_route(route, definition)
     {
-      # TODO: unify with verb handling in Definition
-      route.verb.scan(/\w+/).sort.last.downcase => {
+      route.verb => {
         description: definition.api,
         responses: export_responses(definition.returns),
       }.compact,
     }
-  end
-
-  def openapi_path(route)
-    route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
   end
 
   def export_responses(returns)
