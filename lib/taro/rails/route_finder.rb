@@ -1,7 +1,8 @@
 module Taro::Rails::RouteFinder
   class << self
     def call(controller_class:, action_name:)
-      cache["#{controller_class.controller_path}##{action_name}"] || []
+      endpoint = "#{controller_class.controller_path}##{action_name}"
+      cache[endpoint] || []
     end
 
     def clear_cache
@@ -17,7 +18,7 @@ module Taro::Rails::RouteFinder
     def build_cache
       # Build a Hash like
       # { 'users#show' } => [#<NormalizedRoute>, #<NormalizedRoute>] }
-      routes.each_with_object({}) do |rails_route, hash|
+      rails_routes.each_with_object({}) do |rails_route, hash|
         route = Taro::Rails::NormalizedRoute.new(rails_route:)
         next unless route.ok?
 
@@ -25,7 +26,7 @@ module Taro::Rails::RouteFinder
       end
     end
 
-    def routes
+    def rails_routes
       # make sure routes are loaded
       Rails.application.reload_routes! unless Rails.application.routes.routes.any?
       Rails.application.routes.routes
