@@ -11,29 +11,44 @@ class Taro::Export::OpenAPIv3
     @components = {}
   end
 
-  # :api, :accepts, :returns, :routes
-
-  # paths:
-  # /users:
-  #   get:
-  #     summary: Returns a list of users.
-  #     description: Optional extended description in CommonMark or HTML.
-  #     responses:
-  #       "200": # status code
-  #         description: A JSON array of user names
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 type: string
-
   def export_definitions(definitions)
-    paths = definitions.map { |defi| export_definition(defi) }
+    definitions.each_with_object({ paths: {} }) do |definition, result|
+      definition.routes.each do |route|
+        result[:paths][openapi_path(route)] = export_route(route, definition)
+      end
+    end.merge(components:)
   end
 
-  def export_definition(definition)
-    
+  def export_route(route, definition)
+    {
+      # TODO: unify with verb handling in Definition
+      route.verb.scan(/\w+/).sort.last.downcase => {
+        description: definition.api,
+        responses: export_responses(definition.returns),
+      }.compact,
+    }
+  end
+
+  def openapi_path(route)
+    route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
+  end
+
+  def export_responses(returns)
+    returns.to_h do |code, type|
+      [
+        code.to_s,
+        { content: { :'application/json' => { schema: export_type(type) } } }
+      ]
+    end
+  end
+
+  # TODO: array, enum
+  def export_type(type)
+    if type < Taro::Types::ScalarType
+      { type: type.openapi_type }
+    else
+      extract_component_ref(type)
+    end
   end
 
   def export_field(field)
@@ -82,6 +97,7 @@ class Taro::Export::OpenAPIv3
     {
       type: type.openapi_type,
       description: type.description,
+      required: type.fields.values.reject(&:null).map(&:name),
       properties: type.fields.to_h { |name, f| [name, export_field(f)] },
     }.compact
   end

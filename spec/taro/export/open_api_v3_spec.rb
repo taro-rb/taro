@@ -2,28 +2,55 @@ require 'yaml'
 
 describe Taro::Export::OpenAPIv3 do
   it 'handles Definitions' do
+    failure_type = Class.new(T::ObjectType) do
+      def self.name = 'FailureType'
+
+      field :message, type: 'String', null: true
+      field :code, type: 'Integer', null: false
+    end
+
     definition = Taro::Rails::Definition.new(
       api: 'My description',
-      accepts: String,
-      returns: Integer,
+      accepts: S::StringType,
+      returns: {
+        200 => S::IntegerType,
+        404 => failure_type,
+      },
       routes: [mock_user_route],
     )
-    result = described_class.export_definition(definition)
-    expect(result.to_yaml).to eq <<~YAML
+
+    result = subject.export_definitions([definition])
+
+    expect(result.to_yaml.gsub(/(^| +)\K:/, '')).to eq <<~YAML
+      ---
       paths:
-        /users/{id}:
+        "/users/{id}":
           get:
-            summary: Returns a list of users.
-            description: Optional extended description in CommonMark or HTML.
+            description: My description
             responses:
-              "200": # status code
-                description: A JSON array of user names
+              '200':
                 content:
                   application/json:
                     schema:
-                      type: array
-                      items:
-                        type: string
+                      type: integer
+              '404':
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/failure"
+      components:
+        schemas:
+          failure:
+            type: object
+            required:
+            - code
+            properties:
+              message:
+                type:
+                - string
+                - null
+              code:
+                type: integer
     YAML
   end
 
