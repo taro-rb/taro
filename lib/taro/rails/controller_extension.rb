@@ -13,8 +13,8 @@ module Taro::Rails::ControllerExtension
       Taro::Rails.buffered_definition(self).api = description
     end
 
-    def accepts(type)
-      Taro::Rails.buffered_definition(self).accepts = type
+    def accepts(**kwargs)
+      Taro::Rails.buffered_definition(self).accepts = kwargs
     end
 
     def returns(**kwargs)

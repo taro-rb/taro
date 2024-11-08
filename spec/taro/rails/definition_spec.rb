@@ -12,17 +12,17 @@ describe Taro::Rails::Definition do
 
   describe '#accepts=' do
     it 'sets the accepts attribute' do
-      subject.accepts = 'String'
-      expect(subject.accepts).to eq(S::StringType)
+      subject.accepts = { input: 'String' }
+      expect(subject.accepts).to eq([S::StringType])
     end
 
     it 'sets the accepts attribute for derived types' do
-      subject.accepts = { array_of: 'String' }
-      expect(subject.accepts).to eq(T::ListType.for(S::StringType))
+      subject.accepts = { input: { array_of: 'String' } }
+      expect(subject.accepts).to eq([T::ListType.for(S::StringType)])
     end
 
     it 'raises for inexistent types' do
-      expect { subject.accepts = 'XType' }.to raise_error(Taro::ArgumentError)
+      expect { subject.accepts = { input: 'XType' } }.to raise_error(Taro::ArgumentError)
     end
   end
 
@@ -90,7 +90,7 @@ describe Taro::Rails::Definition do
       stub_const('UserInputType', Class.new(T::InputType) do
         field :name, type: 'String', null: false
       end)
-      definition = described_class.new(accepts: 'UserInputType')
+      definition = described_class.new(accepts: { input: 'UserInputType' })
       params = ActionController::Parameters.new(name: 'Alice')
       expect { definition.parse_params(params) }.not_to raise_error
     ensure

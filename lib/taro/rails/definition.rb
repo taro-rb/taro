@@ -13,9 +13,13 @@ class Taro::Rails::Definition
     @api = arg
   end
 
-  def accepts=(type)
-    validated_type = Taro::Types::CoerceToType.from_string_or_hash!(type)
-    @accepts = validated_type
+  def accepts=(hash)
+    validated_types = []
+    validated_types << Taro::Types::CoerceToType.from_string_or_hash!(hash[:input]) if hash[:input]
+    Hash(hash[:path]).each do |name, description|
+      validated_types << Class.new(Taro::Types::ObjectType) { field name, type: 'Taro::Types::Scalar::StringType', description:, null: false }
+    end
+    @accepts = validated_types
   end
 
   def returns=(hash)
@@ -35,8 +39,9 @@ class Taro::Rails::Definition
 
   def parse_params(params)
     hash = params.to_unsafe_h
-    hash = hash[accepts.nesting] if Taro.config.input_nesting
-    accepts.new(hash).validate!
+    accepts.each do |type|
+      type.new(hash).validate!
+    end
     params
   end
 

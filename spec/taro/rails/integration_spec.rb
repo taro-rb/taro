@@ -23,7 +23,7 @@ describe 'Rails integration' do
       def self.name = 'UsersController'
 
       api 'my api'
-      accepts 'UserInputType'
+      accepts input: 'UserInputType', path: { id: 'String' }
       returns ok: 'UserResponseType'
       def show
         render json: UserResponseType.render(name: @api_params[:name].upcase)
@@ -37,7 +37,7 @@ describe 'Rails integration' do
     @routes.draw { get '/users', to: 'users#show' }
     setup_controller_request_and_response
 
-    get(:show, params: { user: { name: 'taro' } })
+    get(:show, params: { name: 'taro', id: '42' })
 
     expect(response.body).to eq('{"usr":{"name":"TARO"}}')
   end
