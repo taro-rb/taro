@@ -53,7 +53,7 @@ module Taro::Types::CoerceToType
       @shortcuts ||= {
         # rubocop:disable Layout/HashAlignment - buggy cop
         'Boolean'  => Taro::Types::Scalar::BooleanType,
-        'Date'     => Taro::Types::Scalar::TimestampType,
+        'Date'     => Taro::Types::Scalar::DateType,
         'DateTime' => Taro::Types::Scalar::TimestampType,
         'Float'    => Taro::Types::Scalar::FloatType,
         'Integer'  => Taro::Types::Scalar::IntegerType,

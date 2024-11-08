@@ -8,7 +8,7 @@ class Taro::Types::Scalar::TimestampType < Taro::Types::ScalarType
 
   def coerce_response
     case object
-    when Date, Time, DateTime then object.to_time.to_i
+    when Date, DateTime, Time then object.to_time.to_i
     when Integer              then object
     end
   end
