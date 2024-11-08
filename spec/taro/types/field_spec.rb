@@ -1,4 +1,4 @@
-describe Taro::Types::Field do
+describe Taro::Field do
   it 'coerces values' do
     field = described_class.new(name: :foo, type: S::StringType, null: false)
     expect(field.extract_value({ foo: 'FOO' })).to eq('FOO')
@@ -32,10 +32,17 @@ describe Taro::Types::Field do
     expect(field.extract_value(:ARG, context:, object_is_hash: false)).to eq(':ARG')
   end
 
+  it 'does not call :method if objects is a hash' do
+    field = described_class.new(name: :foo, type: S::StringType, null: false, method: :foobar)
+    expect(field.extract_value({ foo: 'FOO' })).to eq('FOO')
+  end
+
+  it 'raises for private method usage'
+
   it 'retains nullability constraints with a custom method' do
     field = described_class.new(name: :foo, type: S::StringType, null: false, method: :bar)
     expect do
-      field.extract_value({ foo: 'foo' })
+      field.extract_value(Data.define(:foo, :bar).new(foo: 'foo', bar: nil), object_is_hash: false)
     end.to raise_error(Taro::RuntimeError, /not nullable/)
   end
 

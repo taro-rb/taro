@@ -1,4 +1,6 @@
-Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :description) do
+Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :description) do
+  # extend Taro::Field::Validation
+
   def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, description: nil)
     enum = coerce_to_enum(enum)
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
@@ -13,17 +15,15 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     !default.equal?(:none)
   end
 
+  # TODO move all validation to Taro::Field::Validation module
   # Validate the value against the fields definition. This method will raise
   # a Taro::RuntimeError if the value is not matching.
   def validate!(object)
     value = object[name]
-    return if null_and_ok?(object, value)
-    return if value === type.new(value).coerce_input
-    return if enum.nil? || enum.include?(result)
 
-    raise Taro::RuntimeError, <<~MSG
-      Field #{name} has an invalid value #{result.inspect} (expected one of #{enum.inspect})
-    MSG
+    validate_null_and_ok?(object, value)
+    validate_value_and_type(object, value)
+    validate_enum_inclusion(object, value)
   end
 
   def openapi_type
@@ -46,10 +46,6 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
       retrieve_hash_value(object)
     elsif context&.resolve?(method)
       context.public_send(method)
-    # if context&.resolve?(method)
-    #   context.public_send(method)
-    # elsif object_is_hash
-    #   retrieve_hash_value(object)
     elsif object.respond_to?(method, false)
       object.public_send(method)
     elsif object.respond_to?(method, true)
@@ -71,7 +67,8 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
 
   def coerce_value(object, value, from_input)
     return default if value.nil? && default_specified?
-    return if null_and_ok?(object, value)
+    # Question: Should we even validate this here? After all this is what the separate validation step is for.
+    return if validate_null_and_ok?(object, value)
 
     result = coerce_value_with_type(value, from_input)
     result.nil? && raise_coercion_error(object)
@@ -86,12 +83,32 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     end
   end
 
-  def null_and_ok?(object, value)
+  # TODO move all validation to Taro::Field::Validation module
+  def validate_null_and_ok?(object, value)
     return false unless value.nil?
     return true if null
 
-    raise Taro::RuntimeError, <<~MSG
+    raise Taro::ValidationError, <<~MSG
       Field #{name} is not nullable (tried :#{method} on #{object})
+    MSG
+  end
+
+  # TODO move all validation to Taro::Field::Validation module
+  def validate_enum_inclusion(object, value)
+    return if enum.nil? || enum.include?(value)
+
+    raise Taro::ValidationError, <<~MSG
+      Field #{name} has an invalid value #{value.inspect} (expected one of #{enum.inspect})
+    MSG
+  end
+
+  # TODO move all validation to Taro::Field::Validation module
+  def validate_value_and_type(object, value)
+    expected_value = type.new(value).coerce_input
+    return if value === expected_value
+
+    raise Taro::ValidationError, <<~MSG
+      Field #{name} has an invalid value #{value.inspect} (expected #{expected_value.inspect})
     MSG
   end
 
