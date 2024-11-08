@@ -3,8 +3,8 @@ module Taro::Types::CoerceToType
     def from_string_or_hash!(arg)
       from_hash(arg) || from_string(arg) || raise(Taro::ArgumentError, <<~MSG)
         Unsupported type: #{arg.inspect}. Must be a Hash containining a type name,
-        e.g. { type: "MyType" }, or be the name of a type class
-        (e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}).
+        e.g. { type: "MyType" }, or be the name of a type class,
+        e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}.
       MSG
     end
 
