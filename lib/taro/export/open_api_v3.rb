@@ -2,10 +2,8 @@ class Taro::Export::OpenAPIv3
   attr_reader :components
 
   # TODO:
-  # - accept Taro::Rails.definitions as an argument
-  # - get routes (#openapi_paths), params, status codes, responses etc. from each Definition
-  # - use methods below to render their details
-  # - support list/array type
+  # - render accepts type and path params for each Definition
+  # - support list/array and enum types
   # - use json-schema gem to validate overall result against OpenAPIv3 schema
   def initialize
     @components = {}
