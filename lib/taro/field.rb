@@ -56,8 +56,6 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
   end
 
   def retrieve_hash_value(object)
-    # byebug
-    # object[name.to_s] # always expect the outcome here
     if object.key?(method.to_s)
       object[method.to_s]
     else
@@ -67,20 +65,8 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
 
   def coerce_value(object, value, from_input)
     return default if value.nil? && default_specified?
-    # Question: Should we even validate this here? After all this is what the separate validation step is for.
-    return if validate_null_and_ok?(object, value)
 
-    result = coerce_value_with_type(value, from_input)
-    result.nil? && raise_coercion_error(object)
-    result
-  end
-
-  def coerce_value_with_type(value, from_input)
-    if from_input
-      type.new(value).coerce_input
-    else
-      type.new(value).coerce_response
-    end
+    type.new(value).coerce_response
   end
 
   # TODO move all validation to Taro::Field::Validation module
