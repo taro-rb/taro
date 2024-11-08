@@ -1,8 +1,8 @@
 # Adds the `::field` method to object and input types.
 module Taro::Types::Shared::Fields
-  # Fields are defined using blocks. These blocks are evaluated lazily
-  # to allow for circular or recursive type references, and to
-  # avoid unnecessary eager loading of all types in dev/test envs.
+  # Field types are set using class name Strings. The respective type classes
+  # are evaluated lazily to allow for circular or recursive type references,
+  # and to avoid unnecessary eager loading of all types in dev/test envs.
   def field(name, **kwargs)
     defined_at = caller_locations(1..1)[0].then { "#{_1.path}:#{_1.lineno}" }
     validate_name(name, defined_at:)
