@@ -3,7 +3,7 @@
 # It may be overridden by special types (e.g. PageType).
 module Taro::Types::Shared::Rendering
   def render(object)
-    result = new(object).coerce_response
+    result = new(object).render
 
     if Taro.config.response_nesting && nesting
       { nesting => result }

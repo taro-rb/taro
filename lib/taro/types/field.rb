@@ -13,6 +13,19 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     !default.equal?(:none)
   end
 
+  # Validate the value against the fields definition. This method will raise
+  # a Taro::RuntimeError if the value is not matching.
+  def validate!(object)
+    value = object[name]
+    return if null_and_ok?(object, value)
+    return if value === type.new(value).coerce_input
+    return if enum.nil? || enum.include?(result)
+
+    raise Taro::RuntimeError, <<~MSG
+      Field #{name} has an invalid value #{result.inspect} (expected one of #{enum.inspect})
+    MSG
+  end
+
   def openapi_type
     null ? [type.openapi_type, :null] : type.openapi_type
   end
@@ -29,18 +42,26 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def retrieve_value(object, context, object_is_hash)
-    if context&.resolve?(method)
-      context.public_send(method)
-    elsif object_is_hash
+    if object_is_hash
       retrieve_hash_value(object)
+    elsif context&.resolve?(method)
+      context.public_send(method)
+    # if context&.resolve?(method)
+    #   context.public_send(method)
+    # elsif object_is_hash
+    #   retrieve_hash_value(object)
     elsif object.respond_to?(method, false)
       object.public_send(method)
+    elsif object.respond_to?(method, true)
+      raise_private_method_error(object)
     else
       raise_coercion_error(object)
     end
   end
 
   def retrieve_hash_value(object)
+    # byebug
+    # object[name.to_s] # always expect the outcome here
     if object.key?(method.to_s)
       object[method.to_s]
     else
@@ -78,6 +99,13 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     raise Taro::RuntimeError, <<~MSG
       Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
       It is not a valid #{type} value.
+    MSG
+  end
+
+  def raise_private_method_error(object)
+    raise Taro::RuntimeError, <<~MSG
+      Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
+      Private methods are not available for coercion.
     MSG
   end
 end

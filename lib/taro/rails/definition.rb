@@ -36,7 +36,8 @@ class Taro::Rails::Definition
   def parse_params(params)
     hash = params.to_unsafe_h
     hash = hash[accepts.nesting] if Taro.config.input_nesting
-    accepts.new(hash).coerce_input
+    accepts.new(hash).validate!
+    params
   end
 
   def openapi_paths
