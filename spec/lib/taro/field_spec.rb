@@ -5,6 +5,11 @@ describe Taro::Field do
       expect(field.extract_value({ foo: 'FOO' })).to eq('FOO')
     end
 
+    it 'fetches value from a hash, with string key' do
+      field = described_class.new(name: :foo, type: S::StringType, null: false)
+      expect(field.extract_value({ 'foo' => 'FOO' })).to eq('FOO')
+    end
+
     it 'fetches uses the default if provided' do
       field = described_class.new(name: :foo, type: S::StringType, null: false, default: 'bar')
       expect(field.extract_value({})).to eq('bar')
@@ -65,6 +70,10 @@ describe Taro::Field do
       expect { field.validate!({ foo: 'FOO' }) }.not_to raise_error
     end
 
+    it 'raises if the object is not using symbol keys' do
+      expect { field.validate!({ 'foo' => 'FOO' }) }.to raise_error(Taro::ValidationError, /is not nullable/)
+    end
+
     it 'raises if the object is not a hash' do
       expect { field.validate!(Object.new) }.to raise_error(NoMethodError)
     end
@@ -75,6 +84,14 @@ describe Taro::Field do
 
     it 'raises if the object is not matching the type' do
       expect { field.validate!({ foo: 1 }) }.to raise_error(Taro::ValidationError)
+    end
+
+    describe 'with null allowed' do
+      let(:field) { described_class.new(name: :foo, type: S::StringType, null: true) }
+
+      it 'does not raise if the object is valid' do
+        expect { field.validate!({ foo: nil }) }.not_to raise_error
+      end
     end
 
     describe 'with enum' do

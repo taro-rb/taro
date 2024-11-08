@@ -5,22 +5,14 @@ module Taro::Types::Shared::ObjectCoercion
   end
 
   # Render the object into a hash.
-  def render
-    object_is_hash = object.is_a?(Hash)
-    self.class.fields.to_h do |name, field|
-      [name, field.extract_value(object, context: self, from_input: false, object_is_hash:)]
-    end
+  def coerce_response
+    coerce_with_fields(false)
   end
 
   # Validate the given object against the schema. This method will raise a
   # Taro::RuntimeError if the object is not matching.
   def validate!
     self.class.fields.each { |_name, field| field.validate!(object) }
-  end
-
-  # TODO Maybe deprecated?
-  def coerce_response
-    coerce_with_fields(false)
   end
 
   # TODO Maybe deprecated?

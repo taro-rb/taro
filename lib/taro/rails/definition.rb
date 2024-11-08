@@ -14,8 +14,7 @@ class Taro::Rails::Definition
   end
 
   def accepts=(type)
-    validated_type = Taro::Types::CoerceToType.from_string_or_hash!(type)
-    @accepts = validated_type
+    @accepts = Taro::Types::CoerceToType.from_string_or_hash!(type)
   end
 
   def returns=(hash)
@@ -35,7 +34,6 @@ class Taro::Rails::Definition
 
   def parse_params(params)
     hash = params.to_unsafe_h
-    hash = hash[accepts.nesting] if Taro.config.input_nesting
     accepts.new(hash).validate!
     params
   end

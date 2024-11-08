@@ -37,7 +37,7 @@ describe 'Rails integration' do
     @routes.draw { get '/users', to: 'users#show' }
     setup_controller_request_and_response
 
-    get(:show, params: { user: { name: 'taro' } })
+    get(:show, params: { name: 'taro', id: '42' })
 
     expect(response.body).to eq('{"usr":{"name":"TARO"}}')
   end
