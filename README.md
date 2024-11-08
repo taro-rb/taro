@@ -10,15 +10,18 @@ Inspired by `apipie-rails` and `graphql-ruby`.
   - fail openapi generation if not set or not unique across types?
 - additionalProperties, FreeFormType
 - OpenAPI export (e.g. `#to_openapi` methods for types)
+- openapi metadata via Taro.config, e.g. title
 - maybe later: apidoc rendering based on export (rails engine?)
 - maybe change controller DSL to avoid conflict with apipie?
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - rspec matchers for testing?
 - examples https://swagger.io/specification/#example-object
 - `deprecation`
-- move coercion error out of Field, handle in ResponseValidator
-- gemspec
+- move coercion error out of Field, handle in ResponseValidator?
+- ResponseValidator should detect excessive fields (later: only if additionalProperties is false)
 - more docs
+- consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
+  - another alternative: include Taro::ObjectType might be more descriptive
 
 ## Installation
 
@@ -39,9 +42,9 @@ Example:
 ```ruby
 class BikesController < ApplicationController
   api     'Update a bike' # optional description
-  accepts BikeInputType   # accepted params
-  returns ok: BikeType,   # return types by status code
-          unprocessable_content: MyErrorType
+  accepts 'BikeInputType' # accepted params
+  returns ok: 'BikeType', # return types by status code
+          unprocessable_content: 'MyErrorType'
   def update
     if bike.update(@api_params) # automatically parsed params
       render json: BikeType.render(bike), status: :ok
@@ -57,19 +60,19 @@ class BikeType < ObjectType
   self.description = 'A bike and all relevant information about it'
 
   # Field nullability must be set, description is optional
-  field(:brand)     { [String,  null: true, description: 'The brand name'] }
+  field :brand, type: 'String', null: true, description: 'The brand name'
 
   # Fields can reference other types and arrays of values
-  field(:users)     { [[UserType], null: false] }
+  field :users, array_of: 'UserType', null: false
 
   # Pagination is built-in for big lists
-  field(:parts)     { [PartType.page, null: false] }
+  field :parts, page_of: 'PartType', null: false
 
   # Custom methods can be chosen to resolve fields
-  field(:has_brand) { [Boolean, null: true, method: :brand?] }
+  field :has_brand, type: 'Boolean', null: true, method: :brand?
 
   # Field resolvers can also be implemented or overridden on the type
-  field(:info)      { [String,  null: true] }
+  field :info, type: 'String', null: true
 
   def info
     "A bike named #{object.name} with #{object.wheels} wheels."
@@ -80,8 +83,8 @@ end
 # Object types can also be used to define accepted parameters –
 # or parts of them.
 class BikeInputType < InputType
-  field(:brand)  { [String, null: false, description: 'The brand name'] }
-  field(:wheels) { [String, null: true, default: 2] }
+  field :brand,  type: 'String',  null: true,  description: 'The brand name'
+  field :wheels, type: 'Integer', null: false, default: 2
 end
 ```
 
@@ -93,6 +96,7 @@ end
 - nullable enums
 - format specifications
 - min/max values
+- usage without rails is possible but not convenient yet
 
 ## Development
 

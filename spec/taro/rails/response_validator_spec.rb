@@ -23,8 +23,8 @@ describe Taro::Rails::ResponseValidator do
   context 'if there is a definition' do
     let(:definition) do
       Taro::Rails::Definition.new.tap do |defi|
-        defi.accepts = String
-        defi.returns = { ok: String }
+        defi.accepts = 'String'
+        defi.returns = { ok: 'String' }
       end
     end
     before { Taro::Rails.definitions[controller.class] = { show: definition } }
@@ -53,6 +53,13 @@ describe Taro::Rails::ResponseValidator do
       validator.call
     end
 
+    it 'reports if the response nesting does not match the schema' do
+      allow(definition.accepts).to receive(:nesting).and_return('foo')
+      validator = described_class.new(controller: controller, render_kwargs: { json: 123 })
+      expect(validator).to receive(:report).with("Response does not match response schema.", /foo/)
+      validator.call
+    end
+
     it 'reports if coercion raises an error' do
       expect(S::StringType).to receive(:new).and_raise(Taro::Error, 'whatever')
       validator = described_class.new(controller: controller, render_kwargs: { json: 'ok' })
@@ -71,7 +78,8 @@ describe Taro::Rails::ResponseValidator do
   describe '#report' do
     it 'calls the invalid_response_callback' do
       allow(Taro.config.invalid_response_callback).to receive(:call)
-      described_class.new(controller: controller, render_kwargs: {}).report('msg', 'details')
+      described_class.new(controller: controller, render_kwargs: {})
+                     .send(:report, 'msg', 'details')
       expect(Taro.config.invalid_response_callback)
         .to have_received(:call)
         .with('Response validation error in Object#show: msg', 'details')

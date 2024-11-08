@@ -13,7 +13,7 @@ task :benchmark do
     field(:version) { [Float, null: false] }
   end
 
-  type = item_type.list
+  type = Taro::Types::ListType.for(item_type)
 
   # 87.804k (± 1.7%) i/s -    446.811k in   5.090218s
   Benchmark.ips do |x|

@@ -1,48 +1,73 @@
 describe Taro::Rails::Definition do
+  describe '#api=' do
+    it 'sets the api attribute' do
+      subject.api = 'My description'
+      expect(subject.api).to eq('My description')
+    end
+
+    it 'raises for invalid args' do
+      expect { subject.api = 42 }.to raise_error(Taro::ArgumentError)
+    end
+  end
+
   describe '#accepts=' do
     it 'sets the accepts attribute' do
-      definition = described_class.new
-      definition.accepts = String
-      expect(definition.accepts).to eq(S::StringType)
+      subject.accepts = 'String'
+      expect(subject.accepts).to eq(S::StringType)
+    end
+
+    it 'sets the accepts attribute for derived types' do
+      subject.accepts = { array_of: 'String' }
+      expect(subject.accepts).to eq(T::ListType.for(S::StringType))
+    end
+
+    it 'raises for inexistent types' do
+      expect { subject.accepts = 'XType' }.to raise_error(Taro::ArgumentError)
     end
   end
 
   describe '#returns=' do
     it 'sets the returns attribute' do
-      definition = described_class.new
-      definition.returns = { ok: String }
-      expect(definition.returns).to eq(200 => S::StringType)
+      subject.returns = { ok: 'String' }
+      expect(subject.returns).to eq(200 => S::StringType)
+    end
+
+    it 'sets the returns attribute for derived types' do
+      subject.returns = { ok: { array_of: 'String' } }
+      expect(subject.returns).to eq(200 => T::ListType.for(S::StringType))
     end
 
     it 'merges further returns attributes' do
-      definition = described_class.new
-      definition.returns = { ok: String }
-      definition.returns = { not_found: Float }
-      expect(definition.returns).to eq(
+      subject.returns = { ok: 'String' }
+      subject.returns = { not_found: 'Float' }
+      expect(subject.returns).to eq(
         200 => S::StringType,
         404 => S::FloatType,
       )
     end
 
     it 'sets the returns attribute with status numbers' do
-      definition = described_class.new
-      definition.returns = { 200 => String }
-      expect(definition.returns).to eq(200 => S::StringType)
+      subject.returns = { 200 => 'String' }
+      expect(subject.returns).to eq(200 => S::StringType)
     end
 
     it 'raises for bad status' do
-      definition = described_class.new
       expect do
-        definition.returns = { 999 => String }
+        subject.returns = { 999 => 'String' }
       end.to raise_error(Taro::Error, /status/)
+    end
+  end
+
+  describe '#routes=' do
+    it 'raises for invalid args' do
+      expect { subject.routes = :route_set }.to raise_error(Taro::ArgumentError)
     end
   end
 
   describe '#openapi_paths' do
     it 'returns the paths of the routes in an openapi compatible format' do
-      definition = described_class.new
-      definition.routes = [mock_user_route]
-      expect(definition.openapi_paths).to eq(['/users/{id}'])
+      subject.routes = [mock_user_route]
+      expect(subject.openapi_paths).to eq(['/users/{id}'])
     end
   end
 
@@ -50,10 +75,10 @@ describe Taro::Rails::Definition do
 
   describe '#parse_params' do
     it 'coerces the params, expecting nested data by default' do
-      input_type = Class.new(T::InputType)
-      input_type.define_singleton_method(:name) { 'UserInputType' }
-      input_type.field(:name) { [String, null: false] }
-      definition = described_class.new(accepts: input_type)
+      stub_const('UserInputType', Class.new(T::InputType) do
+        field :name, type: 'String', null: false
+      end)
+      definition = described_class.new(accepts: 'UserInputType')
       params = ActionController::Parameters.new(user: { name: 'Alice' })
       coerced = definition.parse_params(params)
       expect(coerced).to eq(name: 'Alice')
@@ -63,10 +88,10 @@ describe Taro::Rails::Definition do
       orig = Taro.config.input_nesting
       Taro.config.input_nesting = false
 
-      input_type = Class.new(T::InputType)
-      input_type.define_singleton_method(:name) { 'UserInputType' }
-      input_type.field(:name) { [String, null: false] }
-      definition = described_class.new(accepts: input_type)
+      stub_const('UserInputType', Class.new(T::InputType) do
+        field :name, type: 'String', null: false
+      end)
+      definition = described_class.new(accepts: 'UserInputType')
       params = ActionController::Parameters.new(name: 'Alice')
       coerced = definition.parse_params(params)
       expect(coerced).to eq(name: 'Alice')

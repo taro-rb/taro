@@ -13,6 +13,8 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
     validate_with_definition if find_definition
   end
 
+  private
+
   def find_definition
     self.definition =
       Taro::Rails.definitions.dig(controller.class, controller.action_name.to_sym)
@@ -35,6 +37,17 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
 
   def validate_with_type(type)
     value = render_kwargs[:json]
+    if Taro.config.response_nesting && type.nesting
+      unless value.is_a?(Hash) && value.key?(type.nesting)
+        return report(*missing_nesting_info(value, type))
+      end
+
+      value = value[type.nesting]
+    end
+    validate_value_against_type(value, type)
+  end
+
+  def validate_value_against_type(value, type)
     type.new(value).coerce_response ||
       report("Response does not match response schema.", "Expected #{type}, got #{value.class}.")
   rescue Taro::Error => e
@@ -47,6 +60,13 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
     prefix = "Response validation error in #{controller.class}##{controller.action_name}"
     callback = Taro.config.invalid_response_callback
     callback.call(*["#{prefix}: #{msg}", details].first(callback.arity))
+  end
+
+  def missing_nesting_info(value, type)
+    [
+      "Response does not match response schema.",
+      "Expected response with key :#{type.nesting}, got #{value.inspect}"
+    ]
   end
 
   def non_json_response_info

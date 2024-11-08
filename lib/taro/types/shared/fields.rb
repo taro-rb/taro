@@ -1,17 +1,15 @@
 # Adds the `::field` method to object and input types.
 module Taro::Types::Shared::Fields
-  # Fields are defined using blocks. These blocks are evaluated lazily
-  # to allow for circular or recursive type references, and to
-  # avoid unnecessary eager loading of all types in dev/test envs.
-  def field(name, &block)
-    name.is_a?(Symbol) || raise(Taro::ArgumentError, 'field name must be a Symbol')
-    block || raise(Taro::ArgumentError, 'field block is required')
-
-    prev = field_defs[name]
-    prev && raise(Taro::ArgumentError, "field #{name} already defined at #{prev[:defined_at]}")
-
+  # Field types are set using class name Strings. The respective type classes
+  # are evaluated lazily to allow for circular or recursive type references,
+  # and to avoid unnecessary eager loading of all types in dev/test envs.
+  def field(name, **kwargs)
     defined_at = caller_locations(1..1)[0].then { "#{_1.path}:#{_1.lineno}" }
-    field_defs[name] = { defined_at:, block: }
+    validate_name(name, defined_at:)
+    validate_no_redefinition(name, defined_at:)
+    validate_options(name, defined_at:, **kwargs)
+
+    field_defs[name] = { name:, defined_at:, **kwargs }
   end
 
   def fields
@@ -20,27 +18,38 @@ module Taro::Types::Shared::Fields
 
   private
 
+  def validate_name(name, defined_at:)
+    name.is_a?(Symbol) ||
+      raise(Taro::ArgumentError, "field name must be a Symbol, got #{name.class} at #{defined_at}")
+  end
+
+  def validate_options(name, defined_at:, **kwargs)
+    [true, false].include?(kwargs[:null]) ||
+      raise(Taro::ArgumentError, "null has to be specified as true or false for field #{name} at #{defined_at}")
+
+    (type_keys = (kwargs.keys & TYPE_KEYS)).size == 1 ||
+      raise(Taro::ArgumentError, "exactly one of type, array_of, or page_of must be given for field #{name} at #{defined_at}")
+
+    kwargs[type_keys.first].class == String ||
+      raise(Taro::ArgumentError, "#{type_key} must be a String for field #{name} at #{defined_at}")
+  end
+
+  def validate_no_redefinition(name, defined_at:)
+    prev = field_defs[name]
+    prev && raise(Taro::ArgumentError, "field #{name} at #{defined_at} previously defined at #{prev[:defined_at]}")
+  end
+
+  TYPE_KEYS = %i[type array_of page_of].freeze
+
   def field_defs
     @field_defs ||= {}
   end
 
   def evaluate_field_defs
-    field_defs.to_h do |name, definition|
-      defined_at, block = definition.values_at(:defined_at, :block)
-      type, opts = instance_exec(&block)
-      validate_block_result(type, opts, name, defined_at)
-      field = Taro::Types::Field.new(**opts.to_h, type:, name:, defined_at:)
-      [name, field]
+    field_defs.transform_values do |field_def|
+      type = Taro::Types::CoerceToType.from_hash!(field_def)
+      Taro::Types::Field.new(**field_def.except(*TYPE_KEYS), type:)
     end
-  end
-
-  def validate_block_result(type, opts, name, defined_at)
-    return if type && opts.to_h.key?(:null)
-
-    raise Taro::ArgumentError, <<~MSG
-      field block must return a Type and a Hash with :null key, but returned
-      #{type}, #{opts} for field #{name} defined at #{defined_at}.
-    MSG
   end
 
   def inherited(subclass)

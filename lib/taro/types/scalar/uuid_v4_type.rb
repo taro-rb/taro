@@ -12,6 +12,3 @@ class Taro::Types::Scalar::UUIDv4Type < Taro::Types::ScalarType
     object if object.is_a?(String) && object.match?(PATTERN)
   end
 end
-
-# define shortcut for use as field type
-Taro::Types::BaseType::UUID = Taro::Types::Scalar::UUIDv4Type

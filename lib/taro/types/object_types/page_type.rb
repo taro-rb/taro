@@ -1,10 +1,11 @@
 # Abstract base class for Page types (paginated ActiveRecord data).
 # Unlike other types, this one should not be manually inherited from,
-# but is used indirectly via `SomeType.page`.
+# but is used indirectly via `page_of: SomeType`.
 #
 # The gem rails_cursor_pagination must be installed to use this.
 #
 class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
+  extend Taro::Types::Shared::DerivableType
   extend Taro::Types::Shared::ItemType
 
   def self.render(object, after:, limit: 20, order_by: nil, order: nil)

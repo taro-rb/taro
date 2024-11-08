@@ -1,14 +1,36 @@
-Taro::Rails::Definition = Struct.new(:api, :accepts, :returns, :routes) do
+class Taro::Rails::Definition
+  attr_reader :api, :accepts, :returns, :routes
+
+  def initialize(api: nil, accepts: nil, returns: nil, routes: [])
+    self.api     = api if api
+    self.accepts = accepts if accepts
+    self.returns = returns if returns
+    self.routes  = routes
+  end
+
+  def api=(arg)
+    arg.is_a?(String) || raise(Taro::ArgumentError, 'api description must be a String')
+    @api = arg
+  end
+
   def accepts=(type)
-    validated_type = Taro::Types::CoerceToType.call(type)
-    self[:accepts] = validated_type
+    validated_type = Taro::Types::CoerceToType.from_string_or_hash!(type)
+    @accepts = validated_type
   end
 
   def returns=(hash)
     validated_hash = hash.to_h do |status, type|
-      [self.class.coerce_status_to_int(status), Taro::Types::CoerceToType.call(type)]
+      [
+        self.class.coerce_status_to_int(status),
+        Taro::Types::CoerceToType.from_string_or_hash!(type),
+      ]
     end
-    self[:returns] = returns.to_h.merge(validated_hash)
+    @returns = returns.to_h.merge(validated_hash)
+  end
+
+  def routes=(arg)
+    arg.is_a?(Array) || raise(Taro::ArgumentError, 'routes must be an Array')
+    @routes = arg
   end
 
   def parse_params(params)

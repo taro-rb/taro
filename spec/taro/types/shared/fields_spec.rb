@@ -1,7 +1,7 @@
 describe Taro::Types::Shared::Fields do
   let(:example) do
     klass = Class.new.extend(described_class)
-    klass.field(:foo) { [String, null: false] }
+    klass.field :foo, type: 'String', null: false
     klass
   end
 
@@ -14,22 +14,28 @@ describe Taro::Types::Shared::Fields do
     expect(field.null).to eq false
   end
 
-  it 'raises when trying to create fields without a block' do
-    expect { example.field(:bar) }.to raise_error(Taro::Error, /block/)
-  end
-
   it 'raises when evaluating fields without type' do
-    example.field(:bar) { { null: true } }
-    expect { example.fields }.to raise_error(Taro::Error, /type/)
+    expect { example.field :bar, null: true }.to raise_error(Taro::ArgumentError, /type/)
   end
 
   it 'raises when evaluating fields without null' do
-    example.field(:bar) { { type: String } }
-    expect { example.fields }.to raise_error(Taro::Error, /null/)
+    expect { example.field :bar, type: 'String' }.to raise_error(Taro::Error, /null/)
   end
 
   it 'raises when redefining fields' do
-    example.field(:bar) { {} }
-    expect { example.field(:bar) { {} } }.to raise_error(Taro::Error, /defined/)
+    example.field :bar, type: 'String', null: true
+    expect { example.field :bar, type: 'Boolean', null: false }.to raise_error(Taro::Error, /defined/)
+  end
+
+  it 'takes array_of instead of type' do
+    example.field :bar, array_of: 'String', null: true
+    field = example.fields[:bar]
+    expect(field.type).to be < Taro::Types::ListType
+  end
+
+  it 'takes page_of instead of type' do
+    example.field :bar, page_of: 'Integer', null: true
+    field = example.fields[:bar]
+    expect(field.type).to be < Taro::Types::ObjectTypes::PageType
   end
 end
