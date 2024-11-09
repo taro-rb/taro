@@ -1,21 +1,5 @@
 describe Taro::Types::Coercion do
-  describe '::from_string_or_hash!' do
-    it "works with Strings" do
-      expect(described_class.from_string_or_hash!('String')).to eq S::StringType
-    end
-
-    it "works with Hashes" do
-      expect(described_class.from_string_or_hash!(type: 'String')).to eq S::StringType
-    end
-
-    it 'raises for unsupported inputs' do
-      expect do
-        described_class.from_string_or_hash!(42)
-      end.to raise_error(Taro::ArgumentError, /Unsupported type/)
-    end
-  end
-
-  describe '::from_string!' do
+  describe '::call' do
     %w[
       Boolean
       Date
@@ -26,35 +10,54 @@ describe Taro::Types::Coercion do
       Time
       UUID
     ].each do |type|
-      it "coerces the String #{type} to a Taro type" do
-        expect(described_class.from_string!(type)).to be < Taro::Types::BaseType
+      it "coerces { type: '#{type}' } to a Taro type" do
+        expect(described_class.call(type:)).to be < T::BaseType
       end
+    end
+
+    it 'works with array_of' do
+      expect(described_class.call(array_of: 'String'))
+        .to eq T::ListType.for(S::StringType)
+    end
+
+    it 'works with page_of' do
+      expect(described_class.call(page_of: 'String'))
+        .to eq T::ObjectTypes::PageType.for(S::StringType)
     end
 
     it 'raises for unknown class names' do
       expect do
-        described_class.from_string!('baddy_boy')
+        described_class.call(type: 'baddy_boy')
       end.to raise_error(Taro::ArgumentError, /Unsupported type/)
     end
 
     it 'raises for unsupported class names' do
       expect do
-        described_class.from_string!('Object')
+        described_class.call(type: 'Object')
       end.to raise_error(Taro::ArgumentError, /Unsupported type/)
     end
 
     it 'raises for unsupported input' do
       expect do
-        described_class.from_string!(42)
+        described_class.call(type: 42)
       end.to raise_error(Taro::ArgumentError, /Unsupported type/)
     end
-  end
 
-  describe '::from_hash!' do
-    it 'raises for unsupported Hashes' do
+    it 'raises for Hashes without type info' do
       expect do
-        described_class.from_hash!({})
-      end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+        described_class.call({})
+      end.to raise_error(Taro::ArgumentError, /must be given/)
+    end
+
+    it 'raises for Hashes with too much type info' do
+      expect do
+        described_class.call({ array_of: 'String', page_of: 'String' })
+      end.to raise_error(Taro::ArgumentError, /exactly one/i)
+    end
+
+    it 'raises for unexpected from_hash arguments' do
+      expect { described_class.send(:from_hash, {}) }
+        .to raise_error(NotImplementedError)
     end
   end
 end

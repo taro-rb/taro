@@ -1,4 +1,4 @@
-# Buffers api declarations in rails controllers (e.g. `accepts MyType`)
+# Buffers api declarations in rails controllers (e.g. `param :foo, ...`)
 # until the next action method is defined (e.g. `def create`).
 module Taro::Rails::DeclarationBuffer
   def buffered_declaration(controller_class)
@@ -13,11 +13,23 @@ module Taro::Rails::DeclarationBuffer
     declaration = pop_buffered_declaration(controller_class)
     return unless declaration
 
+    add_openapi_name_for_input(declaration, controller_class, action_name)
+    add_routes(declaration, controller_class, action_name)
+
+    Taro::Rails.apply(declaration:, controller_class:, action_name:)
+  end
+
+  # TODO: this changes when the controller class is renamed, we might need a way to set it
+  # independently, perhaps as kwarg to `::api`? (Would need a uniqueness check then.)
+  def add_openapi_name_for_input(declaration, controller_class, action_name)
+    declaration.params.openapi_name =
+      "#{controller_class.name.chomp('Controller').sub('::', '_')}_#{action_name}_Input"
+  end
+
+  def add_routes(declaration, controller_class, action_name)
     routes = Taro::Rails::RouteFinder.call(controller_class:, action_name:)
     routes.any? || raise_missing_route(controller_class, action_name)
-
     declaration.routes = routes
-    Taro::Rails.apply(declaration:, controller_class:, action_name:)
   end
 
   def pop_buffered_declaration(controller_class)

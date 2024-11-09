@@ -12,7 +12,7 @@ module Taro::Types::Shared::ObjectCoercion
   # Validate the given object against the schema. This method will raise a
   # Taro::RuntimeError if the object is not matching.
   def validate!
-    self.class.fields.each { |_name, field| field.validate!(object) }
+    self.class.fields.each_value { |field| field.validate!(object) }
   end
 
   # TODO Maybe deprecated?
