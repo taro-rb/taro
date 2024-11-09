@@ -1,4 +1,4 @@
-describe Taro::Field do
+describe Taro::Types::Field do
   describe '#extract_value' do
     it 'fetches value from a hash' do
       field = described_class.new(name: :foo, type: S::StringType, null: false)
