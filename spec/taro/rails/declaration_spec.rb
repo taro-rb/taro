@@ -1,4 +1,4 @@
-describe Taro::Rails::Definition do
+describe Taro::Rails::Declaration do
   describe '#api=' do
     it 'sets the api attribute' do
       subject.api = 'My description'
@@ -74,7 +74,7 @@ describe Taro::Rails::Definition do
   require 'action_controller'
 
   describe '#parse_params' do
-    let(:definition) do
+    let(:declaration) do
       stub_const('UserInputType', Class.new(T::InputType) do
         field :name, type: 'String', null: false
       end)
@@ -83,23 +83,18 @@ describe Taro::Rails::Definition do
 
     it 'coerces the params' do
       params = ActionController::Parameters.new(name: 'Alice')
-      expect { definition.parse_params(params) }.not_to raise_error
+      expect { declaration.parse_params(params) }.not_to raise_error
     end
 
     it 'does not raise for invalid params if config.validate_params is false', config: { validate_params: false } do
-      orig = Taro.config.validate_params
-      Taro.config.validate_params = false
-
       params = ActionController::Parameters.new(name: nil)
-      expect { definition.parse_params(params) }.not_to raise_error
-    ensure
-      Taro.config.validate_params = orig
+      expect { declaration.parse_params(params) }.not_to raise_error
     end
 
     it 'raises for invalid params if config.validate_params is true', config: { validate_params: true } do
       params = ActionController::Parameters.new(name: nil)
       expect do
-        definition.parse_params(params)
+        declaration.parse_params(params)
       end.to raise_error(Taro::ValidationError, /not nullable/)
     end
   end

@@ -16,7 +16,7 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
   end
 
   # TODO move all validation to Taro::Field::Validation module
-  # Validate the value against the fields definition. This method will raise
+  # Validate the value against the field properties. This method will raise
   # a Taro::RuntimeError if the value is not matching.
   def validate!(object)
     value = object[name]

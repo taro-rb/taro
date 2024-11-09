@@ -1,13 +1,13 @@
 require 'yaml'
 
 describe Taro::Export::OpenAPIv3 do
-  it 'handles Definitions' do
+  it 'handles Declarations' do
     stub_const('FailureType', Class.new(T::ObjectType) do
       field :message, type: 'String', null: true
       field :code, type: 'Integer', null: false
     end)
 
-    definition = Taro::Rails::Definition.new(
+    declaration = Taro::Rails::Declaration.new(
       api: 'My description',
       accepts: 'String',
       returns: {
@@ -17,7 +17,7 @@ describe Taro::Export::OpenAPIv3 do
       routes: [Taro::Rails::NormalizedRoute.new(mock_user_route)],
     )
 
-    result = subject.export_definitions([definition])
+    result = subject.export_declarations([declaration])
 
     expect(result.to_yaml.gsub(/(^| +)\K:/, '')).to eq <<~YAML
       ---

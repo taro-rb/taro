@@ -1,4 +1,4 @@
-class Taro::Rails::Definition
+class Taro::Rails::Declaration
   attr_reader :api, :accepts, :returns, :routes
 
   def initialize(api: nil, accepts: nil, returns: nil, routes: [])

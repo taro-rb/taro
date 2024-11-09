@@ -6,7 +6,7 @@ module Taro::Types::Shared::Fields
   def field(name, **kwargs)
     defined_at = caller_locations(1..1)[0].then { "#{_1.path}:#{_1.lineno}" }
     validate_name(name, defined_at:)
-    validate_no_redefinition(name, defined_at:)
+    validate_no_override(name, defined_at:)
     validate_options(name, defined_at:, **kwargs)
 
     field_defs[name] = { name:, defined_at:, **kwargs }
@@ -34,7 +34,7 @@ module Taro::Types::Shared::Fields
       raise(Taro::ArgumentError, "#{type_key} must be a String for field #{name} at #{defined_at}")
   end
 
-  def validate_no_redefinition(name, defined_at:)
+  def validate_no_override(name, defined_at:)
     prev = field_defs[name]
     prev && raise(Taro::ArgumentError, "field #{name} at #{defined_at} previously defined at #{prev[:defined_at]}")
   end

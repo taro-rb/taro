@@ -8,26 +8,26 @@ describe Taro::Rails::ResponseValidator do
   it 'does nothing if invalid_response_callback is disabled' do
     Taro.config.invalid_response_callback = nil
     validator = described_class.new(controller:, render_kwargs: {})
-    expect(validator).not_to receive(:find_definition)
+    expect(validator).not_to receive(:find_declaration)
     validator.call
   ensure
     Taro.config.invalid_response_callback = Taro.config.default_invalid_response_callback
   end
 
-  it 'does nothing if there is no api definition for the action' do
+  it 'does nothing if there is no api declaration for the action' do
     validator = described_class.new(controller: controller, render_kwargs: {})
-    expect(validator).not_to receive(:validate_with_definition)
+    expect(validator).not_to receive(:validate_with_declaration)
     validator.call
   end
 
-  context 'if there is a definition' do
-    let(:definition) do
-      Taro::Rails::Definition.new.tap do |defi|
+  context 'if there is a declaration' do
+    let(:declaration) do
+      Taro::Rails::Declaration.new.tap do |defi|
         defi.accepts = 'String'
         defi.returns = { ok: 'String' }
       end
     end
-    before { Taro::Rails.definitions[controller.class] = { show: definition } }
+    before { Taro::Rails.declarations[controller.class] = { show: declaration } }
 
     it 'does nothing if the response matches the schema' do
       validator = described_class.new(controller: controller, render_kwargs: { json: 'ok' })
@@ -35,7 +35,7 @@ describe Taro::Rails::ResponseValidator do
       validator.call
     end
 
-    it 'reports if there is no response definition for this status code' do
+    it 'reports if there is no response declaration for this status code' do
       validator = described_class.new(controller: controller, render_kwargs: { json: 'ok', status: 201 })
       expect(validator).to receive(:report).with("Response status not defined in response schema.", anything)
       validator.call
