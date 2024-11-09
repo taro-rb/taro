@@ -47,7 +47,7 @@ module Taro::Types::Shared::Fields
 
   def evaluate_field_defs
     field_defs.transform_values do |field_def|
-      type = Taro::Types::CoerceToType.from_hash!(field_def)
+      type = Taro::Types::Coercion.from_hash!(field_def)
       Taro::Field.new(**field_def.except(*TYPE_KEYS), type:)
     end
   end

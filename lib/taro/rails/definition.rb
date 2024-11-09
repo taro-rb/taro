@@ -14,14 +14,14 @@ class Taro::Rails::Definition
   end
 
   def accepts=(type)
-    @accepts = Taro::Types::CoerceToType.from_string_or_hash!(type)
+    @accepts = Taro::Types::Coercion.from_string_or_hash!(type)
   end
 
   def returns=(hash)
     validated_hash = hash.to_h do |status, type|
       [
         self.class.coerce_status_to_int(status),
-        Taro::Types::CoerceToType.from_string_or_hash!(type),
+        Taro::Types::Coercion.from_string_or_hash!(type),
       ]
     end
     @returns = returns.to_h.merge(validated_hash)

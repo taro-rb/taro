@@ -24,7 +24,6 @@ Inspired by `apipie-rails` and `graphql-ruby`.
   - another alternative: include Taro::ObjectType might be more descriptive
 - do we want a config.invalid_params_callback instead of config.validate_params?
 - rename definition -> declaration
-- rename CoerceToType -> Coercion
 
 ## Installation
 
