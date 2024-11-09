@@ -3,12 +3,14 @@ module Taro::Config
     :input_nesting,
     :parse_params,
     :response_nesting,
+    :validate_params,
   )
 
   # defaults
   self.input_nesting = true
   self.parse_params = true
   self.response_nesting = true
+  self.validate_params = true
 
   def self.invalid_response_callback
     if defined?(@invalid_response_callback)

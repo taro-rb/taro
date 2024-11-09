@@ -33,8 +33,8 @@ class Taro::Rails::Definition
   end
 
   def parse_params(params)
-    hash = params.to_unsafe_h
-    accepts.new(hash).validate!
+    hash = accepts.new(params.to_unsafe_h).coerce_input
+    accepts.new(hash).validate! if Taro.config.validate_params
     params
   end
 

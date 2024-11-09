@@ -8,7 +8,7 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
 
   def extract_value(object, context: nil, from_input: true, object_is_hash: true)
     value = retrieve_value(object, context, object_is_hash)
-    coerce_value(object, value, from_input)
+    coerce_value(value, from_input)
   end
 
   def default_specified?
@@ -22,8 +22,8 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
     value = object[name]
 
     validate_null_and_ok?(object, value)
-    validate_value_and_type(object, value)
-    validate_enum_inclusion(object, value)
+    validate_value_and_type(value)
+    validate_enum_inclusion(value)
   end
 
   def openapi_type
@@ -46,10 +46,8 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
       retrieve_hash_value(object)
     elsif context&.resolve?(method)
       context.public_send(method)
-    elsif object.respond_to?(method, false)
-      object.public_send(method)
     elsif object.respond_to?(method, true)
-      raise_private_method_error(object)
+      object.public_send(method)
     else
       raise_coercion_error(object)
     end
@@ -63,10 +61,11 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
     end
   end
 
-  def coerce_value(object, value, from_input)
+  def coerce_value(value, from_input)
     return default if value.nil? && default_specified?
 
-    type.new(value).coerce_response
+    type_obj = type.new(value)
+    from_input ? type_obj.coerce_input : type_obj.coerce_response
   end
 
   # TODO move all validation to Taro::Field::Validation module
@@ -80,7 +79,7 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
   end
 
   # TODO move all validation to Taro::Field::Validation module
-  def validate_enum_inclusion(object, value)
+  def validate_enum_inclusion(value)
     return if enum.nil? || enum.include?(value)
 
     raise Taro::ValidationError, <<~MSG
@@ -89,7 +88,7 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
   end
 
   # TODO move all validation to Taro::Field::Validation module
-  def validate_value_and_type(object, value)
+  def validate_value_and_type(value)
     expected_value = type.new(value).coerce_input
     return if value === expected_value
 
@@ -102,13 +101,6 @@ Taro::Field = Data.define(:name, :type, :null, :method, :default, :enum, :define
     raise Taro::RuntimeError, <<~MSG
       Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
       It is not a valid #{type} value.
-    MSG
-  end
-
-  def raise_private_method_error(object)
-    raise Taro::RuntimeError, <<~MSG
-      Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
-      Private methods are not available for coercion.
     MSG
   end
 end

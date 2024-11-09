@@ -1,13 +1,8 @@
 require_relative "support/coverage"
-require_relative "support/stub_rails"
 require "rails"
 require "taro"
 require "debug"
-
-# aliases for convenience
-F = Taro::Field
-S = Taro::Types::Scalar
-T = Taro::Types
+Dir["#{__dir__}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -52,7 +52,7 @@ describe Taro::Field do
       foo = 'foo'
       foo.singleton_class.send(:private, :upcase)
       field = described_class.new(name: :upcase, type: S::StringType, null: true)
-      expect { field.extract_value(foo, object_is_hash: false) }.to raise_error(Taro::RuntimeError, /Private method/)
+      expect { field.extract_value(foo, object_is_hash: false) }.to raise_error(/Private method/i)
     end
 
     it 'raises for values of the wrong type' do

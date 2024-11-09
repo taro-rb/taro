@@ -53,13 +53,6 @@ describe Taro::Rails::ResponseValidator do
       validator.call
     end
 
-    xit 'reports if the response nesting does not match the schema' do
-      allow(definition.accepts).to receive(:nesting).and_return('foo')
-      validator = described_class.new(controller: controller, render_kwargs: { json: 123 })
-      expect(validator).to receive(:report).with("Response does not match response schema.", /foo/)
-      validator.call
-    end
-
     it 'reports if coercion raises an error' do
       expect(S::StringType).to receive(:new).and_raise(Taro::Error, 'whatever')
       validator = described_class.new(controller: controller, render_kwargs: { json: 'ok' })
