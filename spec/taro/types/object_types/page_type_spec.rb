@@ -26,15 +26,4 @@ describe Taro::Types::ObjectTypes::PageType do
 
     example.render(ActiveRecord::Relation.new, after: 'x')
   end
-
-  it 'has a default_nesting for contents without own nesting' do
-    expect(example.nesting).to eq :page
-  end
-
-  it 'has a default_nesting for complex type content' do
-    obj_type = Class.new(T::ObjectType)
-    obj_type.define_singleton_method(:name) { 'ObjType' }
-    page_type = described_class.for(obj_type)
-    expect(page_type.nesting).to eq :obj_page
-  end
 end

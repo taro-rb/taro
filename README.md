@@ -6,8 +6,6 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 
 ## ⚠️ This is a work in progress - TODO:
 
-- maybe make nesting an optional thing to set manually on each type?
-  - fail openapi generation if not set or not unique across types?
 - additionalProperties, FreeFormType
 - OpenAPI export (e.g. `#to_openapi` methods for types)
 - openapi metadata via Taro.config, e.g. title

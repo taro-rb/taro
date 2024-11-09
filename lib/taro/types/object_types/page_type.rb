@@ -28,12 +28,13 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
     return unless items
 
     {
-      self.class.nesting => items,
+      self.class.items_key => items,
       page_info: Taro::Types::ObjectTypes::PageInfoType.new(object[:page_info]).coerce_response,
     }
   end
 
-  def self.default_nesting
-    item_type.nesting&.then { |n| "#{n}_page" } || 'page'
+  # support overrides, e.g. based on item_type
+  def self.items_key
+    :page
   end
 end

@@ -15,7 +15,6 @@ describe 'Rails integration' do
     end)
 
     stub_const('UserResponseType', Class.new(T::ObjectType) do
-      self.nesting = 'usr'
       field :name, type: 'String', null: false
     end)
 
@@ -39,6 +38,6 @@ describe 'Rails integration' do
 
     get(:show, params: { name: 'taro', id: '42' })
 
-    expect(response.body).to eq('{"usr":{"name":"TARO"}}')
+    expect(response.body).to eq('{"name":"TARO"}')
   end
 end

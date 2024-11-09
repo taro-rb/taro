@@ -3,6 +3,7 @@ class Taro::Export::OpenAPIv3
 
   # TODO:
   # - render accepts type and path params for each Declaration
+  # - validate that openapi_name values of all distinct types are unique
   # - support list/array and enum types
   # - use json-schema gem to validate overall result against OpenAPIv3 schema
   def initialize
@@ -72,8 +73,8 @@ class Taro::Export::OpenAPIv3
 
   def extract_component_ref(type)
     components[:schemas] ||= {}
-    components[:schemas][type.nesting.to_sym] ||= build_type_ref(type)
-    { :'$ref' => "#/components/schemas/#{type.nesting}" }
+    components[:schemas][type.openapi_name.to_sym] ||= build_type_ref(type)
+    { :'$ref' => "#/components/schemas/#{type.openapi_name}" }
   end
 
   def build_type_ref(type)

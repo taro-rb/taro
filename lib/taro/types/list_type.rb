@@ -24,8 +24,4 @@ class Taro::Types::ListType < Taro::Types::BaseType
       res.nil? ? break : res
     end
   end
-
-  def self.default_nesting
-    item_type.nesting&.then { |n| "#{n}_list" }
-  end
 end

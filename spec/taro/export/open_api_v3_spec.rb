@@ -35,10 +35,10 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      $ref: "#/components/schemas/failure"
+                      $ref: "#/components/schemas/Failure"
       components:
         schemas:
-          failure:
+          Failure:
             type: object
             required:
             - code
@@ -84,11 +84,11 @@ describe Taro::Export::OpenAPIv3 do
     field = F.new(type: ThingType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
-      .to eq(:$ref => "#/components/schemas/thing")
+      .to eq(:$ref => "#/components/schemas/Thing")
 
     expect(subject.components).to eq(
       schemas: {
-        thing: {
+        Thing: {
           type: :object,
           required: [:inner],
           properties: {
@@ -107,12 +107,12 @@ describe Taro::Export::OpenAPIv3 do
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
-      allOf: [:$ref => "#/components/schemas/thing"]
+      allOf: [:$ref => "#/components/schemas/Thing"]
     )
 
     expect(subject.components).to eq(
       schemas: {
-        thing: {
+        Thing: {
           type: :object,
           required: [:inner],
           properties: {
@@ -131,11 +131,11 @@ describe Taro::Export::OpenAPIv3 do
     field = F.new(type: MyEnumType, name: 'foo', null: false)
 
     expect(subject.export_field(field))
-      .to eq(:$ref => "#/components/schemas/my_enum")
+      .to eq(:$ref => "#/components/schemas/MyEnum")
 
     expect(subject.components).to eq(
       schemas: {
-        my_enum: {
+        MyEnum: {
           enum: ["foo", "bar"],
           type: :string
         }
@@ -147,11 +147,11 @@ describe Taro::Export::OpenAPIv3 do
     stub_const('NoContentType', Class.new(T::ObjectTypes::NoContentType))
 
     expect(subject.extract_component_ref(NoContentType))
-      .to eq(:$ref => "#/components/schemas/no_content")
+      .to eq(:$ref => "#/components/schemas/NoContent")
 
     expect(subject.components).to eq(
       schemas: {
-        no_content: {
+        NoContent: {
           type: :object,
           properties: {}
         }
