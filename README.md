@@ -23,6 +23,8 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
   - another alternative: include Taro::ObjectType might be more descriptive
 - do we want a config.invalid_params_callback instead of config.validate_params?
+- rename definition -> declaration
+- rename CoerceToType -> Coercion
 
 ## Installation
 
