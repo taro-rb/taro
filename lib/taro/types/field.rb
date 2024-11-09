@@ -1,4 +1,8 @@
+require_relative 'field_validation'
+
 Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :description) do
+  include Taro::Types::FieldValidation
+
   def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, description: nil)
     enum = coerce_to_enum(enum)
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
@@ -6,7 +10,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
 
   def extract_value(object, context: nil, from_input: true, object_is_hash: true)
     value = retrieve_value(object, context, object_is_hash)
-    coerce_value(object, value, from_input)
+    coerce_value(value, from_input)
   end
 
   def default_specified?
@@ -29,11 +33,11 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def retrieve_value(object, context, object_is_hash)
-    if context&.resolve?(method)
-      context.public_send(method)
-    elsif object_is_hash
+    if object_is_hash
       retrieve_hash_value(object)
-    elsif object.respond_to?(method, false)
+    elsif context&.resolve?(method)
+      context.public_send(method)
+    elsif object.respond_to?(method, true)
       object.public_send(method)
     else
       raise_coercion_error(object)
@@ -48,30 +52,11 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     end
   end
 
-  def coerce_value(object, value, from_input)
+  def coerce_value(value, from_input)
     return default if value.nil? && default_specified?
-    return if null_and_ok?(object, value)
 
-    result = coerce_value_with_type(value, from_input)
-    result.nil? && raise_coercion_error(object)
-    result
-  end
-
-  def coerce_value_with_type(value, from_input)
-    if from_input
-      type.new(value).coerce_input
-    else
-      type.new(value).coerce_response
-    end
-  end
-
-  def null_and_ok?(object, value)
-    return false unless value.nil?
-    return true if null
-
-    raise Taro::RuntimeError, <<~MSG
-      Field #{name} is not nullable (tried :#{method} on #{object})
-    MSG
+    type_obj = type.new(value)
+    from_input ? type_obj.coerce_input : type_obj.coerce_response
   end
 
   def raise_coercion_error(object)

@@ -1,4 +1,4 @@
-module Taro::Types::CoerceToType
+module Taro::Types::Coercion
   class << self
     def from_string_or_hash!(arg)
       from_hash(arg) || from_string(arg) || raise(Taro::ArgumentError, <<~MSG)

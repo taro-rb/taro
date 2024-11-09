@@ -8,8 +8,4 @@ class Taro::Types::InputType < Taro::Types::BaseType
   def coerce_response
     raise Taro::RuntimeError, 'InputTypes cannot be used as response types'
   end
-
-  def self.default_nesting
-    super.to_s.chomp('_input')
-  end
 end

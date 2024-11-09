@@ -2,26 +2,26 @@ class Taro::Export::OpenAPIv3
   attr_reader :components
 
   # TODO:
-  # - render accepts type and path params for each Definition
+  # - render accepts type and path params for each Declaration
   # - support list/array and enum types
   # - use json-schema gem to validate overall result against OpenAPIv3 schema
   def initialize
     @components = {}
   end
 
-  def export_definitions(definitions)
-    definitions.each_with_object({ paths: {} }) do |definition, result|
-      definition.routes.each do |route|
-        result[:paths][route.openapi_path] = export_route(route, definition)
+  def export_declarations(declarations)
+    declarations.each_with_object({ paths: {} }) do |declaration, result|
+      declaration.routes.each do |route|
+        result[:paths][route.openapi_path] = export_route(route, declaration)
       end
     end.merge(components:)
   end
 
-  def export_route(route, definition)
+  def export_route(route, declaration)
     {
       route.verb => {
-        description: definition.api,
-        responses: export_responses(definition.returns),
+        description: declaration.api,
+        responses: export_responses(declaration.returns),
       }.compact,
     }
   end

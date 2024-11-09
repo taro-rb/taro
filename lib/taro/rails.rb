@@ -5,11 +5,11 @@ return unless defined?(::Rails)
 module Taro::Rails
   Dir[File.join(__dir__, "rails", "*.rb")].each { |f| require f }
 
-  extend ActiveDefinitions
-  extend DefinitionBuffer
+  extend ActiveDeclarations
+  extend DeclarationBuffer
 
   def self.reset
-    definitions.clear
+    declarations.clear
     RouteFinder.clear_cache
   end
 end

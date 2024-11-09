@@ -14,6 +14,11 @@ describe Taro::Types::ObjectType do
     expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_response).to eq(foo: 'FOO', bar: nil)
   end
 
+  it 'can coerce input data differently than response data (e.g. more strictly)' do
+    expect(ExampleObjectType.new({ foo: :FOO }).coerce_input).to eq(foo: nil, bar: nil)
+    expect(ExampleObjectType.new({ foo: :FOO }).coerce_response).to eq(foo: 'FOO', bar: nil)
+  end
+
   it 'coerces objects as response data' do
     obj = Struct.new(:foo, :bar).new('FOO', nil)
     expect(ExampleObjectType.new(obj).coerce_response).to eq(foo: 'FOO', bar: nil)

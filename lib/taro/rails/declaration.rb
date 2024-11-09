@@ -1,4 +1,4 @@
-class Taro::Rails::Definition
+class Taro::Rails::Declaration
   attr_reader :api, :accepts, :returns, :routes
 
   def initialize(api: nil, accepts: nil, returns: nil, routes: [])
@@ -14,15 +14,14 @@ class Taro::Rails::Definition
   end
 
   def accepts=(type)
-    validated_type = Taro::Types::CoerceToType.from_string_or_hash!(type)
-    @accepts = validated_type
+    @accepts = Taro::Types::Coercion.from_string_or_hash!(type)
   end
 
   def returns=(hash)
     validated_hash = hash.to_h do |status, type|
       [
         self.class.coerce_status_to_int(status),
-        Taro::Types::CoerceToType.from_string_or_hash!(type),
+        Taro::Types::Coercion.from_string_or_hash!(type),
       ]
     end
     @returns = returns.to_h.merge(validated_hash)
@@ -34,9 +33,9 @@ class Taro::Rails::Definition
   end
 
   def parse_params(params)
-    hash = params.to_unsafe_h
-    hash = hash[accepts.nesting] if Taro.config.input_nesting
-    accepts.new(hash).coerce_input
+    hash = accepts.new(params.to_unsafe_h).coerce_input
+    accepts.new(hash).validate! if Taro.config.validate_params
+    params
   end
 
   def openapi_paths

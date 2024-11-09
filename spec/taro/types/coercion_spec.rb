@@ -1,4 +1,4 @@
-describe Taro::Types::CoerceToType do
+describe Taro::Types::Coercion do
   describe '::from_string_or_hash!' do
     it "works with Strings" do
       expect(described_class.from_string_or_hash!('String')).to eq S::StringType

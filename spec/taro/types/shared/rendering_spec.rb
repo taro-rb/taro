@@ -13,14 +13,9 @@ describe Taro::Types::Shared::Rendering do
     expect(test_type.render(name: 'Jane')).to eq(custom: { name: 'Jane' })
   end
 
-  it 'works if nesting is disabled' do
-    orig = Taro.config.response_nesting
-    Taro.config.response_nesting = false
-
+  it 'works if nesting is disabled', config: { response_nesting: false } do
     test_type = Class.new(T::ObjectType)
     test_type.field :name, type: 'String', null: true
     expect(test_type.render(name: 'Jane')).to eq(name: 'Jane')
-  ensure
-    Taro.config.response_nesting = orig
   end
 end

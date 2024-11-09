@@ -1,5 +1,5 @@
 Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
-  attr_accessor :definition
+  attr_accessor :declaration
 
   def initialize(controller:, render_kwargs:)
     super(controller:, render_kwargs:)
@@ -10,40 +10,33 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
     return unless Taro.config.invalid_response_callback
 
     # If this endpoint has no schema at all, ignore it.
-    validate_with_definition if find_definition
+    validate_with_declaration if find_declaration
   end
 
   private
 
-  def find_definition
-    self.definition =
-      Taro::Rails.definitions.dig(controller.class, controller.action_name.to_sym)
+  def find_declaration
+    self.declaration =
+      Taro::Rails.declarations.dig(controller.class, controller.action_name.to_sym)
   end
 
-  def validate_with_definition
+  def validate_with_declaration
     if !render_kwargs.key?(:json)
       report(*non_json_response_info)
-    elsif (type = definition.returns[status])
+    elsif (type = declaration.returns[status])
       validate_with_type(type)
     else
-      report(*incomplete_definition_info)
+      report(*incomplete_declaration_info)
     end
   end
 
   def status
     status = render_kwargs[:status] || 200
-    Taro::Rails::Definition.coerce_status_to_int(status)
+    Taro::Rails::Declaration.coerce_status_to_int(status)
   end
 
   def validate_with_type(type)
     value = render_kwargs[:json]
-    if Taro.config.response_nesting && type.nesting
-      unless value.is_a?(Hash) && value.key?(type.nesting)
-        return report(*missing_nesting_info(value, type))
-      end
-
-      value = value[type.nesting]
-    end
     validate_value_against_type(value, type)
   end
 
@@ -62,13 +55,6 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
     callback.call(*["#{prefix}: #{msg}", details].first(callback.arity))
   end
 
-  def missing_nesting_info(value, type)
-    [
-      "Response does not match response schema.",
-      "Expected response with key :#{type.nesting}, got #{value.inspect}"
-    ]
-  end
-
   def non_json_response_info
     [
       "Response is not JSON.",
@@ -76,10 +62,10 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :render_kwargs) do
     ]
   end
 
-  def incomplete_definition_info
+  def incomplete_declaration_info
     [
       "Response status not defined in response schema.",
-      "Responded with status #{status} but the defined response schemas are: #{definition.returns.keys}",
+      "Responded with status #{status} but the defined response schemas are: #{declaration.returns.keys}",
     ]
   end
 end

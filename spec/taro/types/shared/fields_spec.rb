@@ -33,6 +33,13 @@ describe Taro::Types::Shared::Fields do
     expect(field.type).to be < Taro::Types::ListType
   end
 
+  # it 'handles array_of with nested types' do
+  #   example.field :bar, array_of: 'Object', null: true
+  #   field = example.fields[:bar]
+  #   expect(field.type).to be < Taro::Types::ListType
+  #   expect(field.type.item_type).to be < Taro::Types::ObjectTypes::ObjectType
+  # end
+
   it 'takes page_of instead of type' do
     example.field :bar, page_of: 'Integer', null: true
     field = example.fields[:bar]

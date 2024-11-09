@@ -1,4 +1,4 @@
-describe Taro::Rails::Definition do
+describe Taro::Rails::Declaration do
   describe '#api=' do
     it 'sets the api attribute' do
       subject.api = 'My description'
@@ -74,29 +74,28 @@ describe Taro::Rails::Definition do
   require 'action_controller'
 
   describe '#parse_params' do
-    it 'coerces the params, expecting nested data by default' do
+    let(:declaration) do
       stub_const('UserInputType', Class.new(T::InputType) do
         field :name, type: 'String', null: false
       end)
-      definition = described_class.new(accepts: 'UserInputType')
-      params = ActionController::Parameters.new(user: { name: 'Alice' })
-      coerced = definition.parse_params(params)
-      expect(coerced).to eq(name: 'Alice')
+      described_class.new(accepts: 'UserInputType')
     end
 
-    it 'coerces the params without nesting' do
-      orig = Taro.config.input_nesting
-      Taro.config.input_nesting = false
-
-      stub_const('UserInputType', Class.new(T::InputType) do
-        field :name, type: 'String', null: false
-      end)
-      definition = described_class.new(accepts: 'UserInputType')
+    it 'coerces the params' do
       params = ActionController::Parameters.new(name: 'Alice')
-      coerced = definition.parse_params(params)
-      expect(coerced).to eq(name: 'Alice')
-    ensure
-      Taro.config.input_nesting = orig
+      expect { declaration.parse_params(params) }.not_to raise_error
+    end
+
+    it 'does not raise for invalid params if config.validate_params is false', config: { validate_params: false } do
+      params = ActionController::Parameters.new(name: nil)
+      expect { declaration.parse_params(params) }.not_to raise_error
+    end
+
+    it 'raises for invalid params if config.validate_params is true', config: { validate_params: true } do
+      params = ActionController::Parameters.new(name: nil)
+      expect do
+        declaration.parse_params(params)
+      end.to raise_error(Taro::ValidationError, /not nullable/)
     end
   end
 end
