@@ -3,12 +3,12 @@ module Taro::Rails::DSL
     Taro::Rails.buffered_declaration(self).api = description
   end
 
-  def accepts(type)
-    Taro::Rails.buffered_declaration(self).accepts = type
+  def param(param_name, **kwargs)
+    Taro::Rails.buffered_declaration(self).add_param(param_name, **kwargs)
   end
 
-  def returns(**kwargs)
-    Taro::Rails.buffered_declaration(self).returns = kwargs
+  def returns(field_name = nil, **kwargs)
+    Taro::Rails.buffered_declaration(self).add_return(field_name, **kwargs)
   end
 
   def method_added(method_name)

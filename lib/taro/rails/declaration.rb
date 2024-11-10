@@ -1,11 +1,9 @@
 class Taro::Rails::Declaration
-  attr_reader :api, :accepts, :returns, :routes
+  attr_reader :api, :params, :returns, :routes
 
-  def initialize(api: nil, accepts: nil, returns: nil, routes: [])
-    self.api     = api if api
-    self.accepts = accepts if accepts
-    self.returns = returns if returns
-    self.routes  = routes
+  def initialize
+    @params = Class.new(Taro::Types::InputType)
+    @returns = {}
   end
 
   def api=(arg)
@@ -13,18 +11,25 @@ class Taro::Rails::Declaration
     @api = arg
   end
 
-  def accepts=(type)
-    @accepts = Taro::Types::Coercion.from_string_or_hash!(type)
+  def add_param(param_name, **kwargs)
+    @params.field(param_name, **kwargs)
   end
 
-  def returns=(hash)
-    validated_hash = hash.to_h do |status, type|
-      [
-        self.class.coerce_status_to_int(status),
-        Taro::Types::Coercion.from_string_or_hash!(type),
-      ]
+  def add_return(field_name = nil, code:, **kwargs)
+    status = self.class.coerce_status_to_int(code)
+    returns[status] &&
+      raise(Taro::ArgumentError, "response for status #{status} already declared")
+
+    returns[status] = return_type_from(field_name, **kwargs)
+  end
+
+  def return_type_from(field_name, **kwargs)
+    if field_name
+      # TODO: allow anonymous types in openapi export, ref only their contents
+      Class.new(Taro::Types::ObjectType).tap { |t| t.field(field_name, **kwargs) }
+    else
+      Taro::Types::Coercion.call(kwargs)
     end
-    @returns = returns.to_h.merge(validated_hash)
   end
 
   def routes=(arg)
@@ -32,10 +37,10 @@ class Taro::Rails::Declaration
     @routes = arg
   end
 
-  def parse_params(params)
-    hash = accepts.new(params.to_unsafe_h).coerce_input
-    accepts.new(hash).validate! if Taro.config.validate_params
-    params
+  def parse_params(rails_params)
+    hash = params.new(rails_params.to_unsafe_h).coerce_input
+    params.new(hash).validate! if Taro.config.validate_params
+    hash
   end
 
   def openapi_paths

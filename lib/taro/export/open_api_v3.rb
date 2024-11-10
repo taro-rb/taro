@@ -2,7 +2,7 @@ class Taro::Export::OpenAPIv3
   attr_reader :components
 
   # TODO:
-  # - render accepts type and path params for each Declaration
+  # - render ::params type and path params for each Declaration (if .fields.any?)
   # - validate that openapi_name values of all distinct types are unique
   # - support list/array and enum types
   # - use json-schema gem to validate overall result against OpenAPIv3 schema

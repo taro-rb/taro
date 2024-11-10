@@ -1,49 +1,52 @@
 module Taro::Types::Coercion
+  KEYS = %i[type array_of page_of].freeze
+
   class << self
-    def from_string_or_hash!(arg)
-      from_hash(arg) || from_string(arg) || raise(Taro::ArgumentError, <<~MSG)
-        Unsupported type: #{arg.inspect}. Must be a Hash containining a type name,
-        e.g. { type: "MyType" }, or be the name of a type class,
-        e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}.
-      MSG
-    end
-
-    def from_string!(arg)
-      from_string(arg) || raise(Taro::ArgumentError, <<~MSG)
-        Unsupported type: #{arg.inspect}. Must be the name of a type class,
-        e.g. "MyType", #{shortcuts.keys.map(&:inspect).join(', ')}.
-      MSG
-    end
-
-    def from_hash!(arg)
-      from_hash(arg) || raise(Taro::ArgumentError, <<~MSG)
-        Unsupported type: #{arg.inspect}. Must be a hash containing the name
-        of a type class, e.g. { type: "MyType" }.
-      MSG
+    def call(arg)
+      validate_hash(arg)
+      from_hash(arg)
     end
 
     private
 
-    def from_class(arg)
-      arg if arg.is_a?(Class) && arg < Taro::Types::BaseType
+    def validate_hash(arg)
+      arg.is_a?(Hash) || raise(Taro::ArgumentError, <<~MSG)
+        Type coercion argument must be a Hash, got: #{arg.inspect} (#{arg.class})
+      MSG
+
+      types = arg.slice(*KEYS)
+      types.size == 1 || raise(Taro::ArgumentError, <<~MSG)
+        Exactly one of type, array_of, or page_of must be given, got: #{types}
+      MSG
     end
 
-    def from_hash(arg)
-      return unless arg.is_a?(Hash)
-
-      if arg[:type]
-        from_string(arg[:type])
-      elsif (inner_type = arg[:array_of])
+    def from_hash(hash)
+      if hash[:type]
+        from_string(hash[:type])
+      elsif (inner_type = hash[:array_of])
         Taro::Types::ListType.for(from_string(inner_type))
-      elsif (inner_type = arg[:page_of])
+      elsif (inner_type = hash[:page_of])
         Taro::Types::ObjectTypes::PageType.for(from_string(inner_type))
+      else
+        raise NotImplementedError, 'Unsupported type coercion'
       end
     end
 
     def from_string(arg)
-      arg.is_a?(String) && (shortcuts[arg] || from_class(Object.const_get(arg)))
+      shortcuts[arg] || from_class(Object.const_get(arg.to_s))
     rescue NameError
-      nil
+      raise Taro::ArgumentError, <<~MSG
+        Unsupported type: #{arg}. It should be a type-class name
+        or one of #{shortcuts.keys.map(&:inspect).join(', ')}.
+      MSG
+    end
+
+    def from_class(arg)
+      arg < Taro::Types::BaseType || raise(Taro::ArgumentError, <<~MSG)
+        Unsupported type: #{arg}. It should be a subclass of Taro::Types::BaseType.
+      MSG
+
+      arg
     end
 
     # Map some Ruby class names and other shortcuts to built-in types

@@ -22,9 +22,9 @@ describe Taro::Rails::ResponseValidator do
 
   context 'if there is a declaration' do
     let(:declaration) do
-      Taro::Rails::Declaration.new.tap do |defi|
-        defi.accepts = 'String'
-        defi.returns = { ok: 'String' }
+      Taro::Rails::Declaration.new.tap do |d|
+        d.add_param :foo, type: 'String', null: false
+        d.add_return type: 'String', null: false, code: :ok
       end
     end
     before { Taro::Rails.declarations[controller.class] = { show: declaration } }

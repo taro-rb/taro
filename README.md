@@ -6,6 +6,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 
 ## ⚠️ This is a work in progress - TODO:
 
+- unbreak validation of nested param null (example: 'raises for invalid params if config.validate_params is true')
 - additionalProperties, FreeFormType
 - OpenAPI export (e.g. `#to_openapi` methods for types)
 - openapi metadata via Taro.config, e.g. title
@@ -36,29 +37,49 @@ rails generate taro:install [ --dir app/my_types_dir ]
 
 ## Usage
 
-Example:
+The core concept of Taro are type classes.
+
+This is how type classes can be used in a Rails controller:
 
 ```ruby
 class BikesController < ApplicationController
-  api     'Update a bike' # optional description
-  accepts 'BikeInputType' # accepted params
-  returns ok: 'BikeType', # return types by status code
-          unprocessable_content: 'MyErrorType'
+  # Calling `api` to set an endpoint description is optional.
+  api     'Update a bike'
+  # Params can come from the path, e.g. /bike/:id)
+  param   :id, type: 'UUID', null: false, description: 'ID of the bike to update'
+  # They can also come from the query string or request body
+  param   :bike, type: 'BikeInputType', null: false
+  # Return types can differ by status code
+  returns ok: { bike: 'BikeType' }, # this return value is nested
+          unprocessable_content: 'MyErrorType' # this one is not
   def update
-    if bike.update(@api_params) # automatically parsed params
-      render json: BikeType.render(bike), status: :ok
+    # defined params are available as @api_params
+    bike = Bike.find(@api_params[:id])
+    success = bike.update(@api_params[:bike])
+
+    # Types can be used to render responses.
+    # The object
+    if success
+      render json: { bike: BikeType.render(bike) }, status: :ok
     else
-      render json: MyErrorType.render(bike.errors), status: :unprocessable_entity
+      render json: MyErrorType.render(bike.errors.first), status: :unprocessable_entity
     end
   end
 end
+```
 
-# ObjectTypes are used to define, render, and validate responses.
+Notice the multiple roles of types: They are used to define the structure of API requests and responses, and render the response. Both the input and output of the API can be validated against the schema if desired (see below).
+
+Here is an example of the `BikeType` from that controller:
+
+```ruby
 class BikeType < ObjectType
-  # Optional type description (for docs and OpenAPI export)
+  # Optional description of BikeType (for API docs and the OpenAPI export)
   self.description = 'A bike and all relevant information about it'
 
-  # Field nullability must be set, description is optional
+  # Object types have fields. Each field has a name, its own type,
+  # and a `null:` setting to indicate if it can be nil.
+  # Providing a description is optional.
   field :brand, type: 'String', null: true, description: 'The brand name'
 
   # Fields can reference other types and arrays of values
@@ -68,22 +89,72 @@ class BikeType < ObjectType
   field :parts, page_of: 'PartType', null: false
 
   # Custom methods can be chosen to resolve fields
-  field :has_brand, type: 'Boolean', null: true, method: :brand?
+  field :has_brand, type: 'Boolean', null: false, method: :brand?
 
-  # Field resolvers can also be implemented or overridden on the type
-  field :info, type: 'String', null: true
-
-  def info
-    "A bike named #{object.name} with #{object.wheels} wheels."
+  # Field resolvers can also be implemented or overridden on the type.
+  # The object passed in to `BikeType.render` is available as `object`.
+  field :fancy_info, type: 'String', null: false
+  def fancy_info
+    "A bike named #{object.name} with #{object.parts.count} parts."
   end
 end
+```
 
-# The usage of dedicated InputTypes is optional.
-# Object types can also be used to define accepted parameters –
-# or parts of them.
+### Input types
+
+Note the use of `BikeInputType` in the `param` declaration above? It could look like so:
+
+```ruby
 class BikeInputType < InputType
   field :brand,  type: 'String',  null: true,  description: 'The brand name'
   field :wheels, type: 'Integer', null: false, default: 2
+end
+```
+
+The usage of such dedicated InputTypes is optional. Object types can also be used to define accepted parameters, or parts of them, depending on what you want to allow API clients to send.
+
+### Validation
+
+#### Request validation
+
+TODO
+
+#### Response validation
+
+TODO
+
+### Included type options
+
+The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
+
+- `'Boolean'` - accepts and renders `true` or `false`
+- `'Date'` - accepts and renders dates as unix timestamp integers
+- `'DateTime'`, `'Time'` - accepts and renders times as unix timestamp integers
+- `'Float'`
+- `'Integer'`
+- `'NoContentType'` - renders an empty object, for use with `status: :no_content`
+- `'String'`
+- `'UUID'` - accepts and renders UUIDs
+
+### Enums
+
+`EnumType` can be inherited from to define shared enums:
+
+```ruby
+class SeverityEnumType < EnumType
+  value 'info'
+  value 'warning'
+  value 'debacle'
+end
+
+class ErrorType < ObjectType
+  field :severity, type: 'SeverityEnumType', null: false
+end
+
+# inline enums are also possible
+# (unlike enum classes, these are not extracted into refs in the OpenAPI export)
+class ErrorType < ObjectType
+  field :severity, type: 'String', enum: %w[info warning debacle], null: false
 end
 ```
 

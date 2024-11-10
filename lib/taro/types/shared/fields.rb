@@ -27,7 +27,7 @@ module Taro::Types::Shared::Fields
     [true, false].include?(kwargs[:null]) ||
       raise(Taro::ArgumentError, "null has to be specified as true or false for field #{name} at #{defined_at}")
 
-    (type_keys = (kwargs.keys & TYPE_KEYS)).size == 1 ||
+    (type_keys = (kwargs.keys & Taro::Types::Coercion::KEYS)).size == 1 ||
       raise(Taro::ArgumentError, "exactly one of type, array_of, or page_of must be given for field #{name} at #{defined_at}")
 
     kwargs[type_keys.first].class == String ||
@@ -39,16 +39,14 @@ module Taro::Types::Shared::Fields
     prev && raise(Taro::ArgumentError, "field #{name} at #{defined_at} previously defined at #{prev[:defined_at]}")
   end
 
-  TYPE_KEYS = %i[type array_of page_of].freeze
-
   def field_defs
     @field_defs ||= {}
   end
 
   def evaluate_field_defs
     field_defs.transform_values do |field_def|
-      type = Taro::Types::Coercion.from_hash!(field_def)
-      Taro::Types::Field.new(**field_def.except(*TYPE_KEYS), type:)
+      type = Taro::Types::Coercion.call(field_def)
+      Taro::Types::Field.new(**field_def.except(*Taro::Types::Coercion::KEYS), type:)
     end
   end
 

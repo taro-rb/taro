@@ -7,15 +7,12 @@ describe Taro::Export::OpenAPIv3 do
       field :code, type: 'Integer', null: false
     end)
 
-    declaration = Taro::Rails::Declaration.new(
-      api: 'My description',
-      accepts: 'String',
-      returns: {
-        200 => 'Integer',
-        404 => 'FailureType',
-      },
-      routes: [Taro::Rails::NormalizedRoute.new(mock_user_route)],
-    )
+    declaration = Taro::Rails::Declaration.new
+    declaration.api = 'My description'
+    declaration.add_param :foo, type: 'String', null: true
+    declaration.add_return type: 'Integer', code: 200, null: false
+    declaration.add_return type: 'FailureType', code: 404, null: false
+    declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
 
     result = subject.export_declarations([declaration])
 
