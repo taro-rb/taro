@@ -5,6 +5,8 @@ class Taro::Types::InputType < Taro::Types::BaseType
   include Taro::Types::Shared::CustomFieldResolvers
   include Taro::Types::Shared::ObjectCoercion
 
+  self.openapi_type = :object
+
   def coerce_response
     raise Taro::RuntimeError, 'InputTypes cannot be used as response types'
   end

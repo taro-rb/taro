@@ -8,10 +8,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 
 - unbreak validation of nested param null (example: 'raises for invalid params if config.validate_params is true')
 - additionalProperties, FreeFormType
-- OpenAPI export (e.g. `#to_openapi` methods for types)
-- openapi metadata via Taro.config, e.g. title
 - maybe later: apidoc rendering based on export (rails engine?)
-- maybe change controller DSL to avoid conflict with apipie?
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - rspec matchers for testing?
 - examples https://swagger.io/specification/#example-object
@@ -22,6 +19,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 - consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
   - another alternative: include Taro::ObjectType might be more descriptive
 - do we want a config.invalid_params_callback instead of config.validate_params?
+- replace surprising aliases to TimestampType and DateType
 
 ## Installation
 
@@ -49,9 +47,10 @@ class BikesController < ApplicationController
   param   :id, type: 'UUID', null: false, description: 'ID of the bike to update'
   # They can also come from the query string or request body
   param   :bike, type: 'BikeInputType', null: false
-  # Return types can differ by status code
-  returns ok: { bike: 'BikeType' }, # this return value is nested
-          unprocessable_content: 'MyErrorType' # this one is not
+  # Return types can differ by status code and can be nested as in this case:
+  returns :bike, code: :ok, type: 'BikeType', description: 'update success'
+  # This one is not nested:
+  returns code: :unprocessable_content, type: 'MyErrorType', description: 'failure'
   def update
     # defined params are available as @api_params
     bike = Bike.find(@api_params[:id])

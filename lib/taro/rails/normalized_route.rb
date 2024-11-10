@@ -18,6 +18,10 @@ Taro::Rails::NormalizedRoute = Data.define(:rails_route) do
     rails_route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
   end
 
+  def path_params
+    openapi_path.scan(/{(\w+)}/).flatten.map(&:to_sym)
+  end
+
   def endpoint
     controller, action = rails_route.requirements.values_at(:controller, :action)
     "#{controller}##{action}"
