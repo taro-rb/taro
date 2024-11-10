@@ -1,5 +1,6 @@
 class Taro::Types::Scalar::IntegerType < Taro::Types::ScalarType
   self.openapi_type = :integer
+  self.response_types = [Integer]
 
   def coerce_input
     object if object.instance_of?(Integer)

@@ -9,18 +9,14 @@ module Taro::Types::Shared::ObjectCoercion
     coerce_with_fields(false)
   end
 
-  # Validate the given object against the schema. This method will raise a
-  # Taro::RuntimeError if the object is not matching.
-  def validate!
-    self.class.fields.each_value { |field| field.validate!(object) }
-  end
-
   # TODO Maybe deprecated?
   def coerce_with_fields(from_input)
     # we might need to validate the opposite as well: are there too many information and not only are some missing?
     object_is_hash = object.is_a?(Hash)
     self.class.fields.to_h do |name, field|
-      [name, field.extract_value(object, context: self, from_input:, object_is_hash:)]
+      value = field.extract_value(object, context: self, from_input:, object_is_hash:)
+      field.valid?(value) unless from_input
+      [name, value]
     end
   end
 end

@@ -5,4 +5,12 @@ module Taro::Types::Shared::Rendering
   def render(object)
     new(object).coerce_response
   end
+
+  def response_types
+    @response_types
+  end
+
+  def response_types=(types)
+    @response_types = types
+  end
 end

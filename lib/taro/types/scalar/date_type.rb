@@ -1,6 +1,7 @@
 class Taro::Types::Scalar::DateType < Taro::Types::ScalarType
   self.description = 'Represents a date as Date on the server side and UNIX timestamp (integer) on the client side.'
   self.openapi_type = :integer
+  self.response_types = [Integer]
 
   def coerce_input
     Time.at(object).to_date if object.instance_of?(Integer)
