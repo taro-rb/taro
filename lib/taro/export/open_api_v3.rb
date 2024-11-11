@@ -1,20 +1,27 @@
-class Taro::Export::OpenAPIv3 # rubocop:disable Metrics/ClassLength
+class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/ClassLength
   attr_reader :schemas
 
   def initialize
+    super
     @schemas = {}
   end
 
   # TODO:
   # - use json-schema gem to validate overall result against OpenAPIv3 schema
-  def call(declarations:, title: 'Taro-based API', version: '1.0')
-    result = { openapi: '3.1.0', info: { title:, version: }, paths: {} }
-    declarations.each do |declaration|
+  def call(declarations:, title:, version:)
+    @result = { openapi: '3.1.0', info: { title:, version: } }
+    paths = export_paths(declarations)
+    @result[:paths] = paths if paths.any?
+    @result[:components] = { schemas: } if schemas.any?
+    self
+  end
+
+  def export_paths(declarations)
+    declarations.each_with_object({}) do |declaration, paths|
       declaration.routes.each do |route|
-        result[:paths][route.openapi_path] = export_route(route, declaration)
+        paths[route.openapi_path] = export_route(route, declaration)
       end
     end
-    result.merge(components: { schemas: })
   end
 
   def export_route(route, declaration)
@@ -89,6 +96,7 @@ class Taro::Export::OpenAPIv3 # rubocop:disable Metrics/ClassLength
 
   def export_scalar_field(field)
     base = { type: field.openapi_type }
+    base = { oneOf: [base, { type: 'null' }] } if field.null
     base[:description] = field.description if field.description
     base[:default] = field.default if field.default_specified?
     base[:enum] = field.enum if field.enum
@@ -97,11 +105,12 @@ class Taro::Export::OpenAPIv3 # rubocop:disable Metrics/ClassLength
 
   def export_complex_field_ref(field)
     ref = extract_component_ref(field.type)
-    if field.description || field.null
-      # RE description: https://github.com/OAI/OpenAPI-Specification/issues/2033
+    if field.null
       # RE nullable: https://stackoverflow.com/a/70658334
-      nullable = true if field.null
-      { description: field.description, nullable:, allOf: [ref] }.compact
+      { description: field.description, oneOf: [ref, { type: 'null' }] }.compact
+    elsif field.description
+      # https://github.com/OAI/OpenAPI-Specification/issues/2033
+      { description: field.description, allOf: [ref] }
     else
       ref
     end

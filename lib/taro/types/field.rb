@@ -25,7 +25,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def openapi_type
-    null ? [type.openapi_type, 'null'] : type.openapi_type
+    type.openapi_type
   end
 
   private

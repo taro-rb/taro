@@ -1,5 +1,3 @@
-require 'yaml'
-
 describe Taro::Export::OpenAPIv3 do
   it 'handles Declarations' do
     stub_const('FailureType', Class.new(T::ObjectType) do
@@ -19,9 +17,9 @@ describe Taro::Export::OpenAPIv3 do
       action_name: 'update',
     )
 
-    result = subject.call(declarations: [declaration])
+    result = described_class.call(declarations: [declaration])
 
-    expect(result.to_yaml.gsub(/(^| +)\K:/, '')).to eq <<~YAML
+    expect(result.to_yaml).to eq <<~YAML
       ---
       openapi: 3.1.0
       info:
@@ -41,7 +39,7 @@ describe Taro::Export::OpenAPIv3 do
               content:
                 application/json:
                   schema:
-                    $ref: "#/components/schemas/Foo_update_Input"
+                    "$ref": "#/components/schemas/Foo_update_Input"
             responses:
               '200':
                 description: okay
@@ -54,39 +52,51 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      $ref: "#/components/schemas/Foo_update_422_Response"
+                      "$ref": "#/components/schemas/Foo_update_422_Response"
       components:
         schemas:
           Foo_update_Input:
             type: object
             properties:
               foo:
-                type:
-                - string
-                - 'null'
+                oneOf:
+                - type: string
+                - type: 'null'
           Failure:
             type: object
             required:
             - code
             properties:
               message:
-                type:
-                - string
-                - 'null'
+                oneOf:
+                - type: string
+                - type: 'null'
               code:
                 type: integer
           Failure_List:
             type: array
             items:
-              $ref: "#/components/schemas/Failure"
+              "$ref": "#/components/schemas/Failure"
           Foo_update_422_Response:
             type: object
             required:
             - errors
             properties:
               errors:
-                $ref: "#/components/schemas/Failure_List"
+                "$ref": "#/components/schemas/Failure_List"
     YAML
+  end
+
+  it 'can be exported as json' do
+    expect(described_class.call(declarations: []).to_json).to eq(<<~JSON.chomp)
+      {
+        "openapi": "3.1.0",
+        "info": {
+          "title": "Taro-based API",
+          "version": "1.0"
+        }
+      }
+    JSON
   end
 
   it 'does not render requestBody if there are no body params' do
@@ -98,7 +108,7 @@ describe Taro::Export::OpenAPIv3 do
       action_name: 'show',
     )
 
-    result = subject.call(declarations: [declaration])
+    result = described_class.call(declarations: [declaration]).result
     expect(result[:paths].values.first[:put]).not_to have_key(:requestBody)
   end
 
@@ -109,7 +119,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'handles nullable scalar fields' do
     field = F.new(type: S::StringType, name: 'foo', null: true)
-    expect(subject.export_field(field)).to eq(type: [:string, 'null'])
+    expect(subject.export_field(field)).to eq(oneOf: [{ type: :string }, { type: 'null' }])
   end
 
   it 'handles field defaults' do
@@ -167,8 +177,7 @@ describe Taro::Export::OpenAPIv3 do
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
-      allOf: [{ :$ref => "#/components/schemas/Thing" }],
-      nullable: true,
+      oneOf: [{ :$ref => "#/components/schemas/Thing" }, { type: 'null' }],
     )
   end
 
@@ -179,8 +188,7 @@ describe Taro::Export::OpenAPIv3 do
     field = F.new(type: ThingType, name: 'foo', null: true)
 
     expect(subject.export_field(field)).to eq(
-      allOf: [{ :$ref => "#/components/schemas/Thing" }],
-      nullable: true,
+      oneOf: [{ :$ref => "#/components/schemas/Thing" }, { type: 'null' }],
     )
   end
 
