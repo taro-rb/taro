@@ -125,12 +125,11 @@ TODO
 The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
 
 - `'Boolean'` - accepts and renders `true` or `false`
-- `'Date'` - accepts and renders dates as unix timestamp integers
-- `'DateTime'`, `'Time'` - accepts and renders times as unix timestamp integers
 - `'Float'`
 - `'Integer'`
 - `'NoContentType'` - renders an empty object, for use with `status: :no_content`
 - `'String'`
+- `'Timestamp'` - accepts and renders `Time` instances as unix timestamp integers
 - `'UUID'` - accepts and renders UUIDs
 
 ### Enums
