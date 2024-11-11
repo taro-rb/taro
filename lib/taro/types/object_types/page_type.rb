@@ -22,10 +22,8 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
   def coerce_response
     item_type = self.class.item_type
     items = object[:page].map do |item|
-      res = item_type.new(item[:data]).coerce_response
-      res.nil? ? break : res
+      item_type.new(item[:data]).coerce_response
     end
-    return unless items
 
     {
       self.class.items_key => items,

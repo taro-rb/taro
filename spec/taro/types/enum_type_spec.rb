@@ -1,9 +1,9 @@
 describe Taro::Types::EnumType do
   let(:example) do
-    Class.new(described_class) do
+    stub_const('MyEnum', Class.new(described_class) do
       value 'foo'
       value 'bar'
-    end
+    end)
   end
 
   it 'has values' do
@@ -16,12 +16,14 @@ describe Taro::Types::EnumType do
 
   it 'coerces input' do
     expect(example.new('foo').coerce_input).to eq 'foo'
-    expect(example.new('qux').coerce_input).to be_nil
+    expect { example.new('qux').coerce_input }
+      .to raise_error(Taro::InputError, '"qux" (String) is not valid as MyEnum: must be one of ["foo", "bar"]')
   end
 
   it 'coerces response data' do
     expect(example.new('foo').coerce_response).to eq 'foo'
-    expect(example.new('qux').coerce_response).to be_nil
+    expect { example.new('qux').coerce_response }
+      .to raise_error(Taro::ResponseError, '"qux" (String) is not valid as MyEnum: must be one of ["foo", "bar"]')
   end
 
   it 'raises for empty enums' do

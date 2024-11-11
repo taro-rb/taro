@@ -12,4 +12,5 @@ Taro::Types::BaseType = Data.define(:object) do
   extend Taro::Types::Shared::OpenAPIName
   extend Taro::Types::Shared::OpenAPIType
   extend Taro::Types::Shared::Rendering
+  include Taro::Types::Shared::Errors
 end

@@ -5,7 +5,7 @@ describe Taro::Types::ObjectTypes::NoContentType do
 
   it 'coerces an empty object as response' do
     expect(described_class.new({}).coerce_response).to eq({})
-    expect(described_class.new('foo').coerce_response).to be_nil
+    expect(described_class.new('foo').coerce_response).to eq({})
   end
 
   it 'can not coerce input' do

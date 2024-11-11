@@ -15,7 +15,8 @@ describe Taro::Types::ObjectType do
   end
 
   it 'can coerce input data differently than response data (e.g. more strictly)' do
-    expect { ExampleObjectType.new({ foo: :FOO }).coerce_input }.to raise_error(Taro::ValidationError, /invalid type/)
+    expect { ExampleObjectType.new({ foo: :FOO }).coerce_input }
+      .to raise_error(Taro::InputError, /must be a String/)
     expect(ExampleObjectType.new({ foo: :FOO }).coerce_response).to eq(foo: 'FOO', bar: nil)
   end
 

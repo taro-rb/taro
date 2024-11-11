@@ -55,14 +55,12 @@ module Taro::Types::Coercion
     def shortcuts
       @shortcuts ||= {
         # rubocop:disable Layout/HashAlignment - buggy cop
-        'Boolean'  => Taro::Types::Scalar::BooleanType,
-        'Date'     => Taro::Types::Scalar::DateType,
-        'DateTime' => Taro::Types::Scalar::TimestampType,
-        'Float'    => Taro::Types::Scalar::FloatType,
-        'Integer'  => Taro::Types::Scalar::IntegerType,
-        'String'   => Taro::Types::Scalar::StringType,
-        'Time'     => Taro::Types::Scalar::TimestampType,
-        'UUID'     => Taro::Types::Scalar::UUIDv4Type,
+        'Boolean'   => Taro::Types::Scalar::BooleanType,
+        'Float'     => Taro::Types::Scalar::FloatType,
+        'Integer'   => Taro::Types::Scalar::IntegerType,
+        'String'    => Taro::Types::Scalar::StringType,
+        'Timestamp' => Taro::Types::Scalar::TimestampType,
+        'UUID'      => Taro::Types::Scalar::UUIDv4Type,
         # rubocop:enable Layout/HashAlignment - buggy cop
       }.freeze
     end

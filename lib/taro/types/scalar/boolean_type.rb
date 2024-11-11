@@ -1,13 +1,19 @@
 class Taro::Types::Scalar::BooleanType < Taro::Types::ScalarType
   self.openapi_type = :boolean
-  self.response_types = [TrueClass, FalseClass]
-  self.input_types = [TrueClass, FalseClass]
 
   def coerce_input
-    object if object == true || object == false
+    if object == true || object == false
+      object
+    else
+      input_error('must be true or false')
+    end
   end
 
   def coerce_response
-    object if object == true || object == false
+    if object == true || object == false
+      object
+    else
+      response_error('must be true or false')
+    end
   end
 end

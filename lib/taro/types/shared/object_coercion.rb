@@ -1,18 +1,16 @@
 # Provides input and response handling for types with fields.
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
-    self.class.fields.to_h do |name, field|
-      value = field.coerce_input(object)
-      [name, value]
+    self.class.fields.transform_values do |field|
+      field.value_for_input(object)
     end
   end
 
   # Render the object into a hash.
   def coerce_response
     object_is_hash = object.is_a?(Hash)
-    self.class.fields.to_h do |name, field|
-      value = field.extract_value(object, context: self, object_is_hash:)
-      [name, value]
+    self.class.fields.transform_values do |field|
+      field.value_for_response(object, context: self, object_is_hash:)
     end
   end
 end
