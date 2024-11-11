@@ -9,9 +9,13 @@ module Taro::Types::Shared::Rendering
       MSG
     end
 
+    result = new(object).coerce_response(**opts)
+
+    # Only mark this as the used type if coercion worked so that
+    # rescue_from can be used to render another type.
     self.rendered = self
 
-    new(object).coerce_response(**opts)
+    result
   end
 
   def rendered=(value)
