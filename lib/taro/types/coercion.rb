@@ -57,6 +57,7 @@ module Taro::Types::Coercion
         # rubocop:disable Layout/HashAlignment - buggy cop
         'Boolean'   => Taro::Types::Scalar::BooleanType,
         'Float'     => Taro::Types::Scalar::FloatType,
+        'FreeForm'  => Taro::Types::ObjectTypes::FreeFormType,
         'Integer'   => Taro::Types::Scalar::IntegerType,
         'String'    => Taro::Types::Scalar::StringType,
         'Timestamp' => Taro::Types::Scalar::TimestampType,

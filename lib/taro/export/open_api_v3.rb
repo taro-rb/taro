@@ -141,6 +141,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       description: type.description,
       required: (required if required.any?),
       properties: type.fields.to_h { |name, f| [name, export_field(f)] },
+      additionalProperties: (true if type.additional_properties?),
     }.compact
   end
 

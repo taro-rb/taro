@@ -2,11 +2,16 @@
 
 This library provides an object-based type system for RESTful Ruby APIs, with built-in parameter parsing, response rendering, and OpenAPI schema export.
 
-Inspired by `apipie-rails` and `graphql-ruby`.
+It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [`graphql-ruby`](https://github.com/rmosolgo/graphql-ruby).
+
+## Goals
+
+- provide a simple, declarative way to describe API endpoints
+- conveniently check request and response data against the declaration
+- offer an up-to-date OpenAPI export with minimal configuration
 
 ## ⚠️ This is a work in progress - TODO:
 
-- additionalProperties, FreeFormType
 - rspec matchers for testing?
 - ISO8601Time, ISO8601Date types
 
@@ -105,11 +110,19 @@ The usage of such dedicated InputTypes is optional. Object types can also be use
 
 #### Request validation
 
-TODO
+Requests are automatically validated to match the declared input schema, unless you disable the automatic parsing of parameters into the `@api_params` hash:
+
+```ruby
+Taro.config.parse_params = false
+```
 
 #### Response validation
 
-TODO
+Responses are automatically validated to use the correct type for rendering, which guarantees that they match the declaration. This can be disabled:
+
+```ruby
+Taro.config.validate_responses = false
+```
 
 ### Included type options
 
@@ -117,6 +130,7 @@ The following type names are available by default and can be used as `type:`/`ar
 
 - `'Boolean'` - accepts and renders `true` or `false`
 - `'Float'`
+- '`FreeForm'` - accepts and renders any JSON-serializable object, use with care
 - `'Integer'`
 - `'NoContentType'` - renders an empty object, for use with `status: :no_content`
 - `'String'`

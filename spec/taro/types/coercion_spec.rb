@@ -3,6 +3,7 @@ describe Taro::Types::Coercion do
     %w[
       Boolean
       Float
+      FreeForm
       Integer
       String
       Timestamp

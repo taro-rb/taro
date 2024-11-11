@@ -219,7 +219,22 @@ describe Taro::Export::OpenAPIv3 do
     expect(subject.schemas).to eq(
       NoContent: {
         type: :object,
-        properties: {}
+        properties: {},
+      }
+    )
+  end
+
+  it 'handles FooFormType' do
+    stub_const('FreeFormType', Class.new(T::ObjectTypes::FreeFormType))
+
+    expect(subject.extract_component_ref(FreeFormType))
+      .to eq(:$ref => "#/components/schemas/FreeForm")
+
+    expect(subject.schemas).to eq(
+      FreeForm: {
+        type: :object,
+        properties: {},
+        additionalProperties: true,
       }
     )
   end
