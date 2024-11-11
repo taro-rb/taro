@@ -6,7 +6,7 @@ describe Taro::Rails::RouteFinder do
   it 'returns matching routes' do
     route = mock_user_route
     allow(described_class).to receive(:rails_routes).and_return([route])
-    taro_routes = described_class.call(controller_class:, action_name: 'show')
+    taro_routes = described_class.call(controller_class:, action_name: 'update')
     expect(taro_routes.map(&:rails_route)).to eq([route])
   end
 

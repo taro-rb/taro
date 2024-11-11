@@ -16,7 +16,7 @@ describe Taro::Export::OpenAPIv3 do
     declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
     declaration.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
-      action_name: 'show',
+      action_name: 'update',
     )
 
     result = subject.call(declarations: [declaration])
@@ -29,7 +29,7 @@ describe Taro::Export::OpenAPIv3 do
         version: '1.0'
       paths:
         "/users/{id}":
-          get:
+          put:
             description: My endpoint description
             parameters:
             - name: id
@@ -41,7 +41,7 @@ describe Taro::Export::OpenAPIv3 do
               content:
                 application/json:
                   schema:
-                    $ref: "#/components/schemas/Foo_show_Input"
+                    $ref: "#/components/schemas/Foo_update_Input"
             responses:
               '200':
                 description: okay
@@ -54,10 +54,10 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      $ref: "#/components/schemas/Foo_show_422_Response"
+                      $ref: "#/components/schemas/Foo_update_422_Response"
       components:
         schemas:
-          Foo_show_Input:
+          Foo_update_Input:
             type: object
             properties:
               foo:
@@ -79,7 +79,7 @@ describe Taro::Export::OpenAPIv3 do
             type: array
             items:
               $ref: "#/components/schemas/Failure"
-          Foo_show_422_Response:
+          Foo_update_422_Response:
             type: object
             required:
             - errors
@@ -99,7 +99,7 @@ describe Taro::Export::OpenAPIv3 do
     )
 
     result = subject.call(declarations: [declaration])
-    expect(result[:paths].values.first[:get]).not_to have_key(:requestBody)
+    expect(result[:paths].values.first[:put]).not_to have_key(:requestBody)
   end
 
   it 'handles scalar fields' do

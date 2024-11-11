@@ -9,7 +9,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def value_for_input(object)
-    value = object[name]
+    value = object[name] if object
     value = coerce_value(value, true)
     validated_value(value)
   end
@@ -66,7 +66,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     type_obj = type.new(value)
     from_input ? type_obj.coerce_input : type_obj.coerce_response
   rescue Taro::Error => e
-    raise e.class, "#{e.message} after using method/key `:#{method}` to resolve field `#{name}`."
+    raise e.class, "#{e.message}, after using method/key `:#{method}` to resolve field `#{name}`"
   end
 
   def raise_response_coercion_error(object)
