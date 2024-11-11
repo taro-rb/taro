@@ -1,9 +1,9 @@
 class Taro::Types::ObjectTypes::NoContentType < Taro::Types::ObjectType
   self.description = 'An empty response'
 
-  # render takes no argument in this case
+  # render takes no arguments in this case
   def self.render
-    {}
+    super(nil)
   end
 
   def coerce_input

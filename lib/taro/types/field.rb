@@ -17,7 +17,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   def value_for_response(object, context: nil, object_is_hash: true)
     value = retrieve_response_value(object, context, object_is_hash)
     value = coerce_value(value, false)
-    validated_value(value)
+    validated_value(value, false)
   end
 
   def default_specified?

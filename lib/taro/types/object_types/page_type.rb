@@ -8,26 +8,26 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
   extend Taro::Types::Shared::DerivableType
   extend Taro::Types::Shared::ItemType
 
-  def self.render(object, after:, limit: 20, order_by: nil, order: nil)
-    paginated_list = RailsCursorPagination::Paginator.new(
-      object, limit:, order_by:, order:, after:
-    ).fetch
-    super(paginated_list)
-  end
-
   def coerce_input
     raise Taro::RuntimeError, 'PageTypes cannot be used as input types'
   end
 
-  def coerce_response
+  def coerce_response(after:, limit: 20, order_by: nil, order: nil)
+    list = RailsCursorPagination::Paginator.new(
+      object, limit:, order_by:, order:, after:
+    ).fetch
+    coerce_paginated_list(list)
+  end
+
+  def coerce_paginated_list(list)
     item_type = self.class.item_type
-    items = object[:page].map do |item|
+    items = list[:page].map do |item|
       item_type.new(item[:data]).coerce_response
     end
 
     {
       self.class.items_key => items,
-      page_info: Taro::Types::ObjectTypes::PageInfoType.new(object[:page_info]).coerce_response,
+      page_info: Taro::Types::ObjectTypes::PageInfoType.new(list[:page_info]).coerce_response,
     }
   end
 

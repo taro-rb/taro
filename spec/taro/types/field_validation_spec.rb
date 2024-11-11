@@ -6,7 +6,11 @@ describe Taro::Types::FieldValidation do
   end
 
   it 'raises if the object is missing' do
-    expect { field.validated_value(nil) }.to raise_error(Taro::ValidationError)
+    expect { field.validated_value(nil) }.to raise_error(Taro::InputError)
+  end
+
+  it 'raises ResponseError if the object is missing for a response' do
+    expect { field.validated_value(nil, false) }.to raise_error(Taro::ResponseError)
   end
 
   describe 'with null allowed' do
@@ -18,14 +22,20 @@ describe Taro::Types::FieldValidation do
   end
 
   describe 'with enum' do
-    let(:field) { F.new(name: :upcase, type: S::StringType, null: false, enum: ['FOO', 'BAR']) }
+    let(:field) { F.new(name: :upcase, type: S::StringType, null: false, enum: %w[A B]) }
 
     it 'does not raise if the object is valid' do
-      expect { field.validated_value('FOO') }.not_to raise_error
+      expect { field.validated_value('A') }.not_to raise_error
     end
 
     it 'raises if the object is not matching the enum' do
-      expect { field.validated_value('BAZ') }.to raise_error(Taro::ValidationError, /expected one of/)
+      expect { field.validated_value('C') }
+        .to raise_error(Taro::InputError, /expected one of/)
+    end
+
+    it 'raises if the object is not matching the enum for a response' do
+      expect { field.validated_value('C', false) }
+        .to raise_error(Taro::ResponseError, /expected one of/)
     end
   end
 end

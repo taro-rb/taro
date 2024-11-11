@@ -11,5 +11,6 @@ module Taro::Rails
   def self.reset
     declarations.clear
     RouteFinder.clear_cache
+    Taro::Types::BaseType.rendered = nil
   end
 end
