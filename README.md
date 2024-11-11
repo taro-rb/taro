@@ -7,16 +7,7 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 ## ⚠️ This is a work in progress - TODO:
 
 - additionalProperties, FreeFormType
-- maybe later: apidoc rendering based on export (rails engine?)
-- [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - rspec matchers for testing?
-- examples https://swagger.io/specification/#example-object
-- `deprecation`
-- maybe detect when undeclared params are sent (later: only if additionalProperties is false)
-- more docs
-- consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
-  - another alternative: include Taro::ObjectType might be more descriptive
-- object type: accept Hash w.i.access, AC::Parameters?
 - ISO8601Time, ISO8601Date types
 
 ## Installation
@@ -154,15 +145,26 @@ class ErrorType < ObjectType
 end
 ```
 
-## Not supported yet
+## Possible future features
 
-- non-JSON content types
-- sum types
-- mixed enums
-- nullable enums
-- format specifications
-- min/max values
+- warning/raising for undeclared input params (currently they are ignored)
 - usage without rails is possible but not convenient yet
+- sum types
+- api doc rendering based on export (e.g. rails engine with web ui)
+- [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
+- deprecation feature
+- various openapi features
+  - non-JSON content types (e.g. for file uploads)
+  - [examples](https://swagger.io/specification/#example-object)
+  - array minItems, maxItems, uniqueItems
+  - mixed arrays
+  - mixed enums
+  - nullable enums
+  - string format specifications (e.g. binary, int64, password ...)
+  - string pattern specifications
+  - string minLength and maxLength
+  - number minimum, exclusiveMinimum, maximum, multipleOf
+  - readOnly, writeOnly
 
 ## Development
 
