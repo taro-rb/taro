@@ -8,9 +8,16 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
   end
 
-  def extract_value(object, context: nil, from_input: true, object_is_hash: true)
-    value = retrieve_value(object, context, object_is_hash)
-    coerce_value(value, from_input)
+  def value_for_input(object)
+    value = object[name]
+    value = coerce_value(value, true)
+    validated_value(value)
+  end
+
+  def value_for_response(object, context: nil, object_is_hash: true)
+    value = retrieve_response_value(object, context, object_is_hash)
+    value = coerce_value(value, false)
+    validated_value(value)
   end
 
   def default_specified?
@@ -32,7 +39,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     enum
   end
 
-  def retrieve_value(object, context, object_is_hash)
+  def retrieve_response_value(object, context, object_is_hash)
     if object_is_hash
       retrieve_hash_value(object)
     elsif context&.resolve?(method)
@@ -40,7 +47,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     elsif object.respond_to?(method, true)
       object.public_send(method)
     else
-      raise_coercion_error(object)
+      raise_response_coercion_error(object)
     end
   end
 
@@ -53,14 +60,17 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def coerce_value(value, from_input)
+    return if value.nil? && null
     return default if value.nil? && default_specified?
 
     type_obj = type.new(value)
     from_input ? type_obj.coerce_input : type_obj.coerce_response
+  rescue Taro::Error => e
+    raise e.class, "#{e.message} after using method/key `:#{method}` to resolve field `#{name}`."
   end
 
-  def raise_coercion_error(object)
-    raise Taro::RuntimeError, <<~MSG
+  def raise_response_coercion_error(object)
+    raise Taro::ResponseError, <<~MSG
       Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
       It is not a valid #{type} value.
     MSG

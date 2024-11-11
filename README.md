@@ -6,20 +6,18 @@ Inspired by `apipie-rails` and `graphql-ruby`.
 
 ## ⚠️ This is a work in progress - TODO:
 
-- unbreak validation of nested param null (example: 'raises for invalid params if config.validate_params is true')
 - additionalProperties, FreeFormType
 - maybe later: apidoc rendering based on export (rails engine?)
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - rspec matchers for testing?
 - examples https://swagger.io/specification/#example-object
 - `deprecation`
-- move coercion error out of Field, handle in ResponseValidator?
-- ResponseValidator should detect excessive fields (later: only if additionalProperties is false)
+- maybe detect when undeclared params are sent (later: only if additionalProperties is false)
 - more docs
 - consider rename: ObjectType > TaroObjectType, its annoying to inherit from Taro::ObjectType, but its non-optional since ObjectType alone is too generic
   - another alternative: include Taro::ObjectType might be more descriptive
-- do we want a config.invalid_params_callback instead of config.validate_params?
-- replace surprising aliases to TimestampType and DateType
+- object type: accept Hash w.i.access, AC::Parameters?
+- ISO8601Time, ISO8601Date types
 
 ## Installation
 
@@ -127,12 +125,11 @@ TODO
 The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
 
 - `'Boolean'` - accepts and renders `true` or `false`
-- `'Date'` - accepts and renders dates as unix timestamp integers
-- `'DateTime'`, `'Time'` - accepts and renders times as unix timestamp integers
 - `'Float'`
 - `'Integer'`
 - `'NoContentType'` - renders an empty object, for use with `status: :no_content`
 - `'String'`
+- `'Timestamp'` - accepts and renders `Time` instances as unix timestamp integers
 - `'UUID'` - accepts and renders UUIDs
 
 ### Enums

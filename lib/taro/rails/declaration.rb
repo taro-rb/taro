@@ -29,7 +29,6 @@ class Taro::Rails::Declaration
 
   def parse_params(rails_params)
     hash = params.new(rails_params.to_unsafe_h).coerce_input
-    params.new(hash).validate! if Taro.config.validate_params
     hash
   end
 

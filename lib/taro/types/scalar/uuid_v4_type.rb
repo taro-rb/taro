@@ -5,10 +5,18 @@ class Taro::Types::Scalar::UUIDv4Type < Taro::Types::ScalarType
   PATTERN = /\A\h{8}-?(?:\h{4}-?){3}\h{12}\z/
 
   def coerce_input
-    object if object.is_a?(String) && object.match?(PATTERN)
+    if object.is_a?(String) && object.match?(PATTERN)
+      object
+    else
+      input_error("must be a UUID v4 string")
+    end
   end
 
   def coerce_response
-    object if object.is_a?(String) && object.match?(PATTERN)
+    if object.is_a?(String) && object.match?(PATTERN)
+      object
+    else
+      response_error("must be a UUID v4 string")
+    end
   end
 end

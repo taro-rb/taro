@@ -13,7 +13,12 @@ describe Taro::Types::ObjectTypes::PageType do
   it 'coerces response data' do
     expect(example.new({ page: [], page_info: }).coerce_response).to eq(page: [], page_info:)
     expect(example.new({ page: [{ data: 'x' }], page_info: }).coerce_response).to eq(page: %w[x], page_info:)
-    expect(example.new({ page: [{ data: 42 }], page_info: }).coerce_response).to be_nil
+    expect do
+      example.new({ page: [{ data: 42 }], page_info: }).coerce_response
+    end.to raise_error(
+      Taro::ResponseError,
+      '42 (Integer) is not valid as Taro::Types::Scalar::StringType: must be a String or Symbol'
+    )
   end
 
   it 'renders with rails_cursor_pagination' do

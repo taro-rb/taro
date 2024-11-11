@@ -2,12 +2,10 @@ describe Taro::Types::Coercion do
   describe '::call' do
     %w[
       Boolean
-      Date
-      DateTime
       Float
       Integer
       String
-      Time
+      Timestamp
       UUID
     ].each do |type|
       it "coerces { type: '#{type}' } to a Taro type" do

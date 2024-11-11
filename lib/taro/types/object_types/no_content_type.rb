@@ -11,6 +11,6 @@ class Taro::Types::ObjectTypes::NoContentType < Taro::Types::ObjectType
   end
 
   def coerce_response
-    object if object == {}
+    {}
   end
 end

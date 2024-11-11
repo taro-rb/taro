@@ -4,12 +4,14 @@ describe Taro::Types::Scalar::UUIDv4Type do
   it 'coerces input' do
     expect(described_class.new(uuid).coerce_input).to eq uuid
     expect(described_class.new(uuid.tr('-', '')).coerce_input).to eq uuid.tr('-', '')
-    expect(described_class.new(uuid[1..]).coerce_input).to be_nil
+    expect { described_class.new(uuid[1..]).coerce_input }
+      .to raise_error(Taro::InputError, /must be a UUID v4 string/)
   end
 
   it 'coerces response data' do
     expect(described_class.new(uuid).coerce_response).to eq uuid
     expect(described_class.new(uuid.tr('-', '')).coerce_response).to eq uuid.tr('-', '')
-    expect(described_class.new(uuid[1..]).coerce_response).to be_nil
+    expect { described_class.new(uuid[1..]).coerce_response }
+      .to raise_error(Taro::ResponseError, /must be a UUID v4 string/)
   end
 end

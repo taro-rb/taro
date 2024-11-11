@@ -8,20 +8,16 @@ class Taro::Types::ListType < Taro::Types::BaseType
   self.openapi_type = :array
 
   def coerce_input
-    return unless object.instance_of?(Array)
+    object.instance_of?(Array) || input_error('must be an Array')
 
     item_type = self.class.item_type
-    object.map do |el|
-      res = item_type.new(el).coerce_input
-      res.nil? ? break : res
-    end
+    object.map { |el| item_type.new(el).coerce_input }
   end
 
   def coerce_response
+    object.respond_to?(:map) || response_error('must be an Enumerable')
+
     item_type = self.class.item_type
-    Array(object).map do |el|
-      res = item_type.new(el).coerce_response
-      res.nil? ? break : res
-    end
+    object.map { |el| item_type.new(el).coerce_response }
   end
 end

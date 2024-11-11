@@ -96,18 +96,11 @@ describe Taro::Rails::Declaration do
       expect { subject.parse_params(params) }.not_to raise_error
     end
 
-    it 'does not raise for invalid params if config.validate_params is false', config: { validate_params: false } do
-      params = ActionController::Parameters.new(user: { name: nil })
-      expect { subject.parse_params(params) }.not_to raise_error
-    end
-
-    it 'raises for invalid params if config.validate_params is true', config: { validate_params: true } do
-      pending 'validation of nested param null is currently broken'
-
+    it 'raises for invalid params' do
       params = ActionController::Parameters.new(user: { name: nil })
       expect do
         subject.parse_params(params)
-      end.to raise_error(Taro::ValidationError, /not nullable/)
+      end.to raise_error(Taro::InputError, /nil.*must be a String/)
     end
   end
 end

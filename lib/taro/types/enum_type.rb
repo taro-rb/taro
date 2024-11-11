@@ -15,13 +15,21 @@ class Taro::Types::EnumType < Taro::Types::BaseType
   def coerce_input
     self.class.raise_if_empty_enum
     value = self.class.item_type.new(object).coerce_input
-    value if self.class.values.include?(value)
+    if self.class.values.include?(value)
+      value
+    else
+      input_error("must be one of #{self.class.values}")
+    end
   end
 
   def coerce_response
     self.class.raise_if_empty_enum
     value = self.class.item_type.new(object).coerce_response
-    value if self.class.values.include?(value)
+    if self.class.values.include?(value)
+      value
+    else
+      response_error("must be one of #{self.class.values}")
+    end
   end
 
   def self.raise_if_empty_enum
