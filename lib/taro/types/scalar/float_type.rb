@@ -1,6 +1,7 @@
 class Taro::Types::Scalar::FloatType < Taro::Types::ScalarType
   self.openapi_type = :number
   self.response_types = [Float]
+  self.input_types = [Float]
 
   def coerce_input
     object if object.instance_of?(Float)

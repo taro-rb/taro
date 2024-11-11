@@ -6,6 +6,12 @@ class Taro::Types::InputType < Taro::Types::BaseType
   include Taro::Types::Shared::ObjectCoercion
 
   self.openapi_type = :object
+  self.input_types = [Hash, ActiveSupport::HashWithIndifferentAccess]
+
+  def self.inherited(subclass)
+    subclass.instance_variable_set(:@input_types, [Hash, ActiveSupport::HashWithIndifferentAccess])
+    super
+  end
 
   def coerce_response
     raise Taro::RuntimeError, 'InputTypes cannot be used as response types'

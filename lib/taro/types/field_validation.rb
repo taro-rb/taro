@@ -1,10 +1,18 @@
 module Taro::Types::FieldValidation
   # Validate the value against the field properties. This method will raise
   # a Taro::RuntimeError if the value is not matching.
-  def valid?(value)
+  def response_validated(value)
     validate_null_and_ok?(value)
     validate_enum_inclusion(value)
-    validate_type(value)
+    validate_response_type(value)
+    value
+  end
+
+  def input_validated(value)
+    validate_null_and_ok?(value)
+    validate_enum_inclusion(value)
+    validate_input_type(value)
+    value
   end
 
   private
@@ -26,12 +34,21 @@ module Taro::Types::FieldValidation
     MSG
   end
 
-  def validate_type(value)
+  def validate_response_type(value)
     return if value.nil?
     return if type.response_types.include?(value.class)
 
     raise Taro::ValidationError, <<~MSG
       Field #{name} has an invalid type #{value.class.name} (expected #{type.response_types.map(&:name).inspect})
+    MSG
+  end
+
+  def validate_input_type(value)
+    return if value.nil?
+    return if type.input_types.include?(value.class)
+
+    raise Taro::ValidationError, <<~MSG
+      Field #{name} has an invalid type #{value.class.name} (expected #{type.input_types.map(&:name).inspect})
     MSG
   end
 end

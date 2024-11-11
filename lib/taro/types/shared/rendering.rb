@@ -13,4 +13,12 @@ module Taro::Types::Shared::Rendering
   def response_types=(types)
     @response_types = types
   end
+
+  def input_types
+    @input_types
+  end
+
+  def input_types=(types)
+    @input_types = types
+  end
 end

@@ -1,21 +1,17 @@
 # Provides input and response handling for types with fields.
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
-    coerce_with_fields(true)
+    self.class.fields.to_h do |name, field|
+      value = field.coerce_input(object)
+      [name, value]
+    end
   end
 
   # Render the object into a hash.
   def coerce_response
-    coerce_with_fields(false)
-  end
-
-  # TODO Maybe deprecated?
-  def coerce_with_fields(from_input)
-    # we might need to validate the opposite as well: are there too many information and not only are some missing?
     object_is_hash = object.is_a?(Hash)
     self.class.fields.to_h do |name, field|
-      value = field.extract_value(object, context: self, from_input:, object_is_hash:)
-      field.valid?(value) unless from_input
+      value = field.extract_value(object, context: self, object_is_hash:)
       [name, value]
     end
   end

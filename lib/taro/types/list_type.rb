@@ -6,6 +6,8 @@ class Taro::Types::ListType < Taro::Types::BaseType
   extend Taro::Types::Shared::ItemType
 
   self.openapi_type = :array
+  self.response_types = [Array]
+  self.input_types = [Array]
 
   def coerce_input
     return unless object.instance_of?(Array)

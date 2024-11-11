@@ -8,9 +8,16 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     super(name:, type:, null:, method:, default:, enum:, defined_at:, description:)
   end
 
-  def extract_value(object, context: nil, from_input: true, object_is_hash: true)
+  def extract_value(object, context: nil, object_is_hash: true)
     value = retrieve_value(object, context, object_is_hash)
-    coerce_value(value, from_input)
+    value = coerce_value(value, false)
+    response_validated(value)
+  end
+
+  def coerce_input(object) # always a hash, context does not matter, always from input
+    value = object[name]
+    coerce_value(value, true)
+    Taro.config.validate_params ? input_validated(value) : value
   end
 
   def default_specified?

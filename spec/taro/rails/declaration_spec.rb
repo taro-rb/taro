@@ -102,8 +102,6 @@ describe Taro::Rails::Declaration do
     end
 
     it 'raises for invalid params if config.validate_params is true', config: { validate_params: true } do
-      pending 'validation of nested param null is currently broken'
-
       params = ActionController::Parameters.new(user: { name: nil })
       expect do
         subject.parse_params(params)
