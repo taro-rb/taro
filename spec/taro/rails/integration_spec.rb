@@ -45,6 +45,8 @@ describe 'Rails integration' do
   end
 
   it 'works' do
+    expect(Taro::Rails.declarations.count).to eq 1
+
     put(:update, params: { user: { name: 'taro', id: '42' } })
 
     expect(response.body).to eq('{"name":"TARO"}')
@@ -85,7 +87,7 @@ describe 'Rails integration' do
   end
 
   it 'tracks defined_at correctly for the ad-hoc input type' do
-    field = Taro::Rails.declarations[UsersController][:update].params.fields[:user]
+    field = Taro::Rails.declaration_for(UsersController, :update).params.fields[:user]
     expect(field.defined_at.to_s).to match(/#{__FILE__}:\d+/)
   end
 end

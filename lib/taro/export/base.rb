@@ -1,8 +1,8 @@
 class Taro::Export::Base
   attr_reader :result
 
-  def self.call(title: 'Taro-based API', version: '1.0', **)
-    new.call(title:, version:, **)
+  def self.call(declarations:, title: 'Taro-based API', version: '1.0', **)
+    new.call(declarations:, title:, version:, **)
   end
 
   def to_json(*)

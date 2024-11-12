@@ -8,7 +8,7 @@ module Taro::Rails::ParamParsing
     installed[key] = true
 
     controller_class.before_action(only: action_name) do
-      declaration = Taro::Rails.declarations[controller_class][action_name]
+      declaration = Taro::Rails.declaration_for(controller_class, action_name)
       @api_params = declaration.parse_params(params)
     end
   end

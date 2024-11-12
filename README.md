@@ -12,14 +12,8 @@ It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [
 
 ## ⚠️ This is a work in progress - TODO:
 
-- rake task for export
-  - eager load in export
-  - get export path from config
-  - declarations: Taro::Rails.declarations.values.flat_map(&:values)
-    - maybe rename ::declarations -> declaration_map
 - param should not be nullable if part of path
 - spec (.:format) handling
-- reset last rendered type after check? or in an rspec hook?
 - ISO8601Time, ISO8601Date types
 
 ## Installation

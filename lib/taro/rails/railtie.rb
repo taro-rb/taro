@@ -8,4 +8,6 @@ class Taro::Rails::Railtie < ::Rails::Railtie
       Taro::Rails.reset
     end
   end
+
+  rake_tasks { Dir["#{__dir__}/tasks/**/*.rake"].each { |f| load f } }
 end

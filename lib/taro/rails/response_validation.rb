@@ -21,7 +21,7 @@ module Taro::Rails::ResponseValidation
   end
 
   def self.call(controller)
-    declaration = Taro::Rails.declarations[controller.class][controller.action_name.to_sym]
+    declaration = Taro::Rails.declaration_for(controller.class, controller.action_name)
     expected = declaration.returns[controller.status]
     used = Taro::Types::BaseType.rendering
 
