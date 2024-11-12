@@ -27,7 +27,9 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def export_route(route, declaration)
     {
       route.verb.to_sym => {
-        description: declaration.api,
+        description: declaration.description,
+        summary: declaration.summary,
+        tags: declaration.tags,
         parameters: path_parameters(declaration, route),
         requestBody: request_body(declaration, route),
         responses: responses(declaration),
@@ -51,7 +53,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     end
   end
 
-  def request_body(declaration, route)
+  def request_body(declaration, route) # rubocop:disable Metrics/MethodLength
     params = declaration.params
     body_param_fields = params.fields.reject do |name, _field|
       route.path_params.include?(name)
@@ -62,8 +64,20 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     body_input_type.fields.replace(body_param_fields)
     body_input_type.openapi_name = params.openapi_name
 
-    ref = extract_component_ref(body_input_type)
-    { content: { 'application/json': { schema: ref } } }
+    # For polymorphic routes (more than one for the same declaration),
+    # we can't use refs because they request body might differ.
+    # Different params might be in the path vs. in the request body.
+    use_refs = declaration.routes.size == 1
+    schema = request_body_schema(body_input_type, use_refs:)
+    { content: { 'application/json': { schema: } } }
+  end
+
+  def request_body_schema(type, use_refs:)
+    if use_refs
+      extract_component_ref(type)
+    else
+      type_details(type)
+    end
   end
 
   def responses(declaration)

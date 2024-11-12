@@ -1,12 +1,27 @@
 describe Taro::Rails::Declaration do
-  describe '#api=' do
-    it 'sets the api attribute' do
-      subject.api = 'My description'
-      expect(subject.api).to eq('My description')
+  describe '#add_info=' do
+    it 'sets the summary attribute' do
+      subject.add_info 'My description'
+      expect(subject.summary).to eq('My description')
+    end
+
+    it 'can add description' do
+      subject.add_info('...', description: 'My long description')
+      expect(subject.description).to eq('My long description')
+    end
+
+    it 'can add tags' do
+      subject.add_info('...', tags: ['My tag'])
+      expect(subject.tags).to eq(['My tag'])
+    end
+
+    it 'can add single tags' do
+      subject.add_info('...', tags: 'My tag')
+      expect(subject.tags).to eq(['My tag'])
     end
 
     it 'raises for invalid args' do
-      expect { subject.api = 42 }.to raise_error(Taro::ArgumentError)
+      expect { subject.add_info(42) }.to raise_error(Taro::ArgumentError)
     end
   end
 

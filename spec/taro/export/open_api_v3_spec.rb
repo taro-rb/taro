@@ -6,7 +6,7 @@ describe Taro::Export::OpenAPIv3 do
     end)
 
     declaration = Taro::Rails::Declaration.new
-    declaration.api = 'My endpoint description'
+    declaration.add_info 'My endpoint description'
     declaration.add_param :id, type: 'Integer', null: false
     declaration.add_param :foo, type: 'String', null: true
     declaration.add_return type: 'Integer', code: 200, null: false, description: 'okay'
@@ -28,7 +28,7 @@ describe Taro::Export::OpenAPIv3 do
       paths:
         "/users/{id}":
           put:
-            description: My endpoint description
+            summary: My endpoint description
             parameters:
             - name: id
               in: path
@@ -236,6 +236,17 @@ describe Taro::Export::OpenAPIv3 do
         properties: {},
         additionalProperties: true,
       }
+    )
+  end
+
+  it 'uses inline request body for polymorphic routes' do
+    stub_const('InputType', Class.new(T::InputType) do
+      field :inner, type: 'String', null: false
+    end)
+    expect(subject.request_body_schema(InputType, use_refs: false)).to eq(
+      properties: { inner: { type: :string } },
+      required: [:inner],
+      type: :object,
     )
   end
 

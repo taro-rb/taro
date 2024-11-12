@@ -1,5 +1,5 @@
 class Taro::Rails::Declaration
-  attr_reader :api, :params, :returns, :return_descriptions, :routes
+  attr_reader :description, :summary, :params, :returns, :return_descriptions, :routes, :tags
 
   def initialize
     @params = Class.new(Taro::Types::InputType)
@@ -7,9 +7,11 @@ class Taro::Rails::Declaration
     @return_descriptions = {}
   end
 
-  def api=(arg)
-    arg.is_a?(String) || raise(Taro::ArgumentError, 'api description must be a String')
-    @api = arg
+  def add_info(summary, description: nil, tags: nil)
+    summary.is_a?(String) || raise(Taro::ArgumentError, 'api summary must be a String')
+    @summary = summary
+    @description = description
+    @tags = Array(tags) if tags
   end
 
   def add_param(param_name, **kwargs)
