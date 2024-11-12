@@ -1,5 +1,5 @@
 module Taro::Rails::ResponseValidation
-  def self.install(controller_class:, action_name:)
+  def self.install(controller_class:, action_name:) # rubocop:disable Metrics/MethodLength
     return unless Taro.config.validate_response
 
     key = [controller_class, action_name]
@@ -7,8 +7,12 @@ module Taro::Rails::ResponseValidation
 
     installed[key] = true
 
-    controller_class.after_action(only: action_name) do
+    controller_class.around_action(only: action_name) do |_, block|
+      Taro::Types::BaseType.rendering = nil
+      block.call
       Taro::Rails::ResponseValidation.call(self)
+    ensure
+      Taro::Types::BaseType.rendering = nil
     end
   end
 
@@ -26,7 +30,6 @@ module Taro::Rails::ResponseValidation
       but #{used ? "#{used}.render" : 'no type render method'} was called.
     MSG
 
-    Taro::Types::BaseType.rendering = nil
     Taro::Types::BaseType.used_in_response = used # for comparisons in specs
   end
 end
