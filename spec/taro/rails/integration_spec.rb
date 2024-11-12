@@ -83,4 +83,9 @@ describe 'Rails integration' do
       put(:update, params: { user: { name: 'taro', id: '42' } })
     end.to raise_error(Taro::ResponseError, /expected.*UserResponseType/i)
   end
+
+  it 'tracks defined_at correctly for the ad-hoc input type' do
+    field = Taro::Rails.declarations[UsersController][:update].params.fields[:user]
+    expect(field.defined_at.to_s).to match(/#{__FILE__}:\d+/)
+  end
 end

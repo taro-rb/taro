@@ -4,7 +4,7 @@ module Taro::Types::Shared::Fields
   # are evaluated lazily to allow for circular or recursive type references,
   # and to avoid unnecessary eager loading of all types in dev/test envs.
   def field(name, **kwargs)
-    defined_at = caller_locations(1..1)[0].then { "#{_1.path}:#{_1.lineno}" }
+    defined_at = kwargs[:defined_at] || caller_locations(1..1)[0]
     validate_name(name, defined_at:)
     validate_no_override(name, defined_at:)
     validate_options(name, defined_at:, **kwargs)

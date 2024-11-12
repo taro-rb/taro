@@ -15,6 +15,7 @@ class Taro::Rails::Declaration
   end
 
   def add_param(param_name, **kwargs)
+    kwargs[:defined_at] = caller_locations(1..2)[1]
     @params.field(param_name, **kwargs)
   end
 
@@ -80,7 +81,7 @@ class Taro::Rails::Declaration
 
   def return_type_from(field_name, **kwargs)
     if field_name
-      # TODO: allow anonymous types in openapi export, ref only their contents
+      kwargs[:defined_at] = caller_locations(1..2)[1]
       Class.new(Taro::Types::ObjectType).tap { |t| t.field(field_name, **kwargs) }
     else
       Taro::Types::Coercion.call(kwargs)
