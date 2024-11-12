@@ -15,7 +15,7 @@ Taro::Rails::NormalizedRoute = Data.define(:rails_route) do
   end
 
   def openapi_path
-    rails_route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
+    rails_route.path.spec.to_s.gsub('(.:format)', '').gsub(/:(\w+)/, '{\1}')
   end
 
   def path_params
