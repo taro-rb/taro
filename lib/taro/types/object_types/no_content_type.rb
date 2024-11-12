@@ -7,7 +7,7 @@ class Taro::Types::ObjectTypes::NoContentType < Taro::Types::ObjectType
   end
 
   def coerce_input
-    raise Taro::RuntimeError, 'NoContentType cannot be used as input type'
+    input_error 'NoContentType cannot be used as input type'
   end
 
   def coerce_response

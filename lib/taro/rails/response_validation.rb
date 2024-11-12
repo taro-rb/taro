@@ -1,5 +1,5 @@
 module Taro::Rails::ResponseValidation
-  def self.install(controller_class:, action_name:) # rubocop:disable Metrics/MethodLength
+  def self.install(controller_class:, action_name:)
     return unless Taro.config.validate_response
 
     key = [controller_class, action_name]

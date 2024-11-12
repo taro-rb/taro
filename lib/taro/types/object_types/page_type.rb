@@ -9,7 +9,7 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
   extend Taro::Types::Shared::ItemType
 
   def coerce_input
-    raise Taro::RuntimeError, 'PageTypes cannot be used as input types'
+    input_error 'PageTypes cannot be used as input types'
   end
 
   def coerce_response(after:, limit: 20, order_by: nil, order: nil)

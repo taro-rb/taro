@@ -37,7 +37,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     }
   end
 
-  def path_parameters(declaration, route) # rubocop:disable Metrics/MethodLength
+  def path_parameters(declaration, route)
     route.path_params.map do |param_name|
       param_field = declaration.params.fields[param_name] || raise(<<~MSG)
         Declaration missing for path param #{param_name} of route #{route.endpoint}
@@ -53,7 +53,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     end
   end
 
-  def request_body(declaration, route) # rubocop:disable Metrics/MethodLength
+  def request_body(declaration, route)
     params = declaration.params
     body_param_fields = params.fields.reject do |name, _field|
       route.path_params.include?(name)

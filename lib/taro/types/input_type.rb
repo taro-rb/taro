@@ -8,6 +8,6 @@ class Taro::Types::InputType < Taro::Types::BaseType
   self.openapi_type = :object
 
   def coerce_response
-    raise Taro::RuntimeError, 'InputTypes cannot be used as response types'
+    response_error 'InputTypes cannot be used as response types'
   end
 end

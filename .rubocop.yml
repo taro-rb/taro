@@ -12,6 +12,9 @@ Lint/AmbiguousOperatorPrecedence:
 Metrics/BlockLength:
   Exclude: ['spec/**/*', 'tasks/**/*']
 
+Metrics/MethodLength:
+  Max: 15
+
 Metrics/ParameterLists:
   Enabled: false
 
