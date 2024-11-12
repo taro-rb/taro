@@ -96,6 +96,9 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
   def export_scalar_field(field)
     base = { type: field.openapi_type }
+    # Using oneOf seems more correct than an array of types
+    # as it puts props like format together with the main type.
+    # https://github.com/OAI/OpenAPI-Specification/issues/3148
     base = { oneOf: [base, { type: 'null' }] } if field.null
     base[:description] = field.description if field.description
     base[:default] = field.default if field.default_specified?

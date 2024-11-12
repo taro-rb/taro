@@ -12,7 +12,7 @@ It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [
 
 ## ⚠️ This is a work in progress - TODO:
 
-- rspec matchers for testing?
+- reset last rendered type after check? or in an rspec hook?
 - ISO8601Time, ISO8601Date types
 
 ## Installation
@@ -163,6 +163,7 @@ end
 
 - warning/raising for undeclared input params (currently they are ignored)
 - usage without rails is possible but not convenient yet
+- rspec matchers for testing
 - sum types
 - api doc rendering based on export (e.g. rails engine with web ui)
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
@@ -188,7 +189,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/taro.
+Bug reports and pull requests are welcome on GitHub at https://github.com/taro-rb/taro.
 
 ## License
 
