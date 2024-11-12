@@ -48,6 +48,7 @@ describe 'Rails integration' do
     put(:update, params: { user: { name: 'taro', id: '42' } })
 
     expect(response.body).to eq('{"name":"TARO"}')
+    expect(Taro::Types::BaseType.used_in_response).to eq(UserResponseType)
   end
 
   it 'can raise errors for invalid params' do

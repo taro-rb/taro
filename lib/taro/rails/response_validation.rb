@@ -19,11 +19,14 @@ module Taro::Rails::ResponseValidation
   def self.call(controller)
     declaration = Taro::Rails.declarations[controller.class][controller.action_name.to_sym]
     expected = declaration.returns[controller.status]
-    used = Taro::Types::BaseType.rendered
+    used = Taro::Types::BaseType.rendering
 
     used&.<=(expected) || raise(Taro::ResponseError, <<~MSG)
       Expected #{controller.class}##{controller.action_name} to use #{expected}.render,
       but #{used ? "#{used}.render" : 'no type render method'} was called.
     MSG
+
+    Taro::Types::BaseType.rendering = nil
+    Taro::Types::BaseType.used_in_response = used # for comparisons in specs
   end
 end

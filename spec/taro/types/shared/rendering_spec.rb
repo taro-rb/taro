@@ -13,7 +13,7 @@ describe Taro::Types::Shared::Rendering do
 
   it 'keeps track of the type used for rendering' do
     test_type.render('foo')
-    expect(T::BaseType.rendered).to eq(test_type)
+    expect(T::BaseType.rendering).to eq(test_type)
   end
 
   it 'raises if called multiple times (DoubleRendering)' do
