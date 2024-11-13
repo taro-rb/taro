@@ -13,7 +13,7 @@ module Taro::Rails::ActiveDeclarations
     declarations_map.values.flat_map(&:values)
   end
 
-  def declaration_for(controller_class, action_name)
-    declarations_map[controller_class].to_h[action_name.to_sym]
+  def declaration_for(controller)
+    declarations_map[controller.class].to_h[controller.action_name.to_sym]
   end
 end

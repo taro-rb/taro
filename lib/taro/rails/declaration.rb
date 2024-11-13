@@ -1,10 +1,11 @@
 class Taro::Rails::Declaration
-  attr_reader :desc, :summary, :params, :returns, :return_descriptions, :routes, :tags
+  attr_reader :desc, :summary, :params, :returns, :return_descriptions, :return_nestings, :routes, :tags
 
   def initialize
     @params = Class.new(Taro::Types::InputType)
     @returns = {}
     @return_descriptions = {}
+    @return_nestings = {}
   end
 
   def add_info(summary, desc: nil, tags: nil)
@@ -19,16 +20,23 @@ class Taro::Rails::Declaration
     @params.field(param_name, **kwargs)
   end
 
-  def add_return(field_name = nil, code:, desc: nil, **kwargs)
+  def add_return(nesting = nil, code:, desc: nil, **kwargs)
     status = self.class.coerce_status_to_int(code)
-    returns[status] &&
-      raise(Taro::ArgumentError, "response for status #{status} already declared")
+    raise_if_already_declared(status)
 
     kwargs[:defined_at] = caller_locations(1..2)[1]
-    returns[status] = return_type_from(field_name, **kwargs)
+    returns[status] = return_type_from(nesting, **kwargs)
 
     # response desc is required in openapi 3 – fall back to status code
     return_descriptions[status] = desc || code.to_s
+
+    # if a field name is provided, the response should be nested
+    return_nestings[status] = nesting if nesting
+  end
+
+  def raise_if_already_declared(status)
+    returns[status] &&
+      raise(Taro::ArgumentError, "response for status #{status} already declared")
   end
 
   def parse_params(rails_params)
@@ -78,9 +86,10 @@ class Taro::Rails::Declaration
 
   private
 
-  def return_type_from(field_name, **kwargs)
-    if field_name
-      Class.new(Taro::Types::ObjectType).tap { |t| t.field(field_name, **kwargs) }
+  def return_type_from(nesting, **kwargs)
+    if nesting
+      # ad-hoc return type, requiring the actual return type to be nested
+      Class.new(Taro::Types::ObjectType).tap { |t| t.field(nesting, **kwargs) }
     else
       Taro::Types::Coercion.call(kwargs)
     end

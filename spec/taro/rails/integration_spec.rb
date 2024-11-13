@@ -85,4 +85,42 @@ describe 'Rails integration' do
       put(:update, params: { user: { name: 'taro', id: '42' } })
     end.to raise_error(Taro::ResponseError, /expected.*UserResponseType/i)
   end
+
+  context 'for nested responses' do
+    let!(:users_controller) do
+      stub_const('UsersController', Class.new(ActionController::API) do
+        def self.name = 'UsersController'
+        returns :str, type: 'String', null: false, code: :ok
+        def update
+          render json: { params[:nest] => S::StringType.render('hi') }
+        end
+      end)
+    end
+
+    it 'works' do
+      expect(Taro::Rails.declarations.count).to eq 1
+
+      put(:update, params: { nest: 'str' })
+
+      expect(response.body).to eq('{"str":"hi"}')
+      expect(Taro::Types::BaseType.used_in_response).to eq(S::StringType)
+    end
+
+    it 'raises for the wrong nesting' do
+      expect(Taro::Rails.declarations.count).to eq 1
+
+      expect do
+        put(:update, params: { nest: 'bad' })
+      end.to raise_error(Taro::ResponseError, /expected.*"str"/i)
+    end
+
+    it 'ignores non-json responses' do
+      allow_any_instance_of(ActionDispatch::TestResponse)
+        .to receive(:media_type).and_return('text/html')
+
+      expect do
+        put(:update, params: { nest: 'bad' })
+      end.not_to raise_error
+    end
+  end
 end
