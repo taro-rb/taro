@@ -24,7 +24,7 @@ bundle add taro
 Then, if using rails, generate type files to inherit from:
 
 ```bash
-rails generate taro:install [ --dir app/my_types_dir ]
+bundle exec rails g taro:rails:install [ --dir app/my_types_dir ]
 ```
 
 ## Usage

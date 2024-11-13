@@ -10,13 +10,9 @@ class Taro::Rails::Generators::InstallGenerator < ::Rails::Generators::Base
 
   # :nocov:
   def create_type_files
-    %w[
-      base_type
-      input_type
-      object_type
-      scalar_type
-    ].each do |type|
-      copy_file "#{type}.erb", "#{dir.chomp('/')}/#{type}.rb"
+    Dir["#{self.class.source_root}/**/*.erb"].each do |tmpl|
+      dest_dir = options[:dir].chomp('/')
+      copy_file tmpl, "#{dest_dir}/#{File.basename(tmpl).sub('erb', 'rb')}"
     end
   end
   # :nocov:
