@@ -129,11 +129,11 @@ The following type names are available by default and can be used as `type:`/`ar
 
 - `'Boolean'` - accepts and renders `true` or `false`
 - `'Float'`
-- '`FreeForm'` - accepts and renders any JSON-serializable object, use with care
+- `'FreeForm'` - accepts and renders any JSON-serializable object, use with care
 - `'Integer'`
 - `'NoContentType'` - renders an empty object, for use with `status: :no_content`
 - `'String'`
-- `'Timestamp'` - accepts and renders `Time` instances as unix timestamp integers
+- `'Timestamp'` - renders a `Time` as unix timestamp integer and turns into incoming integers into a `Time`
 - `'UUID'` - accepts and renders UUIDs
 
 ### Enums
@@ -150,9 +150,11 @@ end
 class ErrorType < ObjectType
   field :severity, type: 'SeverityEnumType', null: false
 end
+```
 
-# inline enums are also possible
-# (unlike enum classes, these are not extracted into refs in the OpenAPI export)
+Inline enums are also possible. Unlike EnumType classes, these are inlined in the OpenAPI export and not extracted into refs.
+
+```ruby
 class ErrorType < ObjectType
   field :severity, type: 'String', enum: %w[info warning debacle], null: false
 end
