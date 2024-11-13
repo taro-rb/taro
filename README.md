@@ -34,8 +34,8 @@ This is how type classes can be used in a Rails controller:
 
 ```ruby
 class BikesController < ApplicationController
-  # Calling `api` to set an endpoint description is optional.
-  api     'Update a bike'
+  # This adds an endpoint summary, description, and tags to the docs (all optional)
+  api     'Update a bike', description: 'My longer description', tags: ['Bikes']
   # Params can come from the path, e.g. /bike/:id)
   param   :id, type: 'UUID', null: false, description: 'ID of the bike to update'
   # They can also come from the query string or request body
@@ -160,6 +160,59 @@ class ErrorType < ObjectType
 end
 ```
 
+### FAQ
+
+#### How to avoid repeating common error declarations?
+
+Hook into the DSL in your base controller(s):
+
+```ruby
+class ApiBaseController < ApplicationController
+  def self.api(...)
+    super
+    returns code: :not_found, type: 'MyErrorType', description: 'The record was not found'
+  end
+
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+
+  def render_not_found
+    render json: MyErrorType.render(something), status: :not_found
+  end
+end
+```
+
+```ruby
+class AuthenticatedApiController < ApiBaseController
+  def self.api(...)
+    super
+    returns code: :unauthorized, type: 'MyErrorType'
+  end
+  # ... rescue_from ... render ...
+end
+```
+
+#### How to use context in my types?
+
+Use [ActiveSupport::CurrentAttributes](https://api.rubyonrails.org/classes/ActiveSupport/CurrentAttributes.html).
+
+```ruby
+class BikeType < ObjectType
+  field :secret_name, type: 'String', null: true
+
+  def secret_name
+    Current.user.superuser? ? object.secret_name : nil
+  end
+end
+```
+
+#### Why do I have to use type name strings instead of the type constants?
+
+Why e.g. `field :id, type: 'UUID'` instead of `field :id, type: UUID`?
+
+The purpose of this is to reduce unnecessary autoloading of the whole type dependency tree in dev and test environments.
+
+This already works fo type classes – they don't trigger loading of referenced types unless used. The API declarations in controller classes still trigger auto-loading for now, but we aim to improve this in the future.
+
 ## Possible future features
 
 - warning/raising for undeclared input params (currently they are ignored)
@@ -169,6 +222,7 @@ end
 - api doc rendering based on export (e.g. rails engine with web ui)
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - deprecation feature
+- maybe make `type:` optional for path params as they're always strings anyway
 - various openapi features
   - non-JSON content types (e.g. for file uploads)
   - [examples](https://swagger.io/specification/#example-object)
