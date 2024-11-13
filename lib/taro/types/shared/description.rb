@@ -1,9 +1,9 @@
 module Taro::Types::Shared::Description
-  def description
-    @description
+  def desc
+    @desc
   end
 
-  def description=(arg)
-    @description = arg
+  def desc=(arg)
+    @desc = arg
   end
 end

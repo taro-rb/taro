@@ -4,7 +4,7 @@
 # and render error responses in rescue_from in a consistent way.
 # You can customize these files to fit your needs, or delete them.
 class ErrorType < ObjectType
-  field :attribute, type: 'String', null: true, description: 'Attribute name'
-  field :code, type: 'String', null: false, method: :type, description: 'Error code'
-  field :message, type: 'String', null: true, description: 'Error message'
+  field :attribute, type: 'String', null: true, desc: 'Attribute name'
+  field :code, type: 'String', null: false, method: :type, desc: 'Error code'
+  field :message, type: 'String', null: true, desc: 'Error message'
 end

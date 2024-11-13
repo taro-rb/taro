@@ -1,5 +1,5 @@
 class Taro::Types::ObjectTypes::NoContentType < Taro::Types::ObjectType
-  self.description = 'An empty response'
+  self.desc = 'An empty response'
 
   # render takes no arguments in this case
   def self.render

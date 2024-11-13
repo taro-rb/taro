@@ -1,5 +1,5 @@
 class Taro::Types::Scalar::TimestampType < Taro::Types::ScalarType
-  self.description = 'Represents a time as Time on the server side and UNIX timestamp (integer) on the client side.'
+  self.desc = 'Represents a time as Time on the server side and UNIX timestamp (integer) on the client side.'
   self.openapi_type = :integer
 
   def coerce_input

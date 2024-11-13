@@ -1,5 +1,5 @@
 class Taro::Types::ObjectTypes::FreeFormType < Taro::Types::ObjectType
-  self.description = 'An arbitrary, unvalidated Hash or JSON object. Use with care.'
+  self.desc = 'An arbitrary, unvalidated Hash or JSON object. Use with care.'
   self.additional_properties = true
 
   def coerce_input

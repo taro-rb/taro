@@ -1,13 +1,13 @@
 describe Taro::Rails::Declaration do
   describe '#add_info=' do
     it 'sets the summary attribute' do
-      subject.add_info 'My description'
-      expect(subject.summary).to eq('My description')
+      subject.add_info 'My text'
+      expect(subject.summary).to eq('My text')
     end
 
-    it 'can add description' do
-      subject.add_info('...', description: 'My long description')
-      expect(subject.description).to eq('My long description')
+    it 'can add a description' do
+      subject.add_info('...', desc: 'My long text')
+      expect(subject.desc).to eq('My long text')
     end
 
     it 'can add tags' do

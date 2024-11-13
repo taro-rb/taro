@@ -9,8 +9,8 @@ describe Taro::Export::OpenAPIv3 do
     declaration.add_info 'My endpoint description'
     declaration.add_param :id, type: 'Integer', null: false
     declaration.add_param :foo, type: 'String', null: true
-    declaration.add_return type: 'Integer', code: 200, null: false, description: 'okay'
-    declaration.add_return :errors, array_of: 'FailureType', code: 422, null: false, description: 'bad'
+    declaration.add_return type: 'Integer', code: 200, null: false, desc: 'okay'
+    declaration.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
     declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
     declaration.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
@@ -128,7 +128,7 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles field descriptions' do
-    field = F.new(type: S::StringType, name: 'foo', null: false, description: 'bar')
+    field = F.new(type: S::StringType, name: 'foo', null: false, desc: 'bar')
     expect(subject.export_field(field)).to eq(type: :string, description: 'bar')
   end
 
@@ -161,7 +161,7 @@ describe Taro::Export::OpenAPIv3 do
     stub_const('ThingType', Class.new(T::ObjectType) do
       field :inner, type: 'String', null: false
     end)
-    field = F.new(type: ThingType, name: 'foo', null: false, description: 'bar')
+    field = F.new(type: ThingType, name: 'foo', null: false, desc: 'bar')
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
@@ -173,7 +173,7 @@ describe Taro::Export::OpenAPIv3 do
     stub_const('ThingType', Class.new(T::ObjectType) do
       field :inner, type: 'String', null: false
     end)
-    field = F.new(type: ThingType, name: 'foo', null: true, description: 'bar')
+    field = F.new(type: ThingType, name: 'foo', null: true, desc: 'bar')
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',

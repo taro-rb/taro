@@ -36,15 +36,15 @@ This is how type classes can be used in a Rails controller:
 ```ruby
 class BikesController < ApplicationController
   # This adds an endpoint summary, description, and tags to the docs (all optional)
-  api     'Update a bike', description: 'My longer description', tags: ['Bikes']
+  api     'Update a bike', desc: 'My longer text', tags: ['Bikes']
   # Params can come from the path, e.g. /bike/:id)
-  param   :id, type: 'UUID', null: false, description: 'ID of the bike to update'
+  param   :id, type: 'UUID', null: false, desc: 'ID of the bike to update'
   # They can also come from the query string or request body
   param   :bike, type: 'BikeInputType', null: false
   # Return types can differ by status code and can be nested as in this case:
-  returns :bike, code: :ok, type: 'BikeType', description: 'update success'
+  returns :bike, code: :ok, type: 'BikeType', desc: 'update success'
   # This one is not nested:
-  returns code: :unprocessable_content, type: 'MyErrorType', description: 'failure'
+  returns code: :unprocessable_content, type: 'MyErrorType', desc: 'failure'
   def update
     # defined params are available as @api_params
     bike = Bike.find(@api_params[:id])
@@ -61,7 +61,7 @@ class BikesController < ApplicationController
 
   # Support for arrays and paginated lists is built-in.
   api     'List all bikes'
-  returns code: :ok, array_of: 'BikeType', description: 'list of bikes'
+  returns code: :ok, array_of: 'BikeType', desc: 'list of bikes'
   def index
     render json: BikeType.array.render(Bike.all)
   end
@@ -75,12 +75,12 @@ Here is an example of the `BikeType` from that controller:
 ```ruby
 class BikeType < ObjectType
   # Optional description of BikeType (for API docs and the OpenAPI export)
-  self.description = 'A bike and all relevant information about it'
+  self.desc = 'A bike and all relevant information about it'
 
   # Object types have fields. Each field has a name, its own type,
   # and a `null:` setting to indicate if it can be nil.
-  # Providing a description is optional.
-  field :brand, type: 'String', null: true, description: 'The brand name'
+  # Providing a desc is optional.
+  field :brand, type: 'String', null: true, desc: 'The brand name'
 
   # Fields can reference other types and arrays of values
   field :users, array_of: 'UserType', null: false
@@ -106,7 +106,7 @@ Note the use of `BikeInputType` in the `param` declaration above? It could look 
 
 ```ruby
 class BikeInputType < InputType
-  field :brand,  type: 'String',  null: true,  description: 'The brand name'
+  field :brand,  type: 'String',  null: true,  desc: 'The brand name'
   field :wheels, type: 'Integer', null: false, default: 2
 end
 ```
@@ -178,7 +178,7 @@ Hook into the DSL in your base controller(s):
 class ApiBaseController < ApplicationController
   def self.api(...)
     super
-    returns code: :not_found, type: 'MyErrorType', description: 'The record was not found'
+    returns code: :not_found, type: 'MyErrorType', desc: 'The record was not found'
   end
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found

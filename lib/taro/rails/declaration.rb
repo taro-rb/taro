@@ -1,5 +1,5 @@
 class Taro::Rails::Declaration
-  attr_reader :description, :summary, :params, :returns, :return_descriptions, :routes, :tags
+  attr_reader :desc, :summary, :params, :returns, :return_descriptions, :routes, :tags
 
   def initialize
     @params = Class.new(Taro::Types::InputType)
@@ -7,10 +7,10 @@ class Taro::Rails::Declaration
     @return_descriptions = {}
   end
 
-  def add_info(summary, description: nil, tags: nil)
+  def add_info(summary, desc: nil, tags: nil)
     summary.is_a?(String) || raise(Taro::ArgumentError, 'api summary must be a String')
     @summary = summary
-    @description = description
+    @desc = desc
     @tags = Array(tags) if tags
   end
 
@@ -19,7 +19,7 @@ class Taro::Rails::Declaration
     @params.field(param_name, **kwargs)
   end
 
-  def add_return(field_name = nil, code:, description: nil, **kwargs)
+  def add_return(field_name = nil, code:, desc: nil, **kwargs)
     status = self.class.coerce_status_to_int(code)
     returns[status] &&
       raise(Taro::ArgumentError, "response for status #{status} already declared")
@@ -27,8 +27,8 @@ class Taro::Rails::Declaration
     kwargs[:defined_at] = caller_locations(1..2)[1]
     returns[status] = return_type_from(field_name, **kwargs)
 
-    # response description is required in openapi 3 – fall back to status code
-    return_descriptions[status] = description || code.to_s
+    # response desc is required in openapi 3 – fall back to status code
+    return_descriptions[status] = desc || code.to_s
   end
 
   def parse_params(rails_params)

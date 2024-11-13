@@ -27,7 +27,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def export_route(route, declaration)
     {
       route.verb.to_sym => {
-        description: declaration.description,
+        description: declaration.desc,
         summary: declaration.summary,
         tags: declaration.tags,
         parameters: path_parameters(declaration, route),
@@ -46,7 +46,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       {
         name: param_field.name,
         in: 'path',
-        description: param_field.description,
+        description: param_field.desc,
         required: true, # path params are always required in rails
         schema: { type: param_field.openapi_type },
       }.compact
@@ -114,7 +114,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     # as it puts props like format together with the main type.
     # https://github.com/OAI/OpenAPI-Specification/issues/3148
     base = { oneOf: [base, { type: 'null' }] } if field.null
-    base[:description] = field.description if field.description
+    base[:description] = field.desc if field.desc
     base[:default] = field.default if field.default_specified?
     base[:enum] = field.enum if field.enum
     base
@@ -124,10 +124,10 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     ref = extract_component_ref(field.type)
     if field.null
       # RE nullable: https://stackoverflow.com/a/70658334
-      { description: field.description, oneOf: [ref, { type: 'null' }] }.compact
-    elsif field.description
+      { description: field.desc, oneOf: [ref, { type: 'null' }] }.compact
+    elsif field.desc
       # https://github.com/OAI/OpenAPI-Specification/issues/2033
-      { description: field.description, allOf: [ref] }
+      { description: field.desc, allOf: [ref] }
     else
       ref
     end
@@ -155,7 +155,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     required = type.fields.values.reject(&:null).map(&:name)
     {
       type: type.openapi_type,
-      description: type.description,
+      description: type.desc,
       required: (required if required.any?),
       properties: type.fields.to_h { |name, f| [name, export_field(f)] },
       additionalProperties: (true if type.additional_properties?),
@@ -165,7 +165,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def enum_type_details(enum)
     {
       type: enum.item_type.openapi_type,
-      description: enum.description,
+      description: enum.desc,
       enum: enum.values,
     }.compact
   end
@@ -173,7 +173,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def list_type_details(list)
     {
       type: 'array',
-      description: list.description,
+      description: list.desc,
       items: export_type(list.item_type),
     }.compact
   end
