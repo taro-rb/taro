@@ -1,7 +1,7 @@
 require 'action_controller'
 
 describe Taro::Rails::RouteFinder do
-  let(:controller_class) { instance_double(ActionController::Base, controller_path: 'users') }
+  let(:controller_class) { instance_double(ActionController::API, controller_path: 'users') }
 
   it 'returns matching routes' do
     route = mock_user_route

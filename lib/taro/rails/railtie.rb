@@ -1,7 +1,9 @@
 class Taro::Rails::Railtie < ::Rails::Railtie
   initializer("taro") do |app|
-    ActiveSupport.on_load(:action_controller_base) do
-      ActionController::Base.prepend(Taro::Rails::ControllerExtension)
+    # The `:action_controller` hook fires for both ActionController::API
+    # and ActionController::Base, executing the block in their context.
+    ActiveSupport.on_load(:action_controller) do
+      extend Taro::Rails::DSL
     end
 
     app.reloader.to_prepare do

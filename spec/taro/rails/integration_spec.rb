@@ -22,7 +22,7 @@ describe 'Rails integration' do
   let!(:users_controller) do
     user_response_type # init
 
-    stub_const('UsersController', Class.new(ActionController::Base) do
+    stub_const('UsersController', Class.new(ActionController::API) do
       def self.name = 'UsersController'
 
       api 'my api'
