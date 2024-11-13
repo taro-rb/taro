@@ -57,6 +57,10 @@ class Taro::Rails::Declaration
     @routes = arg
   end
 
+  def polymorphic_route?
+    routes.size > 1
+  end
+
   # TODO: these change when the controller class is renamed.
   # We might need a way to set `base`. Perhaps as a kwarg to `::api`?
   def add_openapi_names(controller_class:, action_name:)

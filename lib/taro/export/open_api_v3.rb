@@ -47,7 +47,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
         name: param_field.name,
         in: 'path',
         description: param_field.description,
-        required: !param_field.null,
+        required: true, # path params are always required in rails
         schema: { type: param_field.openapi_type },
       }.compact
     end
@@ -67,7 +67,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     # For polymorphic routes (more than one for the same declaration),
     # we can't use refs because they request body might differ.
     # Different params might be in the path vs. in the request body.
-    use_refs = declaration.routes.size == 1
+    use_refs = !declaration.polymorphic_route?
     schema = request_body_schema(body_input_type, use_refs:)
     { content: { 'application/json': { schema: } } }
   end

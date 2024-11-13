@@ -239,6 +239,15 @@ describe Taro::Export::OpenAPIv3 do
     )
   end
 
+  it 'always marks path params as required' do
+    declaration = Taro::Rails::Declaration.new
+    declaration.add_param :id, type: 'Integer', null: true # incorrect null
+    route = Taro::Rails::NormalizedRoute.new(mock_user_route)
+    path_params = subject.path_parameters(declaration, route)
+    expect(path_params.size).to eq 1
+    expect(path_params.first).to include(required: true)
+  end
+
   it 'uses inline request body for polymorphic routes' do
     stub_const('InputType', Class.new(T::InputType) do
       field :inner, type: 'String', null: false

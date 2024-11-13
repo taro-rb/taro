@@ -12,7 +12,6 @@ It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [
 
 ## ⚠️ This is a work in progress - TODO:
 
-- param should not be nullable if part of path
 - spec (.:format) handling
 - ISO8601Time, ISO8601Date types
 
