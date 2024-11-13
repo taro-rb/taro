@@ -13,6 +13,7 @@ It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [
 ## ⚠️ This is a work in progress - TODO:
 
 - ISO8601Time, ISO8601Date types
+- ResponseValidation: allow rendering scalars directly (e.g. `render json: 42`)
 
 ## Installation
 
