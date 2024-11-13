@@ -89,13 +89,6 @@ describe Taro::Rails::Declaration do
     end
   end
 
-  describe '#openapi_paths' do
-    it 'returns the paths of the routes in an openapi compatible format' do
-      subject.routes = [mock_user_route]
-      expect(subject.openapi_paths).to eq(['/users/{id}'])
-    end
-  end
-
   require 'action_controller'
 
   describe '#parse_params' do

@@ -35,12 +35,6 @@ class Taro::Rails::Declaration
     hash
   end
 
-  def openapi_paths
-    routes.to_a.map do |route|
-      route.path.spec.to_s.gsub(/:(\w+)/, '{\1}').gsub('(.:format)', '')
-    end
-  end
-
   def finalize(controller_class:, action_name:)
     add_routes(controller_class:, action_name:)
     add_openapi_names(controller_class:, action_name:)

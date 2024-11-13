@@ -16,7 +16,7 @@ def mock_user_route(verb: 'PUT')
     ActionDispatch::Journey::Route,
     path: instance_double(
       ActionDispatch::Journey::Path::Pattern,
-      spec: instance_double(ActionDispatch::Journey::Nodes::Cat, to_s: '/users/:id'),
+      spec: instance_double(ActionDispatch::Journey::Nodes::Cat, to_s: '/users/:id(.:format)'),
     ),
     requirements: { controller: 'users', action: 'update' },
     verb:,

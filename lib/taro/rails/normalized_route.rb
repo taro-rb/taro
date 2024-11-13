@@ -1,6 +1,6 @@
 Taro::Rails::NormalizedRoute = Data.define(:rails_route) do
-  def ok?
-    !!verb && !patch_update?
+  def ignored?
+    verb.to_s.empty? || patch_update?
   end
 
   # Journey::Route#verb is a String. Its usually something like 'POST', but
