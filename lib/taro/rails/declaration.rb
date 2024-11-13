@@ -24,6 +24,7 @@ class Taro::Rails::Declaration
     returns[status] &&
       raise(Taro::ArgumentError, "response for status #{status} already declared")
 
+    kwargs[:defined_at] = caller_locations(1..2)[1]
     returns[status] = return_type_from(field_name, **kwargs)
 
     # response description is required in openapi 3 – fall back to status code
@@ -79,7 +80,6 @@ class Taro::Rails::Declaration
 
   def return_type_from(field_name, **kwargs)
     if field_name
-      kwargs[:defined_at] = caller_locations(1..2)[1]
       Class.new(Taro::Types::ObjectType).tap { |t| t.field(field_name, **kwargs) }
     else
       Taro::Types::Coercion.call(kwargs)

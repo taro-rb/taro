@@ -9,6 +9,7 @@ module Taro::Rails
   extend DeclarationBuffer
 
   def self.reset
+    buffered_declarations.clear
     declarations_map.clear
     RouteFinder.clear_cache
     Taro::Types::BaseType.rendering = nil

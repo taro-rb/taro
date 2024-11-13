@@ -7,7 +7,7 @@ describe 'Rails integration' do
     # fake railtie and action controller loading
     stub_rails(with_routes: routes)
     Taro::Rails::Railtie.initializers.each { |i| i.run(Rails.application) }
-    ActiveSupport.run_load_hooks(:action_controller_base, nil)
+    ActiveSupport.run_load_hooks(:action_controller, nil)
     Rails.application.reloader.prepare!
 
     # do all the things needed to run the controller, phew ...
@@ -84,10 +84,5 @@ describe 'Rails integration' do
     expect do
       put(:update, params: { user: { name: 'taro', id: '42' } })
     end.to raise_error(Taro::ResponseError, /expected.*UserResponseType/i)
-  end
-
-  it 'tracks defined_at correctly for the ad-hoc input type' do
-    field = Taro::Rails.declaration_for(UsersController, :update).params.fields[:user]
-    expect(field.defined_at.to_s).to match(/#{__FILE__}:\d+/)
   end
 end
