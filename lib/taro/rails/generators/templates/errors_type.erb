@@ -17,9 +17,9 @@ class ErrorsType < Taro::Types::ListType
     when 'ActiveModel::Errors'
       super(object.errors)
     when 'Hash', 'Interactor::Context'
-      super(arg[:errors])
+      super(object[:errors])
     else # e.g. Array
-      super(arg)
+      super(object)
     end
   end
 end
