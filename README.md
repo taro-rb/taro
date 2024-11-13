@@ -58,6 +58,13 @@ class BikesController < ApplicationController
       render json: MyErrorType.render(bike.errors.first), status: :unprocessable_entity
     end
   end
+
+  # Support for arrays and paginated lists is built-in.
+  api     'List all bikes'
+  returns code: :ok, array_of: 'BikeType', description: 'list of bikes'
+  def index
+    render json: BikeType.array.render(Bike.all)
+  end
 end
 ```
 

@@ -35,7 +35,7 @@ describe Taro::Rails::Declaration do
 
     it 'adds the param for derived types' do
       subject.add_param :foo, array_of: 'String', null: false
-      expect(subject.params.fields[:foo].type).to eq(T::ListType.for(S::StringType))
+      expect(subject.params.fields[:foo].type).to eq(S::StringType.array)
     end
 
     it 'raises for inexistent types (upon evaluation)' do
@@ -54,7 +54,7 @@ describe Taro::Rails::Declaration do
 
     it 'sets the returns attribute for derived types' do
       subject.add_return code: :ok, array_of: 'String'
-      expect(subject.returns).to eq(200 => T::ListType.for(S::StringType))
+      expect(subject.returns).to eq(200 => S::StringType.array)
     end
 
     it 'merges further returns attributes' do

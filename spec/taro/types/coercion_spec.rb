@@ -16,12 +16,12 @@ describe Taro::Types::Coercion do
 
     it 'works with array_of' do
       expect(described_class.call(array_of: 'String'))
-        .to eq T::ListType.for(S::StringType)
+        .to eq S::StringType.array
     end
 
     it 'works with page_of' do
       expect(described_class.call(page_of: 'String'))
-        .to eq T::ObjectTypes::PageType.for(S::StringType)
+        .to eq S::StringType.page
     end
 
     it 'raises for unknown class names' do

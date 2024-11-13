@@ -24,9 +24,9 @@ module Taro::Types::Coercion
       if hash[:type]
         from_string(hash[:type])
       elsif (inner_type = hash[:array_of])
-        Taro::Types::ListType.for(from_string(inner_type))
+        from_string(inner_type).array
       elsif (inner_type = hash[:page_of])
-        Taro::Types::ObjectTypes::PageType.for(from_string(inner_type))
+        from_string(inner_type).page
       else
         raise NotImplementedError, 'Unsupported type coercion'
       end

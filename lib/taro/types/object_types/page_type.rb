@@ -36,3 +36,10 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
     :page
   end
 end
+
+# add shortcut to other types
+class Taro::Types::BaseType
+  def self.page
+    Taro::Types::ObjectTypes::PageType.for(self)
+  end
+end

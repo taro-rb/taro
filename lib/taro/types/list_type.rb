@@ -21,3 +21,10 @@ class Taro::Types::ListType < Taro::Types::BaseType
     object.map { |el| item_type.new(el).coerce_response }
   end
 end
+
+# add shortcut to other types
+class Taro::Types::BaseType
+  def self.array
+    Taro::Types::ListType.for(self)
+  end
+end

@@ -16,13 +16,13 @@ describe Taro::Types::Shared::OpenAPIName do
   end
 
   it 'is based on the class name and item_type for lists' do
-    expect(T::ListType.for(S::StringType).openapi_name).to eq('string_List')
-    expect(T::ListType.for(Foo::BarType).openapi_name).to eq('Foo_Bar_List')
+    expect(S::StringType.array.openapi_name).to eq('string_List')
+    expect(Foo::BarType.array.openapi_name).to eq('Foo_Bar_List')
   end
 
   it 'is based on the class name and item_type for pages' do
-    expect(T::ObjectTypes::PageType.for(S::StringType).openapi_name).to eq('string_Page')
-    expect(T::ObjectTypes::PageType.for(Foo::BarType).openapi_name).to eq('Foo_Bar_Page')
+    expect(S::StringType.page.openapi_name).to eq('string_Page')
+    expect(Foo::BarType.page.openapi_name).to eq('Foo_Bar_Page')
   end
 
   it 'can be customized' do
