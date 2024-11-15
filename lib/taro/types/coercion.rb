@@ -62,6 +62,9 @@ module Taro::Types::Coercion
         'String'    => Taro::Types::Scalar::StringType,
         'Timestamp' => Taro::Types::Scalar::TimestampType,
         'UUID'      => Taro::Types::Scalar::UUIDv4Type,
+        'Date'      => Taro::Types::Scalar::ISO8601DateType,
+        'Time'      => Taro::Types::Scalar::ISO8601DateTimeType,
+        'DateTime'  => Taro::Types::Scalar::ISO8601DateTimeType,
         # rubocop:enable Layout/HashAlignment - buggy cop
       }.freeze
     end

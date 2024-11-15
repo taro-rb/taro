@@ -143,6 +143,9 @@ The following type names are available by default and can be used as `type:`/`ar
 - `'String'`
 - `'Timestamp'` - renders a `Time` as unix timestamp integer and turns into incoming integers into a `Time`
 - `'UUID'` - accepts and renders UUIDs
+- `'Date'` - accepts and renders a date string in ISO8601 format
+- `'Time'` - accepts and renders a time string in ISO8601 format
+- `'DateTime'` - an alias for `'Time'`
 
 ### Enums
 
