@@ -29,7 +29,8 @@ describe 'Rails integration' do
       param :user, type: 'UserInputType', null: false
       returns type: 'UserResponseType', null: false, code: :ok
       def update
-        render json: UserResponseType.render(name: @api_params[:user][:name].upcase)
+        render json: UserResponseType.render(name: @api_params[:user][:name].upcase),
+               status: params[:status] ? params[:status].to_i : :ok
       end
     end)
   end
@@ -57,6 +58,12 @@ describe 'Rails integration' do
     expect do
       put(:update, params: {})
     end.to raise_error(Taro::InputError)
+  end
+
+  it 'can raise errors if the controller does not have a matching return declaration' do
+    expect do
+      put(:update, params: { user: { name: 'taro', id: '42' }, status: 201 })
+    end.to raise_error(Taro::ResponseError, /no matching return type declared/i)
   end
 
   it 'can raise errors for invalid response args' do

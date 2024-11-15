@@ -46,6 +46,13 @@ module Taro::Rails::ResponseValidation
   def self.check_expected_type_was_used(controller, expected)
     used = Taro::Types::BaseType.rendering
 
+    if expected.nil?
+      raise(Taro::ResponseError, <<~MSG)
+        No matching return type declared in #{controller.class}##{controller.action_name}\
+        for status #{controller.status}.
+      MSG
+    end
+
     used&.<=(expected) || raise(Taro::ResponseError, <<~MSG)
       Expected #{controller.class}##{controller.action_name} to use #{expected}.render,
       but #{used ? "#{used}.render" : 'no type render method'} was called.
