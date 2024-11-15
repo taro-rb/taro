@@ -2,7 +2,7 @@ module Taro::Rails::ActiveDeclarations
   def apply(declaration:, controller_class:, action_name:)
     (declarations_map[controller_class] ||= {})[action_name] = declaration
     Taro::Rails::ParamParsing.install(controller_class:, action_name:)
-    Taro::Rails::ResponseValidation.install(controller_class:, action_name:)
+    Taro::Rails::ResponseValidation.install(controller_class:)
   end
 
   def declarations_map
