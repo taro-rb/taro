@@ -19,7 +19,8 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def export_paths(declarations)
     declarations.each_with_object({}) do |declaration, paths|
       declaration.routes.each do |route|
-        paths[route.openapi_path] = export_route(route, declaration)
+        paths[route.openapi_path] ||= {}
+        paths[route.openapi_path].merge! export_route(route, declaration)
       end
     end
   end
