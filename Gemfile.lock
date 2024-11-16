@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    taro (1.0.0)
+    taro (1.1.0)
       rack (~> 3.0)
 
 GEM
