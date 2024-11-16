@@ -17,7 +17,17 @@ describe Taro::Export::OpenAPIv3 do
       action_name: 'update',
     )
 
-    result = described_class.call(declarations: [declaration])
+    delete_declaration = Taro::Rails::Declaration.new
+    delete_declaration.add_info 'My endpoint description for DELETE'
+    delete_declaration.add_param :id, type: 'Integer', null: false
+    delete_declaration.add_return type: 'Integer', code: 200, null: false, desc: 'okay'
+    delete_declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
+    delete_declaration.add_openapi_names(
+      controller_class: stub_const('FooController', Class.new),
+      action_name: 'destroy',
+    )
+
+    result = described_class.call(declarations: [declaration, delete_declaration])
 
     expect(result.to_yaml).to eq <<~YAML
       ---
@@ -53,6 +63,21 @@ describe Taro::Export::OpenAPIv3 do
                   application/json:
                     schema:
                       "$ref": "#/components/schemas/Foo_update_422_Response"
+          delete:
+            summary: My endpoint description for DELETE
+            parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                type: integer
+            responses:
+              '200':
+                description: okay
+                content:
+                  application/json:
+                    schema:
+                      type: integer
       components:
         schemas:
           Foo_update_Input:
