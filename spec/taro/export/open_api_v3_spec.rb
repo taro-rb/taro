@@ -20,7 +20,7 @@ describe Taro::Export::OpenAPIv3 do
     delete_declaration = Taro::Rails::Declaration.new
     delete_declaration.add_info 'My endpoint description for DELETE'
     delete_declaration.add_param :id, type: 'Integer', null: false
-    delete_declaration.add_return type: 'Integer', code: 200, null: false, desc: 'okay'
+    delete_declaration.add_return type: 'Integer', code: 200, desc: 'okay'
     delete_declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
     delete_declaration.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
