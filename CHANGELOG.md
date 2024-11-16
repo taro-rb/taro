@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+- Improved error messages
+- Reduced console spam when inspecting declarations
+
 ## [1.1.0] - 2024-11-16
 
 - Response validation refined
