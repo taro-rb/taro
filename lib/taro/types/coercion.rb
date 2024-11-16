@@ -56,15 +56,16 @@ module Taro::Types::Coercion
       @shortcuts ||= {
         # rubocop:disable Layout/HashAlignment - buggy cop
         'Boolean'   => Taro::Types::Scalar::BooleanType,
+        'Date'      => Taro::Types::Scalar::ISO8601DateType,
+        'DateTime'  => Taro::Types::Scalar::ISO8601DateTimeType,
         'Float'     => Taro::Types::Scalar::FloatType,
         'FreeForm'  => Taro::Types::ObjectTypes::FreeFormType,
         'Integer'   => Taro::Types::Scalar::IntegerType,
+        'NoContent' => Taro::Types::ObjectTypes::NoContentType,
         'String'    => Taro::Types::Scalar::StringType,
+        'Time'      => Taro::Types::Scalar::ISO8601DateTimeType,
         'Timestamp' => Taro::Types::Scalar::TimestampType,
         'UUID'      => Taro::Types::Scalar::UUIDv4Type,
-        'Date'      => Taro::Types::Scalar::ISO8601DateType,
-        'Time'      => Taro::Types::Scalar::ISO8601DateTimeType,
-        'DateTime'  => Taro::Types::Scalar::ISO8601DateTimeType,
         # rubocop:enable Layout/HashAlignment - buggy cop
       }.freeze
     end

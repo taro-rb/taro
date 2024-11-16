@@ -89,10 +89,27 @@ class Taro::Rails::Declaration
   def return_type_from(nesting, **kwargs)
     if nesting
       # ad-hoc return type, requiring the actual return type to be nested
-      Class.new(Taro::Types::ObjectType).tap { |t| t.field(nesting, **kwargs) }
+      Class.new(Taro::Types::ObjectType).tap do |type|
+        type.field(nesting, null: false, **kwargs)
+      end
     else
+      check_return_kwargs(kwargs)
       Taro::Types::Coercion.call(kwargs)
     end
+  end
+
+  def check_return_kwargs(kwargs)
+    if kwargs.key?(:null)
+      raise Taro::ArgumentError, <<~MSG
+        `null:` is not supported for top-level returns. If you want a nullable return
+        value, nest it, e.g. `returns :str, type: 'String', null: true`.
+      MSG
+    end
+
+    bad_keys = kwargs.keys - (Taro::Types::Coercion::KEYS + %i[code defined_at desc])
+    return if bad_keys.empty?
+
+    raise Taro::ArgumentError, "Invalid `returns` options: #{bad_keys.join(', ')}"
   end
 
   def raise_missing_route(controller_class, action_name)

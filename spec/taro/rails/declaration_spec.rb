@@ -79,7 +79,19 @@ describe Taro::Rails::Declaration do
     it 'raises for bad status' do
       expect do
         subject.add_return type: 'String', code: 999
-      end.to raise_error(Taro::Error, /status/)
+      end.to raise_error(Taro::ArgumentError, /status/)
+    end
+
+    it 'raises for top-level null' do
+      expect do
+        subject.add_return code: 200, type: 'String', null: true
+      end.to raise_error(Taro::ArgumentError, /null/)
+    end
+
+    it 'raises for unsupported options' do
+      expect do
+        subject.add_return code: 200, type: 'String', foobar: true
+      end.to raise_error(Taro::ArgumentError, /foobar/)
     end
   end
 

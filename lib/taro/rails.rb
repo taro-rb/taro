@@ -12,7 +12,6 @@ module Taro::Rails
     buffered_declarations.clear
     declarations_map.clear
     RouteFinder.clear_cache
-    Taro::Types::BaseType.rendering = nil
-    Taro::Types::BaseType.used_in_response = nil
+    Taro::Types::BaseType.last_render = nil
   end
 end

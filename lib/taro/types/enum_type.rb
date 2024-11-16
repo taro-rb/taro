@@ -18,7 +18,7 @@ class Taro::Types::EnumType < Taro::Types::BaseType
     if self.class.values.include?(value)
       value
     else
-      input_error("must be one of #{self.class.values}")
+      input_error("must be #{self.class.values.map(&:inspect).join(' or ')}")
     end
   end
 
@@ -28,7 +28,7 @@ class Taro::Types::EnumType < Taro::Types::BaseType
     if self.class.values.include?(value)
       value
     else
-      response_error("must be one of #{self.class.values}")
+      response_error("must be #{self.class.values.map(&:inspect).join(' or ')}")
     end
   end
 

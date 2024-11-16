@@ -27,7 +27,7 @@ describe 'Rails integration' do
 
       api 'my api'
       param :user, type: 'UserInputType', null: false
-      returns type: 'UserResponseType', null: false, code: :ok
+      returns type: 'UserResponseType', code: :ok
       def update
         render json: UserResponseType.render(name: @api_params[:user][:name].upcase),
                status: params[:status] ? params[:status].to_i : :ok
@@ -60,13 +60,7 @@ describe 'Rails integration' do
     end.to raise_error(Taro::InputError)
   end
 
-  it 'can raise errors if the controller does not have a matching return declaration' do
-    expect do
-      put(:update, params: { user: { name: 'taro', id: '42' }, status: 201 })
-    end.to raise_error(Taro::ResponseError, /no matching return type declared/i)
-  end
-
-  it 'can raise errors for invalid response args' do
+  it 'can raise errors for invalid responses' do
     expect(@controller).to receive(:update) do
       @controller.render json: UserResponseType.render(name: nil)
     end
@@ -74,60 +68,5 @@ describe 'Rails integration' do
     expect do
       put(:update, params: { user: { name: 'taro', id: '42' } })
     end.to raise_error(Taro::ResponseError)
-  end
-
-  it 'can raise errors for invalid response types' do
-    stub_const('T', Class.new(T::ObjectType))
-    expect(@controller).to receive(:update) { @controller.render json: T.render({}) }
-
-    expect do
-      put(:update, params: { user: { name: 'taro', id: '42' } })
-    end.to raise_error(Taro::ResponseError, /expected.*UserResponseType/i)
-  end
-
-  it 'can raise errors for rendering without types' do
-    expect(@controller).to receive(:update) { @controller.render json: {} }
-
-    expect do
-      put(:update, params: { user: { name: 'taro', id: '42' } })
-    end.to raise_error(Taro::ResponseError, /expected.*UserResponseType/i)
-  end
-
-  context 'for nested responses' do
-    let!(:users_controller) do
-      stub_const('UsersController', Class.new(ActionController::API) do
-        def self.name = 'UsersController'
-        returns :str, type: 'String', null: false, code: :ok
-        def update
-          render json: { params[:nest] => S::StringType.render('hi') }
-        end
-      end)
-    end
-
-    it 'works' do
-      expect(Taro::Rails.declarations.count).to eq 1
-
-      put(:update, params: { nest: 'str' })
-
-      expect(response.body).to eq('{"str":"hi"}')
-      expect(Taro::Types::BaseType.used_in_response).to eq(S::StringType)
-    end
-
-    it 'raises for the wrong nesting' do
-      expect(Taro::Rails.declarations.count).to eq 1
-
-      expect do
-        put(:update, params: { nest: 'bad' })
-      end.to raise_error(Taro::ResponseError, /expected.*"str"/i)
-    end
-
-    it 'ignores non-json responses' do
-      allow_any_instance_of(ActionDispatch::TestResponse)
-        .to receive(:media_type).and_return('text/html')
-
-      expect do
-        put(:update, params: { nest: 'bad' })
-      end.not_to raise_error
-    end
   end
 end

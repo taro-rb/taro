@@ -2,35 +2,21 @@
 # Special types (e.g. PageType) may accept kwargs for `#coerce_response`.
 module Taro::Types::Shared::Rendering
   def render(object, opts = {})
-    if (prev = rendering)
-      raise Taro::RuntimeError, <<~MSG
-        Type.render should only be called once per request.
-        (First called on #{prev}, then on #{self}.)
-      MSG
-    end
-
     result = new(object).coerce_response(**opts)
-
-    # Only mark this as the used type if coercion worked so that
-    # rescue_from can be used to render another type.
-    self.rendering = self
-
+    self.last_render = [self, result.__id__]
     result
   end
 
-  def rendering=(value)
-    ActiveSupport::IsolatedExecutionState[:taro_type_rendering] = value
+  def last_render=(info)
+    ActiveSupport::IsolatedExecutionState[:taro_last_render] = info
   end
 
-  def rendering
-    ActiveSupport::IsolatedExecutionState[:taro_type_rendering]
+  def last_render
+    ActiveSupport::IsolatedExecutionState[:taro_last_render]
   end
 
-  def used_in_response=(value)
-    ActiveSupport::IsolatedExecutionState[:taro_type_used_in_response] = value
-  end
-
+  # get the last used type for assertions in tests/specs
   def used_in_response
-    ActiveSupport::IsolatedExecutionState[:taro_type_used_in_response]
+    last_render.to_a.first
   end
 end

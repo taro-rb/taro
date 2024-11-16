@@ -10,11 +10,6 @@ It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [
 - conveniently check request and response data against the declaration
 - offer an up-to-date OpenAPI export with minimal configuration
 
-## ⚠️ This is a work in progress - TODO:
-
-- ISO8601Time, ISO8601Date types
-- ResponseValidation: allow rendering scalars directly (e.g. `render json: 42`)
-
 ## Installation
 
 ```bash
@@ -139,9 +134,9 @@ The following type names are available by default and can be used as `type:`/`ar
 - `'Float'`
 - `'FreeForm'` - accepts and renders any JSON-serializable object, use with care
 - `'Integer'`
-- `'NoContentType'` - renders an empty object, for use with `status: :no_content`
+- `'NoContent'` - renders an empty object, for use with `status: :no_content`
 - `'String'`
-- `'Timestamp'` - renders a `Time` as unix timestamp integer and turns into incoming integers into a `Time`
+- `'Timestamp'` - renders a `Time` as unix timestamp integer and turns incoming integers into a `Time`
 - `'UUID'` - accepts and renders UUIDs
 - `'Date'` - accepts and renders a date string in ISO8601 format
 - `'Time'` - accepts and renders a time string in ISO8601 format

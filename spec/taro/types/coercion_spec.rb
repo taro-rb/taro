@@ -2,10 +2,14 @@ describe Taro::Types::Coercion do
   describe '::call' do
     %w[
       Boolean
+      Date
+      DateTime
       Float
       FreeForm
       Integer
+      NoContent
       String
+      Time
       Timestamp
       UUID
     ].each do |type|
