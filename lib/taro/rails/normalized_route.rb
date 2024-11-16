@@ -26,4 +26,8 @@ Taro::Rails::NormalizedRoute = Data.define(:rails_route) do
     controller, action = rails_route.requirements.values_at(:controller, :action)
     "#{controller}##{action}"
   end
+
+  def inspect
+    %(#<#{self.class} "#{verb} #{openapi_path}">)
+  end
 end

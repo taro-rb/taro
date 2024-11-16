@@ -37,4 +37,8 @@ describe Taro::Rails::NormalizedRoute do
     allow(rails_route).to receive(:verb).and_return(nil)
     expect(example).to be_ignored
   end
+
+  it 'has non-spammy inspect output' do
+    expect(example.inspect).to eq '#<Taro::Rails::NormalizedRoute "put /users/{id}">'
+  end
 end
