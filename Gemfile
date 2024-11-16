@@ -9,7 +9,7 @@ gem "debug"
 
 gem "rake", "~> 13.0"
 
-gem "rails", "~> 7.0"
+gem "rails", "~> 8.0"
 
 gem "rails_cursor_pagination", "~> 0.4"
 
