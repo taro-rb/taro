@@ -8,6 +8,8 @@ module Taro::Types::Shared::Errors
   end
 
   def coerce_error_message(msg)
-    "#{object.inspect} (#{object.class}) is not valid as #{self.class}: #{msg}"
+    type_desc = (self.class.name || self.class.superclass.name)
+                .sub(/^Taro::Types::.*?([^:]+)Type$/, '\1')
+    "#{object.class} is not valid as #{type_desc}: #{msg}"
   end
 end

@@ -11,7 +11,7 @@ module Taro::Types::Coercion
 
     def validate_hash(arg)
       arg.is_a?(Hash) || raise(Taro::ArgumentError, <<~MSG)
-        Type coercion argument must be a Hash, got: #{arg.inspect} (#{arg.class})
+        Type coercion argument must be a Hash, got: #{arg.class}
       MSG
 
       types = arg.slice(*KEYS)

@@ -47,7 +47,8 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     elsif object.respond_to?(method, true)
       object.public_send(method)
     else
-      raise_response_coercion_error(object)
+      # Note that the ObjectCoercion module rescues this and adds context.
+      raise Taro::ResponseError, "No such method or resolver `:#{method}`."
     end
   end
 
@@ -65,14 +66,5 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
 
     type_obj = type.new(value)
     from_input ? type_obj.coerce_input : type_obj.coerce_response
-  rescue Taro::Error => e
-    raise e.class, "#{e.message}, after using method/key `:#{method}` to resolve field `#{name}`"
-  end
-
-  def raise_response_coercion_error(object)
-    raise Taro::ResponseError, <<~MSG
-      Failed to coerce value #{object.inspect} for field `#{name}` using method/key `:#{method}`.
-      It is not a valid #{type} value.
-    MSG
   end
 end

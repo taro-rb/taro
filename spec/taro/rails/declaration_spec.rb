@@ -120,7 +120,7 @@ describe Taro::Rails::Declaration do
       params = ActionController::Parameters.new(user: { name: nil })
       expect do
         subject.parse_params(params)
-      end.to raise_error(Taro::InputError, /nil.*must be a String/)
+      end.to raise_error(Taro::InputError, /NilClass is not valid as String/)
     end
   end
 end

@@ -35,7 +35,7 @@ describe Taro::Types::ObjectTypes::PageType do
       example.new(ActiveRecord::Relation.new).coerce_response(after: 'cursor')
     end.to raise_error(
       Taro::ResponseError,
-      '42 (Integer) is not valid as Taro::Types::Scalar::StringType: must be a String or Symbol'
+      'Integer is not valid as String: must be a String or Symbol'
     )
   end
 

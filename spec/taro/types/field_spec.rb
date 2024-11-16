@@ -59,7 +59,7 @@ describe Taro::Types::Field do
       field = described_class.new(name: :foo, type: S::StringType, null: false)
       expect do
         field.value_for_response(42, object_is_hash: false)
-      end.to raise_error(Taro::RuntimeError, /Failed to coerce/)
+      end.to raise_error(Taro::ResponseError, /No such method or resolver `:foo`/)
     end
   end
 end

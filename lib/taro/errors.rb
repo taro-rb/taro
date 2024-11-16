@@ -1,7 +1,7 @@
 class Taro::Error < StandardError
   def message
     # clean up newlines introduced when setting the message with a heredoc
-    super.chomp.tr("\n", ' ')
+    super.chomp.sub(/\n(?=\S)/, ' ')
   end
 end
 

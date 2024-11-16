@@ -71,6 +71,7 @@ class Taro::Rails::Declaration
     params.openapi_name = "#{base}_Input"
     returns.each do |status, return_type|
       return_type.openapi_name = "#{base}_#{status}_Response"
+      return_type.define_singleton_method(:name) { openapi_name }
     end
   end
 
