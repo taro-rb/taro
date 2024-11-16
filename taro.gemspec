@@ -5,8 +5,7 @@ require_relative "lib/taro/version"
 Gem::Specification.new do |spec|
   spec.name = "taro"
   spec.version = Taro::VERSION
-  spec.authors = ["Janosch Müller"]
-  spec.email = ["janosch84@gmail.com"]
+  spec.authors = ["Janosch Müller", "Johannes Opper"]
 
   spec.summary = "Typed Api using Ruby Objects."
   spec.description = "This library provides an object-based type system for RESTful Ruby APIs, with built-in parameter parsing, response rendering, and OpenAPI schema export."
