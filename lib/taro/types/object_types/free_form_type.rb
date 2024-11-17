@@ -1,6 +1,7 @@
 class Taro::Types::ObjectTypes::FreeFormType < Taro::Types::ObjectType
   self.desc = 'An arbitrary, unvalidated Hash or JSON object. Use with care.'
   self.additional_properties = true
+  self.openapi_name = 'FreeForm'
 
   def coerce_input
     object.is_a?(Hash) && object || input_error('must be a Hash')

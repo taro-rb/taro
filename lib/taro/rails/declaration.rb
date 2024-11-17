@@ -76,9 +76,13 @@ class Taro::Rails::Declaration
   # TODO: these change when the controller class is renamed.
   # We might need a way to set `base`. Perhaps as a kwarg to `::api`?
   def add_openapi_names(controller_class:, action_name:)
-    base = "#{controller_class.name.chomp('Controller').sub('::', '_')}_#{action_name}"
+    base = "#{controller_class.name.chomp('Controller').gsub('::', '_')}_#{action_name}"
     params.openapi_name = "#{base}_Input"
+    params.define_singleton_method(:name) { openapi_name }
+
     returns.each do |status, return_type|
+      next if return_type.openapi_name? # only set for ad-hoc / nested return types
+
       return_type.openapi_name = "#{base}_#{status}_Response"
       return_type.define_singleton_method(:name) { openapi_name }
     end

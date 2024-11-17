@@ -5,29 +5,40 @@ describe Taro::Export::OpenAPIv3 do
       field :code, type: 'Integer', null: false
     end)
 
-    declaration = Taro::Rails::Declaration.new
-    declaration.add_info 'My endpoint description'
-    declaration.add_param :id, type: 'Integer', null: false
-    declaration.add_param :foo, type: 'String', null: true
-    declaration.add_return type: 'Integer', code: 200, desc: 'okay'
-    declaration.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
-    declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
-    declaration.add_openapi_names(
+    update_decl = Taro::Rails::Declaration.new
+    update_decl.add_info 'My endpoint description'
+    update_decl.add_param :id, type: 'Integer', null: false
+    update_decl.add_param :foo, type: 'String', null: true
+    update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
+    update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
+    update_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
+    update_decl.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
       action_name: 'update',
     )
 
-    delete_declaration = Taro::Rails::Declaration.new
-    delete_declaration.add_info 'My endpoint description for DELETE'
-    delete_declaration.add_param :id, type: 'Integer', null: false
-    delete_declaration.add_return type: 'Integer', code: 200, desc: 'okay'
-    delete_declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
-    delete_declaration.add_openapi_names(
+    delete_decl = Taro::Rails::Declaration.new
+    delete_decl.add_info 'My endpoint description for DELETE'
+    delete_decl.add_param :id, type: 'Integer', null: false
+    delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
+    delete_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
+    delete_decl.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
       action_name: 'destroy',
     )
 
-    result = described_class.call(declarations: [declaration, delete_declaration])
+    show_decl = Taro::Rails::Declaration.new
+    show_decl.add_info 'My endpoint description for DELETE'
+    show_decl.add_param :id, type: 'Integer', null: false
+    show_decl.add_param :show_details, type: 'Boolean', null: false
+    show_decl.add_return type: 'Integer', code: 200, desc: 'okay'
+    show_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'GET'))]
+    show_decl.add_openapi_names(
+      controller_class: stub_const('FooController', Class.new),
+      action_name: 'show',
+    )
+
+    result = described_class.call(declarations: [update_decl, delete_decl, show_decl])
 
     expect(result.to_yaml).to eq <<~YAML
       ---
@@ -41,10 +52,10 @@ describe Taro::Export::OpenAPIv3 do
             summary: My endpoint description
             parameters:
             - name: id
-              in: path
               required: true
               schema:
                 type: integer
+              in: path
             requestBody:
               content:
                 application/json:
@@ -67,10 +78,30 @@ describe Taro::Export::OpenAPIv3 do
             summary: My endpoint description for DELETE
             parameters:
             - name: id
-              in: path
               required: true
               schema:
                 type: integer
+              in: path
+            responses:
+              '200':
+                description: okay
+                content:
+                  application/json:
+                    schema:
+                      type: integer
+          get:
+            summary: My endpoint description for DELETE
+            parameters:
+            - name: id
+              required: true
+              schema:
+                type: integer
+              in: path
+            - name: show_details
+              required: true
+              schema:
+                type: boolean
+              in: query
             responses:
               '200':
                 description: okay
@@ -275,7 +306,7 @@ describe Taro::Export::OpenAPIv3 do
         properties:
         {
           page: { :$ref => "#/components/schemas/string_List" },
-          page_info: { :$ref => "#/components/schemas/Taro_Types_ObjectTypes_PageInfo" },
+          page_info: { :$ref => "#/components/schemas/PageInfo" },
         },
         required: [:page, :page_info],
       },
@@ -283,7 +314,7 @@ describe Taro::Export::OpenAPIv3 do
         type: 'array',
         items: { type: :string },
       },
-      Taro_Types_ObjectTypes_PageInfo: instance_of(Hash),
+      PageInfo: instance_of(Hash),
     )
   end
 

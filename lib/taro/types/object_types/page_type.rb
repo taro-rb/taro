@@ -27,5 +27,9 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::ObjectType
     super(result)
   end
 
+  def self.default_openapi_name
+    "#{item_type.openapi_name}_Page"
+  end
+
   define_derived_type :page, 'Taro::Types::ObjectTypes::PageType'
 end

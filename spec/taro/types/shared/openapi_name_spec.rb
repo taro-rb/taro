@@ -46,6 +46,6 @@ describe Taro::Types::Shared::OpenAPIName do
 
   it 'raises for unknown type classes' do
     klass = Class.new.extend(described_class)
-    expect { klass.openapi_name }.to raise_error(NotImplementedError)
+    expect { klass.openapi_name }.to raise_error(Taro::Error, /implemented/)
   end
 end

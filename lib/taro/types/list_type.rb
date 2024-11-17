@@ -20,5 +20,9 @@ class Taro::Types::ListType < Taro::Types::BaseType
     object.map { |el| item_type.new(el).coerce_response }
   end
 
+  def self.default_openapi_name
+    "#{item_type.openapi_name}_List"
+  end
+
   define_derived_type :array, 'Taro::Types::ListType'
 end

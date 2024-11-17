@@ -1,5 +1,6 @@
 class Taro::Types::Scalar::ISO8601DateType < Taro::Types::ScalarType
   self.desc = 'Represents a time as Date in ISO8601 format.'
+  self.openapi_name = 'ISO8601Date'
   self.openapi_type = :string
 
   PATTERN = /\A\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\z/

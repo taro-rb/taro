@@ -14,7 +14,12 @@
 - Fixed console spam when inspecting declarations
 - Fixed resolver method not being used when rendering a Hash
 - Fixed the ErrorsType template
-- Fixed OpenAPI export for PageType
+- Many fixes for OpenAPI export
+  - Fixed export of parameters for http methods without body
+  - Fixed export for PageType
+  - Fixed export for arrays of UUIDs, Dates, and Times
+  - Fixed export YML keys for namespaced controllers
+  - Reference plain types for repeated flat return types
 
 ## [1.1.0] - 2024-11-16
 

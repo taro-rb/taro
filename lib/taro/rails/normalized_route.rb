@@ -27,6 +27,10 @@ Taro::Rails::NormalizedRoute = Data.define(:rails_route) do
     "#{controller}##{action}"
   end
 
+  def can_have_request_body?
+    %w[patch post put].include?(verb)
+  end
+
   def inspect
     %(#<#{self.class} "#{verb} #{openapi_path}">)
   end

@@ -10,6 +10,10 @@ task 'taro:export' => :environment do
     version: Taro.config.api_version,
   )
 
-  data = export.result.send("to_#{Taro.config.export_format}")
+  data = export.send("to_#{Taro.config.export_format}")
+
+  FileUtils.mkdir_p(File.dirname(Taro.config.export_path))
   File.write(Taro.config.export_path, data)
+
+  puts "Exported #{Taro.config.api_name} to #{Taro.config.export_path}"
 end

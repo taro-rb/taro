@@ -31,11 +31,15 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
         description: declaration.desc,
         summary: declaration.summary,
         tags: declaration.tags,
-        parameters: path_parameters(declaration, route),
+        parameters: route_parameters(declaration, route),
         requestBody: request_body(declaration, route),
         responses: responses(declaration),
       }.compact,
     }
+  end
+
+  def route_parameters(declaration, route)
+    path_parameters(declaration, route) + query_parameters(declaration, route)
   end
 
   def path_parameters(declaration, route)
@@ -44,17 +48,34 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
         Declaration missing for path param #{param_name} of route #{route.endpoint}
       MSG
 
-      {
-        name: param_field.name,
-        in: 'path',
-        description: param_field.desc,
-        required: true, # path params are always required in rails
-        schema: { type: param_field.openapi_type },
-      }.compact
+      # path params are always required in rails
+      export_parameter(param_field).merge(in: 'path', required: true)
     end
   end
 
+  def query_parameters(declaration, route)
+    return [] if route.can_have_request_body?
+
+    declaration.params.fields.filter_map do |name, param_field|
+      next if route.path_params.include?(name)
+
+      export_parameter(param_field).merge(in: 'query')
+    end
+  end
+
+  def export_parameter(field)
+    {
+      name: field.name,
+      deprecated: field.deprecated,
+      description: field.desc,
+      required: !field.null,
+      schema: { type: field.openapi_type },
+    }.compact
+  end
+
   def request_body(declaration, route)
+    return unless route.can_have_request_body?
+
     params = declaration.params
     body_param_fields = params.fields.reject do |name, _field|
       route.path_params.include?(name)
