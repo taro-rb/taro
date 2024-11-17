@@ -8,7 +8,7 @@ describe Taro::Export::OpenAPIv3 do
     update_decl = Taro::Rails::Declaration.new
     update_decl.add_info 'My endpoint description'
     update_decl.add_param :id, type: 'Integer', null: false
-    update_decl.add_param :foo, type: 'String', null: true
+    update_decl.add_param :foo, type: 'String', null: true, deprecated: true
     update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
     update_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
@@ -118,6 +118,7 @@ describe Taro::Export::OpenAPIv3 do
                 oneOf:
                 - type: string
                 - type: 'null'
+                deprecated: true
           Failure:
             type: object
             required:
