@@ -170,7 +170,7 @@ end
 
 ### FAQ
 
-#### How to avoid repeating common error declarations?
+#### How do I avoid repeating common error declarations?
 
 Hook into the DSL in your base controller(s):
 
@@ -199,7 +199,7 @@ class AuthenticatedApiController < ApiBaseController
 end
 ```
 
-#### How to use context in my types?
+#### How do I use context in my types?
 
 Use [ActiveSupport::CurrentAttributes](https://api.rubyonrails.org/classes/ActiveSupport/CurrentAttributes.html).
 
@@ -210,6 +210,45 @@ class BikeType < ObjectType
   def secret_name
     Current.user.superuser? ? object.secret_name : nil
   end
+end
+```
+
+#### How do I migrate from apipie-rails?
+
+First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, it might not be worth it.
+
+If you do:
+
+- note that `taro` currently only supports the latest OpenAPI standard (instead of v2 like `apipie-rails`)
+- extract complex param declarations into InputTypes
+- extract complex response declarations into ObjectTypes
+- replace `required: true` with `null: false` and `required: false` with `null: true`
+
+For a step-by-step migration, you might want to make `taro` use a different DSL then `apipie`:
+
+```ruby
+# config/initializers/taro.rb
+%i[api param returns].each do |m|
+  Taro::Rails::DSL.alias_method("taro_#{m}", m) # `taro_api` etc.
+  Taro::Rails::DSL.define_method(m) { |*a, **k, &b| super(*a, **k, &b) }
+end
+```
+
+#### How do I keep lengthy API descriptions out of my controller?
+
+```ruby
+module BikeUpdateDesc
+  extend ActiveSupport::Concern
+
+  included do
+    api 'Update a bike', description: 'Long description', tags: ['Bikes']
+    # lots of params and returns ...
+  end
+end
+
+class BikesController < ApplicationController
+  include BikeUpdateDesc
+  def update # ...
 end
 ```
 
