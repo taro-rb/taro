@@ -12,17 +12,17 @@ module Taro::Types::Shared::OpenAPIName
   end
 
   def default_openapi_name # rubocop:disable Metrics
-    if self < Taro::Types::EnumType ||
-       self < Taro::Types::InputType ||
-       self < Taro::Types::ObjectType
+    if self < Taro::Types::ObjectTypes::PageType
+      "#{item_type.openapi_name}_Page"
+    elsif self < Taro::Types::EnumType ||
+          self < Taro::Types::InputType ||
+          self < Taro::Types::ObjectType
       name && name.chomp('Type').gsub('::', '_') ||
         raise(Taro::Error, 'openapi_name must be set for anonymous type classes')
     elsif self < Taro::Types::ScalarType
       openapi_type
     elsif self < Taro::Types::ListType
       "#{item_type.openapi_name}_List"
-    elsif self < Taro::Types::ObjectTypes::PageType
-      "#{item_type.openapi_name}_Page"
     else
       raise NotImplementedError, 'no default_openapi_name for this type'
     end

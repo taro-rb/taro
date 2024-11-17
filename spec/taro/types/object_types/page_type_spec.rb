@@ -22,21 +22,21 @@ describe Taro::Types::ObjectTypes::PageType do
   end
 
   it 'coerces response data' do
-    expect(example.new(relation).coerce_response(after: 'cursor'))
+    expect(example.render(relation, after: 'cursor'))
       .to eq(page: [], page_info:)
 
     page << { data: 'x' }
-    expect(example.new(relation).coerce_response(after: 'cursor'))
+    expect(example.render(relation, after: 'cursor'))
       .to eq(page: %w[x], page_info:)
   end
 
   it 'raises for items that do not match the item type' do
     page << { data: 42 }
     expect do
-      example.new(relation).coerce_response(after: 'cursor')
+      example.render(relation, after: 'cursor')
     end.to raise_error(
       Taro::ResponseError,
-      'Integer is not valid as String: must be a String or Symbol'
+      /Integer is not valid as String: must be a String or Symbol/
     )
   end
 
@@ -47,11 +47,6 @@ describe Taro::Types::ObjectTypes::PageType do
       .and_call_original
     result = example.render(relation, after: 'cursor')
     expect(result).to eq(page: [], page_info:)
-  end
-
-  it 'can use a custom key items_key for nesting the items' do
-    expect(example.render(relation, after: 'cursor', items_key: 'foos'))
-      .to eq(foos: [], page_info:)
   end
 
   it 'raises if after kwarg is missing for ::render' do

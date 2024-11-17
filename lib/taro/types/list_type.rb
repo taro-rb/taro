@@ -20,5 +20,5 @@ class Taro::Types::ListType < Taro::Types::BaseType
     object.map { |el| item_type.new(el).coerce_response }
   end
 
-  define_derived_type :array
+  define_derived_type :array, 'Taro::Types::ListType'
 end

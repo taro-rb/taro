@@ -12,6 +12,7 @@
 - Fixed console spam when inspecting declarations
 - Fixed resolver method not being used when rendering a Hash
 - Fixed the ErrorsType template
+- Fixed OpenAPI export for PageType
 
 ## [1.1.0] - 2024-11-16
 

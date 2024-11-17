@@ -1,8 +1,8 @@
-# The `::render` method is intended for use in controllers.
-# Special types (e.g. PageType) may accept kwargs for `#coerce_response`.
 module Taro::Types::Shared::Rendering
-  def render(object, opts = {})
-    result = new(object).coerce_response(**opts)
+  # The `::render` method is intended for use in controllers.
+  # Overrides of this method must call super.
+  def render(object)
+    result = new(object).coerce_response
     self.last_render = [self, result.__id__]
     result
   end

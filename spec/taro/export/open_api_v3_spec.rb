@@ -249,7 +249,7 @@ describe Taro::Export::OpenAPIv3 do
     )
   end
 
-  it 'handles FooFormType' do
+  it 'handles FreeFormType' do
     stub_const('FreeFormType', Class.new(T::ObjectTypes::FreeFormType))
 
     expect(subject.extract_component_ref(FreeFormType))
@@ -261,6 +261,28 @@ describe Taro::Export::OpenAPIv3 do
         properties: {},
         additionalProperties: true,
       }
+    )
+  end
+
+  it 'handles PageType' do
+    expect(subject.extract_component_ref(S::StringType.page))
+      .to eq(:$ref => "#/components/schemas/string_Page")
+
+    expect(subject.schemas).to match(
+      string_Page: {
+        type: :object,
+        properties:
+        {
+          page: { :$ref => "#/components/schemas/string_List" },
+          page_info: { :$ref => "#/components/schemas/Taro_Types_ObjectTypes_PageInfo" },
+        },
+        required: [:page, :page_info],
+      },
+      string_List: {
+        type: 'array',
+        items: { type: :string },
+      },
+      Taro_Types_ObjectTypes_PageInfo: instance_of(Hash),
     )
   end
 

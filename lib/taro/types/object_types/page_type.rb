@@ -4,37 +4,28 @@
 #
 # The gem rails_cursor_pagination must be installed to use this.
 #
-class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
+class Taro::Types::ObjectTypes::PageType < Taro::Types::ObjectType
   extend Taro::Types::Shared::ItemType
+
+  def self.derive_from(from_type)
+    super
+    field(:page, array_of: from_type.name, null: false)
+    field(:page_info, type: 'Taro::Types::ObjectTypes::PageInfoType', null: false)
+  end
 
   def coerce_input
     input_error 'PageTypes cannot be used as input types'
   end
 
-  def coerce_response(after:, items_key: nil, limit: 20, order_by: nil, order: nil)
-    list = RailsCursorPagination::Paginator.new(
-      object, limit:, order_by:, order:, after:
+  def self.render(relation, after:, limit: 20, order_by: nil, order: nil)
+    result = RailsCursorPagination::Paginator.new(
+      relation, limit:, order_by:, order:, after:
     ).fetch
-    coerce_paginated_list(list, items_key:)
+
+    result[:page].map! { |el| el.fetch(:data) }
+
+    super(result)
   end
 
-  def coerce_paginated_list(list, items_key:)
-    item_type = self.class.item_type
-    items = list[:page].map do |item|
-      item_type.new(item[:data]).coerce_response
-    end
-    items_key ||= self.class.items_key
-
-    {
-      items_key.to_sym => items,
-      page_info: Taro::Types::ObjectTypes::PageInfoType.new(list[:page_info]).coerce_response,
-    }
-  end
-
-  # support overrides, e.g. based on item_type
-  def self.items_key
-    :page
-  end
-
-  define_derived_type :page
+  define_derived_type :page, 'Taro::Types::ObjectTypes::PageType'
 end

@@ -10,6 +10,10 @@ module Taro::Types::Coercion
       @keys ||= %i[type]
     end
 
+    def derived_suffix
+      '_of'
+    end
+
     private
 
     def validate_hash(arg)
@@ -19,7 +23,7 @@ module Taro::Types::Coercion
 
       types = arg.slice(*keys)
       types.size == 1 || raise(Taro::ArgumentError, <<~MSG)
-        Exactly one of type, array_of, or page_of must be given, got: #{types}
+        Exactly one of #{keys.join(', ')} must be given, got: #{types}
       MSG
     end
 
@@ -32,10 +36,10 @@ module Taro::Types::Coercion
 
         # DerivedTypes
         # e.g. `returns array_of: 'MyType'` -> MyType.array
-        return from_string(value).send(key.to_s.chomp('_of'))
+        return from_string(value).send(key.to_s.chomp(derived_suffix))
       end
 
-      raise NotImplementedError, 'Unsupported type coercion'
+      raise NotImplementedError, "Unsupported type coercion #{hash}"
     end
 
     def from_string(arg)

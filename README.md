@@ -224,7 +224,7 @@ The purpose of this is to reduce unnecessary autoloading of the whole type depen
 Yes.
 
 ```ruby
-# Call define_derived_type after implementing ::derive_from.
+# Implement ::derive_from in your custom type.
 class PreviewType < Taro::Types::Scalar::StringType
   singleton_class.attr_reader :type_to_preview
 
@@ -235,9 +235,10 @@ class PreviewType < Taro::Types::Scalar::StringType
   def coerce_response
     type_to_preview.new(object).coerce_response.to_s.truncate(100)
   end
-
-  define_derived_type :preview
 end
+
+# Make it available in the DSL, e.g. in an initializer.
+Taro::Types::BaseType.define_derived_type :preview, 'PreviewType'
 
 # Usage:
 class MyController < ApplicationController
