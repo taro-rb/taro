@@ -1,9 +1,9 @@
 class Taro::Rails::Declaration
-  attr_reader :desc, :summary, :params, :returns, :return_descriptions, :return_nestings, :routes, :tags
+  attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :return_nestings, :routes, :tags
 
   def initialize
     @params = Class.new(Taro::Types::InputType)
-    @returns = {}
+    @return_defs = {}
     @return_descriptions = {}
     @return_nestings = {}
   end
@@ -24,8 +24,11 @@ class Taro::Rails::Declaration
     status = self.class.coerce_status_to_int(code)
     raise_if_already_declared(status)
 
+    kwargs[:nesting] = nesting
+    check_return_kwargs(kwargs)
+
     kwargs[:defined_at] = caller_locations(1..2)[1]
-    returns[status] = return_type_from(nesting, **kwargs)
+    return_defs[status] = kwargs
 
     # response desc is required in openapi 3 – fall back to status code
     return_descriptions[status] = desc || code.to_s
@@ -34,8 +37,14 @@ class Taro::Rails::Declaration
     return_nestings[status] = nesting if nesting
   end
 
+  # Return types are evaluated lazily to avoid unnecessary autoloading
+  # of all types in dev/test envs.
+  def returns
+    @returns ||= evaluate_return_defs
+  end
+
   def raise_if_already_declared(status)
-    returns[status] &&
+    return_defs[status] &&
       raise(Taro::ArgumentError, "response for status #{status} already declared")
   end
 
@@ -87,19 +96,11 @@ class Taro::Rails::Declaration
 
   private
 
-  def return_type_from(nesting, **kwargs)
-    if nesting
-      # ad-hoc return type, requiring the actual return type to be nested
-      Class.new(Taro::Types::ObjectType).tap do |type|
-        type.field(nesting, null: false, **kwargs)
-      end
-    else
-      check_return_kwargs(kwargs)
-      Taro::Types::Coercion.call(kwargs)
-    end
-  end
-
   def check_return_kwargs(kwargs)
+    # For nested returns, evaluate_return_def calls ::field, which validates
+    # field options, but does not trigger type autoloading.
+    return evaluate_return_def(**kwargs) if kwargs[:nesting]
+
     if kwargs.key?(:null)
       raise Taro::ArgumentError, <<~MSG
         `null:` is not supported for top-level returns. If you want a nullable return
@@ -107,10 +108,25 @@ class Taro::Rails::Declaration
       MSG
     end
 
-    bad_keys = kwargs.keys - (Taro::Types::Coercion::KEYS + %i[code defined_at desc])
+    bad_keys = kwargs.keys - (Taro::Types::Coercion::KEYS + %i[code desc nesting])
     return if bad_keys.empty?
 
     raise Taro::ArgumentError, "Invalid `returns` options: #{bad_keys.join(', ')}"
+  end
+
+  def evaluate_return_defs
+    return_defs.transform_values { |defi| evaluate_return_def(**defi) }
+  end
+
+  def evaluate_return_def(nesting:, **kwargs)
+    if nesting
+      # ad-hoc return type, requiring the actual return type to be nested
+      Class.new(Taro::Types::ObjectType).tap do |type|
+        type.field(nesting, null: false, **kwargs)
+      end
+    else
+      Taro::Types::Coercion.call(kwargs)
+    end
   end
 
   def raise_missing_route(controller_class, action_name)

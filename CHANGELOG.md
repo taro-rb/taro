@@ -1,7 +1,13 @@
 ## [Unreleased]
 
+### Added
+
 - Improved error messages
-- Reduced console spam when inspecting declarations
+
+### Fixed
+
+- Fixed auto-loading of return types
+- Fixed console spam when inspecting declarations
 
 ## [1.1.0] - 2024-11-16
 

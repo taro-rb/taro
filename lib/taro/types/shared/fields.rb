@@ -2,7 +2,7 @@
 module Taro::Types::Shared::Fields
   # Field types are set using class name Strings. The respective type classes
   # are evaluated lazily to allow for circular or recursive type references,
-  # and to avoid unnecessary eager loading of all types in dev/test envs.
+  # and to avoid unnecessary autoloading of all types in dev/test envs.
   def field(name, **kwargs)
     defined_at = kwargs[:defined_at] || caller_locations(1..1)[0]
     validate_name(name, defined_at:)

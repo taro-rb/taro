@@ -66,6 +66,12 @@ describe Taro::Rails::Declaration do
       )
     end
 
+    it 'does not auto-load the return type' do
+      subject.add_return code: :ok, type: 'NonExistingType'
+      expect { subject.returns }
+        .to raise_error(Taro::ArgumentError, /No such type: NonExistingType/)
+    end
+
     it 'sets the returns attribute with status numbers' do
       subject.add_return code: 200, type: 'String'
       expect(subject.returns).to eq(200 => S::StringType)

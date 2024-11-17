@@ -31,7 +31,7 @@ describe Taro::Types::Coercion do
     it 'raises for unknown class names' do
       expect do
         described_class.call(type: 'baddy_boy')
-      end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+      end.to raise_error(Taro::ArgumentError, /No such type/)
     end
 
     it 'raises for unsupported class names' do
@@ -43,7 +43,7 @@ describe Taro::Types::Coercion do
     it 'raises for unsupported input' do
       expect do
         described_class.call(type: 42)
-      end.to raise_error(Taro::ArgumentError, /Unsupported type/)
+      end.to raise_error(Taro::ArgumentError, /No such type/)
     end
 
     it 'raises for Hashes without type info' do

@@ -36,7 +36,7 @@ module Taro::Types::Coercion
       shortcuts[arg] || from_class(Object.const_get(arg.to_s))
     rescue NameError
       raise Taro::ArgumentError, <<~MSG
-        Unsupported type: #{arg}. It should be a type-class name
+        No such type: #{arg}. It should be a type-class name
         or one of #{shortcuts.keys.map(&:inspect).join(', ')}.
       MSG
     end

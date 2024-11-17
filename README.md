@@ -217,8 +217,6 @@ Why e.g. `field :id, type: 'UUID'` instead of `field :id, type: UUID`?
 
 The purpose of this is to reduce unnecessary autoloading of the whole type dependency tree in dev and test environments.
 
-This already works fo type classes – they don't trigger loading of referenced types unless used. The API declarations in controller classes still trigger auto-loading for now, but we aim to improve this in the future.
-
 ## Possible future features
 
 - warning/raising for undeclared input params (currently they are ignored)
