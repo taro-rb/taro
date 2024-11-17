@@ -11,15 +11,20 @@ class ErrorsType < Taro::Types::ListType
   end
 
   def coerce_response
-    case object.class.name
-    when 'ActiveRecord::Base'
-      super(object.errors.errors)
-    when 'ActiveModel::Errors'
-      super(object.errors)
-    when 'Hash', 'Interactor::Context'
-      super(object[:errors])
-    else # e.g. Array
-      super(object)
-    end
+    list =
+      case object<%- if defined?(ActiveRecord) %>
+      when ActiveModel::Errors
+        object.errors
+      when ActiveRecord::Base
+        object.errors.errors<%- end %>
+      when Array
+        object
+      when Hash<%- if defined?(Interactor::Context) %>, Interactor::Context<%- end %>
+        object.to_h.fetch(:errors)
+      else
+        response_error("must be an Enumerable or an object with errors")
+      end
+
+    list.map { |el| self.class.item_type.new(el).coerce_response }
   end
 end
