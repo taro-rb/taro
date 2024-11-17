@@ -1,11 +1,11 @@
 require_relative 'field_validation'
 
-Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :desc) do
+Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :desc, :deprecated) do
   include Taro::Types::FieldValidation
 
-  def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, desc: nil)
+  def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, desc: nil, deprecated: nil)
     enum = coerce_to_enum(enum)
-    super(name:, type:, null:, method:, default:, enum:, defined_at:, desc:)
+    super(name:, type:, null:, method:, default:, enum:, defined_at:, desc:, deprecated:)
   end
 
   def value_for_input(object)

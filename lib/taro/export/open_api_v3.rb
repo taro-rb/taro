@@ -115,23 +115,29 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     # as it puts props like format together with the main type.
     # https://github.com/OAI/OpenAPI-Specification/issues/3148
     base = { oneOf: [base, { type: 'null' }] } if field.null
-    base[:description] = field.desc if field.desc
-    base[:default] = field.default if field.default_specified?
-    base[:enum] = field.enum if field.enum
-    base
+    base.merge(field_metadata(field))
   end
 
   def export_complex_field_ref(field)
     ref = extract_component_ref(field.type)
+    return ref if field_metadata(field).empty? && !field.null
+
     if field.null
       # RE nullable: https://stackoverflow.com/a/70658334
-      { description: field.desc, oneOf: [ref, { type: 'null' }] }.compact
-    elsif field.desc
+      { oneOf: [ref, { type: 'null' }] }
+    else # i.e. with metadata such as description or deprecated
       # https://github.com/OAI/OpenAPI-Specification/issues/2033
-      { description: field.desc, allOf: [ref] }
-    else
-      ref
-    end
+      { allOf: [ref] }
+    end.merge(field_metadata(field))
+  end
+
+  def field_metadata(field)
+    meta = {}
+    meta[:description] = field.desc if field.desc
+    meta[:deprecated] = field.deprecated unless field.deprecated.nil?
+    meta[:default] = field.default if field.default_specified?
+    meta[:enum] = field.enum if field.enum
+    meta
   end
 
   def extract_component_ref(type)
