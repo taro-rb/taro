@@ -6,6 +6,7 @@ module Taro::Types::Shared::ItemType
     item_type.nil? || new_type == item_type || raise_mixed_types(new_type)
     @item_type = new_type
   end
+  alias_method :derive_from, :item_type=
 
   def raise_mixed_types(new_type)
     raise Taro::ArgumentError, <<~MSG

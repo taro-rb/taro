@@ -2,7 +2,6 @@
 # Unlike other types, this one should not be manually inherited from,
 # but is used indirectly via `array_of: SomeType`.
 class Taro::Types::ListType < Taro::Types::BaseType
-  extend Taro::Types::Shared::DerivableType
   extend Taro::Types::Shared::ItemType
 
   self.openapi_type = :array
@@ -20,11 +19,6 @@ class Taro::Types::ListType < Taro::Types::BaseType
     item_type = self.class.item_type
     object.map { |el| item_type.new(el).coerce_response }
   end
-end
 
-# add shortcut to other types
-class Taro::Types::BaseType
-  def self.array
-    Taro::Types::ListType.for(self)
-  end
+  define_derived_type :array
 end

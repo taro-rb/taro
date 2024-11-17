@@ -5,7 +5,6 @@
 # The gem rails_cursor_pagination must be installed to use this.
 #
 class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
-  extend Taro::Types::Shared::DerivableType
   extend Taro::Types::Shared::ItemType
 
   def coerce_input
@@ -36,11 +35,6 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::BaseType
   def self.items_key
     :page
   end
-end
 
-# add shortcut to other types
-class Taro::Types::BaseType
-  def self.page
-    Taro::Types::ObjectTypes::PageType.for(self)
-  end
+  define_derived_type :page
 end

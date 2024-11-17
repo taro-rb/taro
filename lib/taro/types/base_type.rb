@@ -9,6 +9,7 @@
 Taro::Types::BaseType = Data.define(:object) do
   require_relative "shared"
   extend Taro::Types::Shared::AdditionalProperties
+  extend Taro::Types::Shared::DerivedTypes
   extend Taro::Types::Shared::Description
   extend Taro::Types::Shared::OpenAPIName
   extend Taro::Types::Shared::OpenAPIType

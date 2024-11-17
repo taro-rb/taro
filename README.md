@@ -219,6 +219,35 @@ Why e.g. `field :id, type: 'UUID'` instead of `field :id, type: UUID`?
 
 The purpose of this is to reduce unnecessary autoloading of the whole type dependency tree in dev and test environments.
 
+#### Can I define my own derived types like `page_of` or `array_of`?
+
+Yes.
+
+```ruby
+# Call define_derived_type after implementing ::derive_from.
+class PreviewType < Taro::Types::Scalar::StringType
+  singleton_class.attr_reader :type_to_preview
+
+  def self.derive_from(other_type)
+    self.type_to_preview = other_type
+  end
+
+  def coerce_response
+    type_to_preview.new(object).coerce_response.to_s.truncate(100)
+  end
+
+  define_derived_type :preview
+end
+
+# Usage:
+class MyController < ApplicationController
+  returns code: :ok, preview_of: 'BikeType'
+  def show
+    render json: BikeType.preview.render(Bike.find(params[:id]))
+  end
+end
+```
+
 ## Possible future features
 
 - warning/raising for undeclared input params (currently they are ignored)

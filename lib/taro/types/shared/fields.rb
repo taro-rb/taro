@@ -27,11 +27,12 @@ module Taro::Types::Shared::Fields
     [true, false].include?(kwargs[:null]) ||
       raise(Taro::ArgumentError, "null has to be specified as true or false for field #{name} at #{defined_at}")
 
-    (type_keys = (kwargs.keys & Taro::Types::Coercion::KEYS)).size == 1 ||
-      raise(Taro::ArgumentError, "exactly one of type, array_of, or page_of must be given for field #{name} at #{defined_at}")
+    c_keys = Taro::Types::Coercion.keys
+    (type_keys = (kwargs.keys & c_keys)).size == 1 ||
+      raise(Taro::ArgumentError, "exactly one of #{c_keys.join(', ')} must be given for field #{name} at #{defined_at}")
 
     kwargs[type_keys.first].class == String ||
-      raise(Taro::ArgumentError, "#{type_key} must be a String for field #{name} at #{defined_at}")
+      raise(Taro::ArgumentError, "#{type_keys.first} must be a String for field #{name} at #{defined_at}")
   end
 
   def validate_no_override(name, defined_at:)
@@ -46,7 +47,7 @@ module Taro::Types::Shared::Fields
   def evaluate_field_defs
     field_defs.transform_values do |field_def|
       type = Taro::Types::Coercion.call(field_def)
-      Taro::Types::Field.new(**field_def.except(*Taro::Types::Coercion::KEYS), type:)
+      Taro::Types::Field.new(**field_def.except(*Taro::Types::Coercion.keys), type:)
     end
   end
 

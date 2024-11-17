@@ -3,6 +3,7 @@
 ### Added
 
 - Improved error messages
+- Option to define custom derived types
 - Option to use custom keys in paginated content
 
 ### Fixed

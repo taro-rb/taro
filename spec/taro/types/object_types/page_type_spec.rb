@@ -1,7 +1,7 @@
 require 'rails_cursor_pagination'
 
 describe Taro::Types::ObjectTypes::PageType do
-  let(:example) { described_class.for(S::StringType) }
+  let(:example) { S::StringType.page }
   let(:page) { [] }
   let(:page_info) do
     { has_previous_page: true, has_next_page: true, start_cursor: 'x', end_cursor: 'y' }

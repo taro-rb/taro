@@ -108,7 +108,7 @@ class Taro::Rails::Declaration
       MSG
     end
 
-    bad_keys = kwargs.keys - (Taro::Types::Coercion::KEYS + %i[code desc nesting])
+    bad_keys = kwargs.keys - (Taro::Types::Coercion.keys + %i[code desc nesting])
     return if bad_keys.empty?
 
     raise Taro::ArgumentError, "Invalid `returns` options: #{bad_keys.join(', ')}"

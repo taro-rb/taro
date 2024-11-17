@@ -1,5 +1,5 @@
 describe Taro::Types::ListType do
-  let(:example) { described_class.for(S::StringType) }
+  let(:example) { S::StringType.array }
 
   it 'coerces input' do
     expect(example.new(%w[a]).coerce_input).to eq %w[a]

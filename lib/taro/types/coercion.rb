@@ -1,10 +1,13 @@
 module Taro::Types::Coercion
-  KEYS = %i[type array_of page_of].freeze
-
   class << self
     def call(arg)
       validate_hash(arg)
       from_hash(arg)
+    end
+
+    # Coercion keys can be expanded by the DerivedTypes module.
+    def keys
+      @keys ||= %i[type]
     end
 
     private
@@ -14,22 +17,25 @@ module Taro::Types::Coercion
         Type coercion argument must be a Hash, got: #{arg.class}
       MSG
 
-      types = arg.slice(*KEYS)
+      types = arg.slice(*keys)
       types.size == 1 || raise(Taro::ArgumentError, <<~MSG)
         Exactly one of type, array_of, or page_of must be given, got: #{types}
       MSG
     end
 
     def from_hash(hash)
-      if hash[:type]
-        from_string(hash[:type])
-      elsif (inner_type = hash[:array_of])
-        from_string(inner_type).array
-      elsif (inner_type = hash[:page_of])
-        from_string(inner_type).page
-      else
-        raise NotImplementedError, 'Unsupported type coercion'
+      keys.each do |key|
+        next unless (value = hash[key])
+
+        # e.g. `returns type: 'MyType'` -> MyType
+        return from_string(value) if key == :type
+
+        # DerivedTypes
+        # e.g. `returns array_of: 'MyType'` -> MyType.array
+        return from_string(value).send(key.to_s.chomp('_of'))
       end
+
+      raise NotImplementedError, 'Unsupported type coercion'
     end
 
     def from_string(arg)
