@@ -28,6 +28,11 @@ describe Taro::Types::FieldValidation do
       expect { field.validated_value('A') }.not_to raise_error
     end
 
+    it 'does not raise if the field is nullable and value is nil' do
+      field =  F.new(name: :upcase, type: S::StringType, null: true, enum: %w[A B])
+      expect { field.validated_value(nil) }.not_to raise_error
+    end
+
     it 'raises if the object is not matching the enum' do
       expect { field.validated_value('C') }
         .to raise_error(Taro::InputError, /expected one of/)

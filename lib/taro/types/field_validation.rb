@@ -18,7 +18,7 @@ module Taro::Types::FieldValidation
   end
 
   def validate_enum_inclusion(value, for_input)
-    return if enum.nil? || enum.include?(value)
+    return if enum.nil? || null && value.nil? || enum.include?(value)
 
     raise for_input ? Taro::InputError : Taro::ResponseError, <<~MSG
       Field #{name} has an invalid value #{value.inspect} (expected one of #{enum.inspect})

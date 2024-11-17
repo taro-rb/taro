@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- Fixed nullable enum fields raising for null input
 - Fixed auto-loading of return types
 - Fixed console spam when inspecting declarations
 - Fixed resolver method not being used when rendering a Hash
