@@ -36,6 +36,12 @@ describe Taro::Types::Field do
       expect(field.value_for_response('foo', context:, object_is_hash: false)).to eq('CTX')
     end
 
+    it 'fetches value from context for hashes' do
+      context = Class.new(T::ObjectType).tap { |o| o.define_method(:v) { object[:k] } }.new({ k: 'V' })
+      field = described_class.new(name: :v, type: S::StringType, null: false)
+      expect(field.value_for_response('foo', context:, object_is_hash: false)).to eq('V')
+    end
+
     it 'uses :method to fetch value from context if defined directly on it' do
       context = Class.new(T::ObjectType).tap { |o| o.define_method(:upcase) { 'CTX' } }.new(nil)
       field = described_class.new(name: :foo, type: S::StringType, null: false, method: :upcase)
