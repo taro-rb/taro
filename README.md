@@ -131,16 +131,18 @@ Taro.config.validate_responses = false
 The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
 
 - `'Boolean'` - accepts and renders `true` or `false`
+- `'Date'` - accepts and renders a date string in ISO8601 format
+- `'DateTime'` - an alias for `'Time'`
 - `'Float'`
 - `'FreeForm'` - accepts and renders any JSON-serializable object, use with care
 - `'Integer'`
 - `'NoContent'` - renders an empty object, for use with `status: :no_content`
 - `'String'`
+- `'Time'` - accepts and renders a time string in ISO8601 format
 - `'Timestamp'` - renders a `Time` as unix timestamp integer and turns incoming integers into a `Time`
 - `'UUID'` - accepts and renders UUIDs
-- `'Date'` - accepts and renders a date string in ISO8601 format
-- `'Time'` - accepts and renders a time string in ISO8601 format
-- `'DateTime'` - an alias for `'Time'`
+
+Also, when using the generator, `ErrorsType` and `ErrorDetailsType` are generated as a starting point for unified error presentation. `ErrorsType` can render invalid `ActiveRecord` instances, `ActiveModel::Errors` and other data structures.
 
 ### Enums
 
