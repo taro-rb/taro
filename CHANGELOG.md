@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.2.0] - 2024-11-18
+
 ### Added
 
 - Improved error messages
@@ -24,7 +26,12 @@
 
 ## [1.1.0] - 2024-11-16
 
+### Added
+
 - Response validation refined
+
+### Fixed
+
 - Bugfix for openapi export
 
 ## [1.0.0] - 2024-11-14
