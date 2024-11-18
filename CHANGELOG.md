@@ -20,6 +20,7 @@
   - Fixed export for arrays of UUIDs, Dates, and Times
   - Fixed export YML keys for namespaced controllers
   - Reference plain types for repeated flat return types
+  - Made order of paths, verbs, responses and schemas deterministic
 
 ## [1.1.0] - 2024-11-16
 

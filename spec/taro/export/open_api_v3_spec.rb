@@ -49,32 +49,6 @@ describe Taro::Export::OpenAPIv3 do
         version: '1.0'
       paths:
         "/users/{id}":
-          put:
-            summary: My endpoint description
-            parameters:
-            - name: id
-              required: true
-              schema:
-                type: integer
-              in: path
-            requestBody:
-              content:
-                application/json:
-                  schema:
-                    "$ref": "#/components/schemas/Foo_update_Input"
-            responses:
-              '200':
-                description: okay
-                content:
-                  application/json:
-                    schema:
-                      type: integer
-              '422':
-                description: bad
-                content:
-                  application/json:
-                    schema:
-                      "$ref": "#/components/schemas/Foo_update_422_Response"
           delete:
             summary: My endpoint description for DELETE
             parameters:
@@ -110,16 +84,34 @@ describe Taro::Export::OpenAPIv3 do
                   application/json:
                     schema:
                       type: integer
+          put:
+            summary: My endpoint description
+            parameters:
+            - name: id
+              required: true
+              schema:
+                type: integer
+              in: path
+            requestBody:
+              content:
+                application/json:
+                  schema:
+                    "$ref": "#/components/schemas/Foo_update_Input"
+            responses:
+              '200':
+                description: okay
+                content:
+                  application/json:
+                    schema:
+                      type: integer
+              '422':
+                description: bad
+                content:
+                  application/json:
+                    schema:
+                      "$ref": "#/components/schemas/Foo_update_422_Response"
       components:
         schemas:
-          Foo_update_Input:
-            type: object
-            properties:
-              foo:
-                oneOf:
-                - type: string
-                - type: 'null'
-                deprecated: true
           Failure:
             type: object
             deprecated: true
@@ -144,6 +136,14 @@ describe Taro::Export::OpenAPIv3 do
             properties:
               errors:
                 "$ref": "#/components/schemas/Failure_List"
+          Foo_update_Input:
+            type: object
+            properties:
+              foo:
+                oneOf:
+                - type: string
+                - type: 'null'
+                deprecated: true
     YAML
   end
 

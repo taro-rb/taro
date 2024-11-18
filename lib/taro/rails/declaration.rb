@@ -49,8 +49,7 @@ class Taro::Rails::Declaration
   end
 
   def parse_params(rails_params)
-    hash = params.new(rails_params.to_unsafe_h).coerce_input
-    hash
+    params.new(rails_params.to_unsafe_h).coerce_input
   end
 
   def finalize(controller_class:, action_name:)
@@ -135,5 +134,9 @@ class Taro::Rails::Declaration
 
   def raise_missing_route(controller_class, action_name)
     raise(Taro::ArgumentError, "No route found for #{controller_class}##{action_name}")
+  end
+
+  def <=>(other)
+    params.openapi_name <=> other.params.openapi_name
   end
 end

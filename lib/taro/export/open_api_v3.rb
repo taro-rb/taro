@@ -11,13 +11,13 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def call(declarations:, title:, version:)
     @result = { openapi: '3.1.0', info: { title:, version: } }
     paths = export_paths(declarations)
-    @result[:paths] = paths if paths.any?
-    @result[:components] = { schemas: } if schemas.any?
+    @result[:paths] = paths.sort.to_h if paths.any?
+    @result[:components] = { schemas: schemas.sort.to_h } if schemas.any?
     self
   end
 
   def export_paths(declarations)
-    declarations.each_with_object({}) do |declaration, paths|
+    declarations.sort.each_with_object({}) do |declaration, paths|
       declaration.routes.each do |route|
         paths[route.openapi_path] ||= {}
         paths[route.openapi_path].merge! export_route(route, declaration)
@@ -103,7 +103,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def responses(declaration)
-    declaration.returns.to_h do |code, type|
+    declaration.returns.sort.to_h do |code, type|
       [
         code.to_s,
         {
