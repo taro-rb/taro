@@ -5,7 +5,7 @@
 - Improved error messages
 - Option to define custom derived types
 - Option to use custom keys in paginated content
-- Option to deprecate individual fields and params
+- Option to deprecate individual fields, params, and types
 
 ### Fixed
 

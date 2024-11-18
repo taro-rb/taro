@@ -1,6 +1,7 @@
 describe Taro::Export::OpenAPIv3 do
   it 'handles Declarations' do
     stub_const('FailureType', Class.new(T::ObjectType) do
+      self.deprecated = true
       field :message, type: 'String', null: true, deprecated: true
       field :code, type: 'Integer', null: false
     end)
@@ -121,6 +122,7 @@ describe Taro::Export::OpenAPIv3 do
                 deprecated: true
           Failure:
             type: object
+            deprecated: true
             required:
             - code
             properties:

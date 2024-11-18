@@ -296,7 +296,6 @@ end
 - sum types
 - api doc rendering based on export (e.g. rails engine with web ui)
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
-- type-level deprecation
 - maybe make `type:` optional for path params as they're always strings anyway
 - various openapi features
   - non-JSON content types (e.g. for file uploads)
