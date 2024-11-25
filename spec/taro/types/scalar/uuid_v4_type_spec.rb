@@ -5,13 +5,13 @@ describe Taro::Types::Scalar::UUIDv4Type do
     expect(described_class.new(uuid).coerce_input).to eq uuid
     expect(described_class.new(uuid.tr('-', '')).coerce_input).to eq uuid.tr('-', '')
     expect { described_class.new(uuid[1..]).coerce_input }
-      .to raise_error(Taro::InputError, /must be a UUID v4 string/)
+      .to raise_error(Taro::InputError, /must match pattern/)
   end
 
   it 'coerces response data' do
     expect(described_class.new(uuid).coerce_response).to eq uuid
     expect(described_class.new(uuid.tr('-', '')).coerce_response).to eq uuid.tr('-', '')
     expect { described_class.new(uuid[1..]).coerce_response }
-      .to raise_error(Taro::ResponseError, /must be a UUID v4 string/)
+      .to raise_error(Taro::ResponseError, /must match pattern/)
   end
 end

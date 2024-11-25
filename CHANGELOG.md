@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- Support for string patterns (on StringType children and in export)
+
 ## [1.2.0] - 2024-11-18
 
 ### Added

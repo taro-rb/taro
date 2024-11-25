@@ -32,7 +32,7 @@ describe Taro::Export::OpenAPIv3 do
     show_decl.add_info 'My endpoint description for DELETE'
     show_decl.add_param :id, type: 'Integer', null: false
     show_decl.add_param :show_details, type: 'Boolean', null: false
-    show_decl.add_return type: 'Integer', code: 200, desc: 'okay'
+    show_decl.add_return type: 'UUID', code: 200, desc: 'okay'
     show_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'GET'))]
     show_decl.add_openapi_names(
       controller_class: stub_const('FooController', Class.new),
@@ -83,7 +83,7 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      type: integer
+                      "$ref": "#/components/schemas/UUIDv4"
           put:
             summary: My endpoint description
             parameters:
@@ -144,6 +144,10 @@ describe Taro::Export::OpenAPIv3 do
                 - type: string
                 - type: 'null'
                 deprecated: true
+          UUIDv4:
+            type: string
+            description: A UUID v4 string
+            pattern: "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
     YAML
   end
 

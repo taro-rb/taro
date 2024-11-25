@@ -115,11 +115,15 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def export_type(type)
-    if type < Taro::Types::ScalarType
+    if type < Taro::Types::ScalarType && !custom_scalar_type?(type)
       { type: type.openapi_type }
     else
       extract_component_ref(type)
     end
+  end
+
+  def custom_scalar_type?(type)
+    type < Taro::Types::ScalarType && (type.openapi_pattern || type.deprecated)
   end
 
   def export_field(field)
@@ -174,6 +178,8 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       enum_type_details(type)
     elsif type < Taro::Types::ListType
       list_type_details(type)
+    elsif custom_scalar_type?(type)
+      custom_scalar_type_details(type)
     else
       raise NotImplementedError, "Unsupported type: #{type}"
     end
@@ -206,6 +212,15 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       deprecated: list.deprecated,
       description: list.desc,
       items: export_type(list.item_type),
+    }.compact
+  end
+
+  def custom_scalar_type_details(scalar)
+    {
+      type: scalar.openapi_type,
+      deprecated: scalar.deprecated,
+      description: scalar.desc,
+      pattern: scalar.openapi_pattern,
     }.compact
   end
 
