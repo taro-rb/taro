@@ -8,7 +8,7 @@ describe Taro::Export::OpenAPIv3 do
 
     update_decl = Taro::Rails::Declaration.new
     update_decl.add_info 'My endpoint description'
-    update_decl.add_param :id, type: 'Integer', null: false
+    update_decl.add_param :id, type: 'Integer', enum: [1, 2, 3], null: false, desc: 'The ID'
     update_decl.add_param :foo, type: 'String', null: true, deprecated: true
     update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
@@ -18,9 +18,14 @@ describe Taro::Export::OpenAPIv3 do
       action_name: 'update',
     )
 
+    stub_const('MyEnumType', Class.new(T::EnumType) do
+      value 4
+      value 5
+    end)
+
     delete_decl = Taro::Rails::Declaration.new
     delete_decl.add_info 'My endpoint description for DELETE'
-    delete_decl.add_param :id, type: 'Integer', null: false
+    delete_decl.add_param :id, type: 'MyEnumType', null: false
     delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     delete_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
     delete_decl.add_openapi_names(
@@ -55,7 +60,7 @@ describe Taro::Export::OpenAPIv3 do
             - name: id
               required: true
               schema:
-                type: integer
+                "$ref": "#/components/schemas/MyEnum"
               in: path
             responses:
               '200':
@@ -88,9 +93,14 @@ describe Taro::Export::OpenAPIv3 do
             summary: My endpoint description
             parameters:
             - name: id
+              description: The ID
               required: true
               schema:
                 type: integer
+                enum:
+                - 1
+                - 2
+                - 3
               in: path
             requestBody:
               content:
@@ -144,6 +154,11 @@ describe Taro::Export::OpenAPIv3 do
                 - type: string
                 - type: 'null'
                 deprecated: true
+          MyEnum:
+            type: integer
+            enum:
+            - 4
+            - 5
           UUIDv4:
             type: string
             description: A UUID v4 string

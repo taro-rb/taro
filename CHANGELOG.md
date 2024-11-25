@@ -4,6 +4,10 @@
 
 - Support for string patterns (on StringType children and in export)
 
+### Fixed
+
+- Fixed OpenAPI export of params with enum (inline & type-based)
+
 ## [1.2.0] - 2024-11-18
 
 ### Added

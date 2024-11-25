@@ -64,13 +64,20 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def export_parameter(field)
+    validate_path_or_query_parameter(field)
+
     {
       name: field.name,
       deprecated: field.deprecated,
       description: field.desc,
       required: !field.null,
-      schema: { type: field.openapi_type },
+      schema: export_field(field).except(:deprecated, :description),
     }.compact
+  end
+
+  def validate_path_or_query_parameter(field)
+    [:array, :object].include?(field.type.openapi_type) &&
+      raise("Unexpected object as path/query param #{field.name}: #{field.type}")
   end
 
   def request_body(declaration, route)
@@ -87,7 +94,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     body_input_type.openapi_name = params.openapi_name
 
     # For polymorphic routes (more than one for the same declaration),
-    # we can't use refs because they request body might differ.
+    # we can't use refs because their request body might differ:
     # Different params might be in the path vs. in the request body.
     use_refs = !declaration.polymorphic_route?
     schema = request_body_schema(body_input_type, use_refs:)
