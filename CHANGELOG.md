@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.3.0] - 2024-11-25
+
 ### Added
 
 - Support for string patterns (on StringType children and in export)
