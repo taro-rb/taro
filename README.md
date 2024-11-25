@@ -298,6 +298,7 @@ end
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - maybe make `type:` optional for path params as they're always strings anyway
 - various openapi features
+  - generate unique operationId for each endpoint
   - non-JSON content types (e.g. for file uploads)
   - [examples](https://swagger.io/specification/#example-object)
   - array minItems, maxItems, uniqueItems
