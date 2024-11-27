@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+### Added
+
+- added operationId to OpenAPI export
+
+### Fixed
+
+- fixed potential ref name clashes in OpenAPI export
+  - e.g. `FooBar::BazController` & `Foo::BarBazController`
+
 ## [1.3.0] - 2024-11-25
 
 ### Added

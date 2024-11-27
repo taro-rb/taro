@@ -31,9 +31,10 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
         description: declaration.desc,
         summary: declaration.summary,
         tags: declaration.tags,
+        operationId: route.openapi_operation_id,
         parameters: route_parameters(declaration, route),
         requestBody: request_body(declaration, route),
-        responses: responses(declaration),
+        responses: responses(declaration, route),
       }.compact,
     }
   end
@@ -91,7 +92,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
     body_input_type = Class.new(params)
     body_input_type.fields.replace(body_param_fields)
-    body_input_type.openapi_name = params.openapi_name
+    body_input_type.openapi_name = "#{route.openapi_operation_id}_Input"
 
     # For polymorphic routes (more than one for the same declaration),
     # we can't use refs because their request body might differ:
@@ -109,7 +110,9 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     end
   end
 
-  def responses(declaration)
+  def responses(declaration, route)
+    name_anonymous_return_types(declaration, route)
+
     declaration.returns.sort.to_h do |code, type|
       [
         code.to_s,
@@ -118,6 +121,14 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
           content: { 'application/json': { schema: export_type(type) } },
         }
       ]
+    end
+  end
+
+  def name_anonymous_return_types(declaration, route)
+    declaration.returns.each do |code, type|
+      next if type.openapi_name?
+
+      type.openapi_name = "#{route.openapi_operation_id}_#{code}_Response"
     end
   end
 

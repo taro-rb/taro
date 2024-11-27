@@ -11,14 +11,14 @@ def stub_rails(with_routes: [])
   stub_const('Rails', rails)
 end
 
-def mock_user_route(verb: 'PUT')
+def mock_user_route(verb: 'PUT', action: 'update')
   instance_double(
     ActionDispatch::Journey::Route,
     path: instance_double(
       ActionDispatch::Journey::Path::Pattern,
       spec: instance_double(ActionDispatch::Journey::Nodes::Cat, to_s: '/users/:id(.:format)'),
     ),
-    requirements: { controller: 'users', action: 'update' },
+    requirements: { controller: 'users', action: },
     verb:,
   )
 end

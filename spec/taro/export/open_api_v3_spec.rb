@@ -13,10 +13,6 @@ describe Taro::Export::OpenAPIv3 do
     update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
     update_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
-    update_decl.add_openapi_names(
-      controller_class: stub_const('FooController', Class.new),
-      action_name: 'update',
-    )
 
     stub_const('MyEnumType', Class.new(T::EnumType) do
       value 4
@@ -27,22 +23,14 @@ describe Taro::Export::OpenAPIv3 do
     delete_decl.add_info 'My endpoint description for DELETE'
     delete_decl.add_param :id, type: 'MyEnumType', null: false
     delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
-    delete_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE'))]
-    delete_decl.add_openapi_names(
-      controller_class: stub_const('FooController', Class.new),
-      action_name: 'destroy',
-    )
+    delete_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE', action: 'destroy'))]
 
     show_decl = Taro::Rails::Declaration.new
-    show_decl.add_info 'My endpoint description for DELETE'
+    show_decl.add_info 'My endpoint description for GET'
     show_decl.add_param :id, type: 'Integer', null: false
     show_decl.add_param :show_details, type: 'Boolean', null: false
     show_decl.add_return type: 'UUID', code: 200, desc: 'okay'
-    show_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'GET'))]
-    show_decl.add_openapi_names(
-      controller_class: stub_const('FooController', Class.new),
-      action_name: 'show',
-    )
+    show_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'GET', action: 'show'))]
 
     result = described_class.call(declarations: [update_decl, delete_decl, show_decl])
 
@@ -56,6 +44,7 @@ describe Taro::Export::OpenAPIv3 do
         "/users/{id}":
           delete:
             summary: My endpoint description for DELETE
+            operationId: delete_destroy_users
             parameters:
             - name: id
               required: true
@@ -70,7 +59,8 @@ describe Taro::Export::OpenAPIv3 do
                     schema:
                       type: integer
           get:
-            summary: My endpoint description for DELETE
+            summary: My endpoint description for GET
+            operationId: get_show_users
             parameters:
             - name: id
               required: true
@@ -91,6 +81,7 @@ describe Taro::Export::OpenAPIv3 do
                       "$ref": "#/components/schemas/UUIDv4"
           put:
             summary: My endpoint description
+            operationId: put_update_users
             parameters:
             - name: id
               description: The ID
@@ -106,7 +97,7 @@ describe Taro::Export::OpenAPIv3 do
               content:
                 application/json:
                   schema:
-                    "$ref": "#/components/schemas/Foo_update_Input"
+                    "$ref": "#/components/schemas/put_update_users_Input"
             responses:
               '200':
                 description: okay
@@ -119,7 +110,7 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      "$ref": "#/components/schemas/Foo_update_422_Response"
+                      "$ref": "#/components/schemas/put_update_users_422_Response"
       components:
         schemas:
           Failure:
@@ -139,21 +130,6 @@ describe Taro::Export::OpenAPIv3 do
             type: array
             items:
               "$ref": "#/components/schemas/Failure"
-          Foo_update_422_Response:
-            type: object
-            required:
-            - errors
-            properties:
-              errors:
-                "$ref": "#/components/schemas/Failure_List"
-          Foo_update_Input:
-            type: object
-            properties:
-              foo:
-                oneOf:
-                - type: string
-                - type: 'null'
-                deprecated: true
           MyEnum:
             type: integer
             enum:
@@ -163,6 +139,21 @@ describe Taro::Export::OpenAPIv3 do
             type: string
             description: A UUID v4 string
             pattern: "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+          put_update_users_422_Response:
+            type: object
+            required:
+            - errors
+            properties:
+              errors:
+                "$ref": "#/components/schemas/Failure_List"
+          put_update_users_Input:
+            type: object
+            properties:
+              foo:
+                oneOf:
+                - type: string
+                - type: 'null'
+                deprecated: true
     YAML
   end
 
@@ -182,10 +173,6 @@ describe Taro::Export::OpenAPIv3 do
     declaration = Taro::Rails::Declaration.new
     declaration.add_param :id, type: 'Integer', null: false
     declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
-    declaration.add_openapi_names(
-      controller_class: stub_const('FooController', Class.new),
-      action_name: 'show',
-    )
 
     result = described_class.call(declarations: [declaration]).result
     expect(result[:paths].values.first[:put]).not_to have_key(:requestBody)
