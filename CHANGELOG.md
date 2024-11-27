@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.4.0] - 2024-11-27
+
 ### Added
 
 - added operationId to OpenAPI export
