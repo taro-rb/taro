@@ -34,19 +34,19 @@ class BikesController < ApplicationController
   api     'Update a bike', desc: 'My longer text', tags: ['Bikes']
   # Params can come from the path, e.g. /bike/:id)
   param   :id, type: 'UUID', null: false, desc: 'ID of the bike to update'
-  # They can also come from the query string or request body
+  # They can also come from the query string or request body.
+  # This describes a Hash param:
   param   :bike, type: 'BikeInputType', null: false
   # Return types can differ by status code and can be nested as in this case:
   returns :bike, code: :ok, type: 'BikeType', desc: 'update success'
   # This one is not nested:
   returns code: :unprocessable_content, type: 'MyErrorType', desc: 'failure'
   def update
-    # defined params are available as @api_params
+    # Declared params are available as @api_params
     bike = Bike.find(@api_params[:id])
     success = bike.update(@api_params[:bike])
 
-    # Types can be used to render responses.
-    # The object
+    # Types are also used to render responses.
     if success
       render json: { bike: BikeType.render(bike) }, status: :ok
     else
@@ -63,9 +63,9 @@ class BikesController < ApplicationController
 end
 ```
 
-Notice the multiple roles of types: They are used to define the structure of API requests and responses, and render the response. Both the input and output of the API can be validated against the schema if desired (see below).
+Notice the multiple roles of types: They are used to describe the structure of API requests and responses, and render the response. Both the input and output of the API are validated against the schema by default (see below).
 
-Here is an example of the `BikeType` from that controller:
+Here is an example of the `BikeType` from the controller above:
 
 ```ruby
 class BikeType < ObjectType
@@ -106,7 +106,7 @@ class BikeInputType < InputType
 end
 ```
 
-The usage of such dedicated InputTypes is optional. Object types can also be used to define accepted parameters, or parts of them, depending on what you want to allow API clients to send.
+The usage of such dedicated InputTypes is optional. Normal Object types can also be re-used to define accepted parameters, or parts of them, depending on what you want to allow API clients to send.
 
 ### Validation
 
@@ -120,7 +120,7 @@ Taro.config.parse_params = false
 
 #### Response validation
 
-Responses are automatically validated to use the correct type for rendering, which guarantees that they match the declaration. This can be disabled:
+Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration. This can be disabled:
 
 ```ruby
 Taro.config.validate_responses = false
