@@ -21,7 +21,7 @@ class Taro::Rails::Declaration
   end
 
   def add_return(nesting = nil, code:, desc: nil, **kwargs)
-    status = self.class.coerce_status_to_int(code)
+    status = Taro::StatusCode.coerce_to_int(code)
     raise_if_already_declared(status)
 
     kwargs[:nesting] = nesting
@@ -65,16 +65,6 @@ class Taro::Rails::Declaration
 
   def polymorphic_route?
     routes.size > 1
-  end
-
-  require 'rack'
-  def self.coerce_status_to_int(status)
-    # support using http status numbers directly
-    return status if ::Rack::Utils::SYMBOL_TO_STATUS_CODE.key(status)
-
-    # support using symbols, but coerce them to numbers
-    ::Rack::Utils::SYMBOL_TO_STATUS_CODE[status] ||
-      raise(Taro::ArgumentError, "Invalid status: #{status.inspect}")
   end
 
   private
