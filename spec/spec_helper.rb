@@ -2,7 +2,7 @@ require_relative "support/coverage"
 require "rails"
 require "taro"
 require "debug"
-Dir["#{__dir__}/support/**/*.rb"].each { |f| require f }
+Dir["#{__dir__}/support/**/*.rb"].each { |f| require_relative f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

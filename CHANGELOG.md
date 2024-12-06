@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- fixed unnecessary `$LOAD_PATH` searches at require time
+
 ## [1.4.0] - 2024-11-27
 
 ### Added

@@ -4,5 +4,5 @@ class Taro::Types::ScalarType < Taro::Types::BaseType
 end
 
 module Taro::Types::Scalar
-  Dir[File.join(__dir__, 'scalar', '**', '*.rb')].each { |f| require f }
+  Dir[File.join(__dir__, 'scalar', '**', '*.rb')].each { |f| require_relative f }
 end
