@@ -1,4 +1,4 @@
-class Taro::Types::ObjectTypes::PageInfoType < Taro::Types::ObjectType
+class Taro::Types::ObjectTypes::PageInfoType < Taro::Types::ResponseType
   self.openapi_name = 'PageInfo'
 
   field :has_previous_page, type: 'Boolean', null: false, desc: 'Whether there is a previous page of results'

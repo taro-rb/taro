@@ -16,9 +16,9 @@ describe Taro::Types::ObjectTypes::PageType do
   end
 
   it 'can not coerce input' do
-    expect do
-      example.new('foo').coerce_input
-    end.to raise_error(Taro::Error, /PageTypes cannot be used as input types/)
+    expect { example.new('foo').coerce_input }.to raise_error(
+      Taro::Error, /StringType.page is a ResponseType and cannot be used as input type/
+    )
   end
 
   it 'coerces response data' do

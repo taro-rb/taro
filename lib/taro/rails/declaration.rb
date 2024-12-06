@@ -30,8 +30,7 @@ class Taro::Rails::Declaration
     kwargs[:defined_at] = caller_locations(1..2)[1]
     return_defs[status] = kwargs
 
-    # response desc is required in openapi 3 – fall back to status code
-    return_descriptions[status] = desc || code.to_s
+    return_descriptions[status] = desc
 
     # if a field name is provided, the response should be nested
     return_nestings[status] = nesting if nesting

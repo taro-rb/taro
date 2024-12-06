@@ -9,8 +9,9 @@ describe Taro::Types::ObjectTypes::NoContentType do
   end
 
   it 'can not coerce input' do
-    expect do
-      described_class.new({}).coerce_input
-    end.to raise_error(Taro::Error, /NoContentType cannot be used as input type/)
+    expect { described_class.new({}).coerce_input }.to raise_error(
+      Taro::Error,
+      /NoContentType is a ResponseType and cannot be used as input type/
+    )
   end
 end

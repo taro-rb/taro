@@ -117,7 +117,8 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       [
         code.to_s,
         {
-          description: declaration.return_descriptions[code],
+          # response desc is required in openapi 3 – fall back to status code
+          description: declaration.return_descriptions[code] || type.desc || code.to_s,
           content: { 'application/json': { schema: export_type(type) } },
         }
       ]

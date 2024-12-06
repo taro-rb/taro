@@ -4,17 +4,13 @@
 #
 # The gem rails_cursor_pagination must be installed to use this.
 #
-class Taro::Types::ObjectTypes::PageType < Taro::Types::ObjectType
+class Taro::Types::ObjectTypes::PageType < Taro::Types::ResponseType
   extend Taro::Types::Shared::ItemType
 
   def self.derive_from(from_type)
     super
     field(:page, array_of: from_type.name, null: false)
     field(:page_info, type: 'Taro::Types::ObjectTypes::PageInfoType', null: false)
-  end
-
-  def coerce_input
-    input_error 'PageTypes cannot be used as input types'
   end
 
   def self.render(relation, after:, limit: 20, order_by: nil, order: nil)

@@ -95,7 +95,9 @@ class BikeType < ObjectType
 end
 ```
 
-### Input types
+### Input and response types
+
+You can use object types for input and output. However, if you want added control, you can also define dedicated input and response types.
 
 Note the use of `BikeInputType` in the `param` declaration above? It could look like so:
 
@@ -106,7 +108,18 @@ class BikeInputType < InputType
 end
 ```
 
-The usage of such dedicated InputTypes is optional. Normal Object types can also be re-used to define accepted parameters, or parts of them, depending on what you want to allow API clients to send.
+A type inheriting from InputType behaves just like an ObjectType when parsing parameters. The only difference is that it can't be used in response declarations.
+
+Likewise, there is a special type for responses, which can't be used in input declarations:
+
+```ruby
+class BikeSearchResponseType < ResponseType
+  field :bike, type: 'BikeType', null: true, desc: 'The found bike'
+  field :search_duration, type: 'Integer', null: false
+end
+```
+
+In cases where users may edit every attribute that you render, using a single ObjectType for both input and output is more convenient. E.g. `BikeType` could be used for both input and output in the `update` action above – if all its fields should be editable.
 
 ### Validation
 
@@ -215,13 +228,13 @@ end
 
 #### How do I migrate from apipie-rails?
 
-First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, it might not be worth it.
+First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, or less repetitive definitions, it might not be worth it.
 
 If you do:
 
 - note that `taro` currently only supports the latest OpenAPI standard (instead of v2 like `apipie-rails`)
 - extract complex param declarations into InputTypes
-- extract complex response declarations into ObjectTypes
+- extract complex response declarations into ObjectTypes or ResponseTypes
 - replace `required: true` with `null: false` and `required: false` with `null: true`
 
 For a step-by-step migration, you might want to make `taro` use a different DSL then `apipie`:

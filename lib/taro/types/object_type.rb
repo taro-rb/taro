@@ -9,5 +9,6 @@ class Taro::Types::ObjectType < Taro::Types::BaseType
 end
 
 module Taro::Types::ObjectTypes
-  Dir[File.join(__dir__, 'object_types', '**', '*.rb')].each { |f| require f }
+  require_relative 'response_type'
+  Dir[File.join(__dir__, 'object_types', '**', '*.rb')].each { |f| require_relative f }
 end
