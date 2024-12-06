@@ -6,12 +6,6 @@ class Taro::Types::ObjectType < Taro::Types::BaseType
   include Taro::Types::Shared::ObjectCoercion
 
   self.openapi_type = :object
-
-  def self.inherited(subclass)
-    subclass.instance_variable_set(:@response_types, [Hash])
-    subclass.instance_variable_set(:@input_types, [Hash])
-    super
-  end
 end
 
 module Taro::Types::ObjectTypes
