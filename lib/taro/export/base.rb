@@ -1,7 +1,7 @@
 class Taro::Export::Base
   attr_reader :result
 
-  def self.call(declarations:, title: 'Taro-based API', version: '1.0', **)
+  def self.call(declarations: Taro.declarations, title: Taro.config.api_name, version: Taro.config.api_version, **)
     new.call(declarations:, title:, version:, **)
   end
 

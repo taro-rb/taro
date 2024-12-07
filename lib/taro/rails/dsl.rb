@@ -1,16 +1,16 @@
 module Taro::Rails::DSL
-  def api(summary, **kwargs)
-    Taro::Rails.buffered_declaration(self).add_info(summary, **kwargs)
+  def api(summary, **)
+    Taro::Rails.buffered_declaration(self).add_info(summary, **)
   end
 
-  def param(param_name, **kwargs)
-    kwargs[:defined_at] = caller_locations(1..1)[0]
-    Taro::Rails.buffered_declaration(self).add_param(param_name, **kwargs)
+  def param(param_name, **)
+    defined_at = caller_locations(1..1)[0]
+    Taro::Rails.buffered_declaration(self).add_param(param_name, defined_at:, **)
   end
 
-  def returns(field_name = nil, **kwargs)
-    kwargs[:defined_at] = caller_locations(1..1)[0]
-    Taro::Rails.buffered_declaration(self).add_return(field_name, **kwargs)
+  def returns(nesting = nil, **)
+    defined_at = caller_locations(1..1)[0]
+    Taro::Rails.buffered_declaration(self).add_return(nesting, defined_at:, **)
   end
 
   def method_added(method_name)
@@ -18,8 +18,8 @@ module Taro::Rails::DSL
     super
   end
 
-  def common_return(**kwargs)
-    kwargs[:defined_at] = caller_locations(1..1)[0]
-    Taro::Rails::CommonReturns.define(self, **kwargs)
+  def common_return(nesting = nil, **)
+    defined_at = caller_locations(1..1)[0]
+    Taro::CommonReturns.define(self, nesting, defined_at:, **)
   end
 end

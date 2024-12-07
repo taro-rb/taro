@@ -63,6 +63,15 @@ describe Taro::Rails::ResponseValidator do
     expect { test(result) }.not_to raise_error
   end
 
+  it 'can pass for nested object types' do
+    stub_const('MyObj', Class.new(T::ObjectType))
+    MyObj.field(:bar, type: 'String', null: false)
+    declaration.add_return(:nest, code: 200, type: 'MyObj')
+    result = MyObj.render(bar: 'baz')
+
+    expect { test(nest: result) }.not_to raise_error
+  end
+
   it 'can pass for FreeForm' do
     declaration.add_return(code: 200, type: 'FreeForm')
     expect { test(foo: 'bar') }.not_to raise_error
@@ -71,6 +80,17 @@ describe Taro::Rails::ResponseValidator do
   it 'can pass for NoContent' do
     declaration.add_return(code: 200, type: 'NoContent')
     expect { test({}) }.not_to raise_error
+  end
+
+  it 'can pass for FreeForm' do
+    declaration.add_return(code: 200, type: 'FreeForm')
+    expect { test({ foo: 23 }) }.not_to raise_error
+  end
+
+  it 'can pass for NoContent / FreeForm children' do
+    stub_const('FF2', Class.new(Taro::Types::ObjectTypes::FreeFormType))
+    declaration.add_return(code: 200, type: 'FF2')
+    expect { test({ foo: 23 }) }.not_to raise_error
   end
 
   it 'fails when given nil' do

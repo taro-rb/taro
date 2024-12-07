@@ -19,7 +19,7 @@ module Taro::Rails::RouteFinder
       # Build a Hash like
       # { 'users#show' } => [#<NormalizedRoute>, #<NormalizedRoute>] }
       rails_routes.each_with_object({}) do |rails_route, hash|
-        route = Taro::Rails::NormalizedRoute.new(rails_route:)
+        route = Taro::Rails::NormalizedRoute.new(rails_route)
         next if route.ignored?
 
         (hash[route.endpoint] ||= []) << route

@@ -3,13 +3,14 @@
 ### Changed
 
 - rendering undeclared http error codes (except 422) is now allowed
-  - they previously raised response validation errors
-  - this turned errors rendered from `rescue_from` blocks into 500s
+  - this previously raised errors when done in endpoints with other declarations
+  - as a result, some errors rendered from `rescue_from` blocks became 500s
 - deduplicated response schemas for ad-hoc nested returns in OpenAPI export
   - this only affects nested returns e.g. `returns :x, code: :ok, type: 'YType'`
   - old name: `get_show_ys_200_Response`, new_name: `Y_in_x_Response`
 - removed option to render nested returns with string keys
-  - e.g. `returns :foo, [...] render json: { 'foo' => [...] }` raises now
+  - e.g. for `returns :foo, [...]`,  `render json: { 'foo' => [...] }` fails now
+- removed `Taro::Rails.declarations`, replaced it with `Taro.declarations`
 
 ### Added
 
@@ -17,6 +18,8 @@
 - added support for declaring path & query params as Integer
   - e.g. `param :id, type: 'Integer', required: true` for `/users/1`
   - e.g. `param :page, type: 'Integer', required: true` for `?page=1`
+- added parsed/rendered object to validation errors for debugging
+- improved validation error messages
 
 ### Fixed
 

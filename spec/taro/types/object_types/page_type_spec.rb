@@ -36,11 +36,11 @@ describe Taro::Types::ObjectTypes::PageType do
       example.render(relation, after: 'cursor')
     end.to raise_error(
       Taro::ResponseError,
-      /Integer is not valid as String: must be a String or Symbol/
+      'Integer is not valid as StringType at `page`: must be a String or Symbol'
     )
   end
 
-  it 'takes kwargs for ::render and passes on pagination args' do
+  it 'takes keyword arguments for ::render and passes on pagination args' do
     expect(RailsCursorPagination::Paginator)
       .to receive(:new)
       .with(relation, hash_including(after: 'cursor'))

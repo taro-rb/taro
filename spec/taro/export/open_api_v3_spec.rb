@@ -7,12 +7,14 @@ describe Taro::Export::OpenAPIv3 do
     end)
 
     update_decl = Taro::Rails::Declaration.new
-    update_decl.add_info 'My endpoint description'
+    update_decl.add_info 'My endpoint description for PUT'
     update_decl.add_param :id, type: 'Integer', enum: [1, 2, 3], null: false, desc: 'The ID'
     update_decl.add_param :foo, type: 'String', null: true, deprecated: true
+    update_decl.add_param :bar, type: 'Boolean', null: false
     update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
-    update_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
+    update_decl.add_return :errors, array_of: 'FailureType', code: 403, null: false
+    stub_declaration_routes(update_decl, mock_user_route)
 
     stub_const('MyEnumType', Class.new(T::EnumType) do
       value 4
@@ -23,14 +25,14 @@ describe Taro::Export::OpenAPIv3 do
     delete_decl.add_info 'My endpoint description for DELETE'
     delete_decl.add_param :id, type: 'MyEnumType', null: false
     delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
-    delete_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'DELETE', action: 'destroy'))]
+    stub_declaration_routes(delete_decl, mock_user_route(verb: 'DELETE', action: 'destroy'))
 
     show_decl = Taro::Rails::Declaration.new
     show_decl.add_info 'My endpoint description for GET'
     show_decl.add_param :id, type: 'Integer', null: false
-    show_decl.add_param :show_details, type: 'Boolean', null: false
-    show_decl.add_return type: 'UUID', code: 200, desc: 'okay'
-    show_decl.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route(verb: 'GET', action: 'show'))]
+    show_decl.add_param :utm_foo, type: 'String', null: false
+    show_decl.add_return type: 'UUID', code: 200
+    stub_declaration_routes(show_decl, mock_user_route(verb: 'GET', action: 'show'))
 
     result = described_class.call(declarations: [update_decl, delete_decl, show_decl])
 
@@ -67,20 +69,20 @@ describe Taro::Export::OpenAPIv3 do
               schema:
                 type: integer
               in: path
-            - name: show_details
+            - name: utm_foo
               required: true
               schema:
-                type: boolean
+                type: string
               in: query
             responses:
               '200':
-                description: okay
+                description: A UUID v4 string
                 content:
                   application/json:
                     schema:
                       "$ref": "#/components/schemas/UUIDv4"
           put:
-            summary: My endpoint description
+            summary: My endpoint description for PUT
             operationId: put_update_users
             parameters:
             - name: id
@@ -105,6 +107,12 @@ describe Taro::Export::OpenAPIv3 do
                   application/json:
                     schema:
                       type: integer
+              '403':
+                description: Forbidden
+                content:
+                  application/json:
+                    schema:
+                      "$ref": "#/components/schemas/Failure_List_in_errors_Response"
               '422':
                 description: bad
                 content:
@@ -148,12 +156,16 @@ describe Taro::Export::OpenAPIv3 do
             pattern: "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
           put_update_users_Input:
             type: object
+            required:
+            - bar
             properties:
               foo:
                 oneOf:
                 - type: string
                 - type: 'null'
                 deprecated: true
+              bar:
+                type: boolean
     YAML
   end
 
@@ -172,7 +184,7 @@ describe Taro::Export::OpenAPIv3 do
   it 'does not render requestBody if there are no body params' do
     declaration = Taro::Rails::Declaration.new
     declaration.add_param :id, type: 'Integer', null: false
-    declaration.routes = [Taro::Rails::NormalizedRoute.new(mock_user_route)]
+    stub_declaration_routes(declaration, mock_user_route)
 
     result = described_class.call(declarations: [declaration]).result
     expect(result[:paths].values.first[:put]).not_to have_key(:requestBody)
@@ -347,23 +359,25 @@ describe Taro::Export::OpenAPIv3 do
     )
   end
 
-  it 'raises if two types have the same openapi_name' do
+  it 'raises if two distinct types have the same openapi_name' do
     stub_const('T1', Class.new(T::ObjectType) { self.openapi_name = 'foo' })
-    stub_const('T2', Class.new(T::ObjectType) { self.openapi_name = 'foo' })
+    stub_const('T2', Class.new(S::StringType) { self.openapi_name = 'foo' })
     subject.extract_component_ref(T1)
-    expect { subject.extract_component_ref(T2) }
-      .to raise_error('Duplicate openapi_name "foo" for types T1 and T2')
+    expect { subject.extract_component_ref(T2) }.to raise_error(
+      Taro::InvariantError,
+      'Duplicate openapi_name "foo" for types T1 and T2'
+    )
   end
 
-  it 'does not raises if two NestedResponseTypes have the same openapi_name' do
-    # there can be duplicates of these, but the same name means an identical structure
-    stub_const('T1', Class.new(T::NestedResponseType) { self.openapi_name = 'foo' })
-    stub_const('T2', Class.new(T::NestedResponseType) { self.openapi_name = 'foo' })
+  it 'does not raise if two equivalent have the same openapi_name' do
+    stub_const('T1', Class.new(T::ObjectType) { self.openapi_name = 'foo' })
+    stub_const('T2', Class.new(T::ObjectType) { self.openapi_name = 'foo' })
     subject.extract_component_ref(T1)
     expect { subject.extract_component_ref(T2) }.not_to raise_error
   end
 
   it 'raises for not implemented types' do
-    expect { subject.type_details(Float) }.to raise_error(NotImplementedError)
+    expect { subject.type_details(Float) }
+      .to raise_error(Taro::InvariantError, 'Unexpected type: Float')
   end
 end

@@ -5,27 +5,13 @@ describe Taro::Types::Shared::Fields do
     klass
   end
 
-  it 'adds field capabilitites to classes' do
+  it 'adds field capabilities to classes' do
     expect(example.fields.keys).to eq %i[foo]
 
     field = example.fields[:foo]
     expect(field.name).to eq :foo
     expect(field.type).to eq S::StringType
     expect(field.null).to eq false
-  end
-
-  it 'raises when evaluating fields without type' do
-    expect { example.field :bar, null: true }
-      .to raise_error(Taro::ArgumentError, /type.*must be given/)
-  end
-
-  it 'raises when evaluating fields with non-string type' do
-    expect { example.field :bar, type: S::StringType, null: true }
-      .to raise_error(Taro::ArgumentError, /type must be a String/)
-  end
-
-  it 'raises when evaluating fields without null' do
-    expect { example.field :bar, type: 'String' }.to raise_error(Taro::Error, /null/)
   end
 
   it 'raises when redefining fields' do

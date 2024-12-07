@@ -1,15 +1,15 @@
 module Taro::Types::Shared::Errors
-  def input_error(msg)
-    raise Taro::InputError, coerce_error_message(msg)
+  def input_error(msg, value = object)
+    raise Taro::InputError.new(coerce_error_message(msg, value), value, self)
   end
 
-  def response_error(msg)
-    raise Taro::ResponseError, coerce_error_message(msg)
+  def response_error(msg, value = object)
+    raise Taro::ResponseError.new(coerce_error_message(msg, value), value, self)
   end
 
-  def coerce_error_message(msg)
-    type_desc = (self.class.name || self.class.superclass.name)
-                .sub(/^Taro::Types::.*?([^:]+)Type$/, '\1')
-    "#{object.class} is not valid as #{type_desc}: #{msg}"
+  def coerce_error_message(msg, value)
+    type_class = is_a?(Taro::Types::Field) ? self.type : self.class
+    type_desc = type_class.name.sub(/^Taro::Types::.*?([^:]+)$/, '\1')
+    "#{value.class} is not valid as #{type_desc}: #{msg}"
   end
 end

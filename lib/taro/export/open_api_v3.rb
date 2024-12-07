@@ -43,9 +43,10 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
   def path_parameters(declaration, route)
     route.path_params.map do |param_name|
-      param_field = declaration.params.fields[param_name] || raise(<<~MSG)
-        Declaration missing for path param #{param_name} of route #{route.endpoint}
-      MSG
+      param_field = declaration.params.fields[param_name] || raise(
+        Taro::InvariantError,
+        "Declaration missing for path param #{param_name} of route #{route}"
+      )
 
       # path params are always required in rails
       export_parameter(param_field).merge(in: 'path', required: true)
@@ -75,8 +76,11 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def validate_path_or_query_parameter(field)
-    [:array, :object].include?(field.type.openapi_type) &&
-      raise("Unexpected object as path/query param #{field.name}: #{field.type}")
+    ok = %i[string integer]
+    ok.include?(field.type.openapi_type) || raise(Taro::ArgumentError, <<~MSG)
+      Unsupported #{field.openapi_type} as path/query param "#{field.name}",
+      expected one of: #{ok.join(', ')}
+    MSG
   end
 
   def request_body(declaration, route)
@@ -110,11 +114,13 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
   def responses(declaration)
     declaration.returns.sort.to_h do |code, type|
+      # response description is required in openapi 3 – fall back to status code
+      description = declaration.return_descriptions[code] || type.desc ||
+                    Taro::StatusCode.coerce_to_message(code)
       [
         code.to_s,
         {
-          # response desc is required in openapi 3 – fall back to status code
-          description: declaration.return_descriptions[code] || type.desc || code.to_s,
+          description:,
           content: { 'application/json': { schema: export_type(type) } },
         }
       ]
@@ -188,7 +194,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     elsif custom_scalar_type?(type)
       custom_scalar_type_details(type)
     else
-      raise NotImplementedError, "Unsupported type: #{type}"
+      raise Taro::InvariantError, "Unexpected type: #{type}"
     end
   end
 
@@ -233,10 +239,10 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
   def assert_unique_openapi_name(type)
     @name_to_type_map ||= {}
-    if (prev = @name_to_type_map[type.openapi_name]) &&
-       type != prev &&
-       ![type, prev].all? { |t| t < Taro::Types::NestedResponseType }
-      raise("Duplicate openapi_name \"#{type.openapi_name}\" for types #{prev} and #{type}")
+    if (prev = @name_to_type_map[type.openapi_name]) && !prev.equivalent?(type)
+      raise Taro::InvariantError, <<~MSG
+        Duplicate openapi_name "#{type.openapi_name}" for types #{prev} and #{type}
+      MSG
     else
       @name_to_type_map[type.openapi_name] = type
     end

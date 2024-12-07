@@ -2,8 +2,9 @@ require_relative 'field_validation'
 
 Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :desc, :deprecated) do
   include Taro::Types::FieldValidation
+  include Taro::Types::Shared::Errors
 
-  def initialize(name:, type:, null:, method: name, default: :none, enum: nil, defined_at: nil, desc: nil, deprecated: nil)
+  def initialize(name:, type:, null:, method: name, default: Taro::None, enum: nil, defined_at: nil, desc: nil, deprecated: nil)
     enum = coerce_to_enum(enum)
     super(name:, type:, null:, method:, default:, enum:, defined_at:, desc:, deprecated:)
   end
@@ -21,7 +22,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def default_specified?
-    !default.equal?(:none)
+    !default.equal?(Taro::None)
   end
 
   def openapi_type
@@ -47,8 +48,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     elsif object.respond_to?(method, true)
       object.public_send(method)
     else
-      # Note that the ObjectCoercion module rescues this and adds context.
-      raise Taro::ResponseError, "No such method or resolver `:#{method}`."
+      response_error "No such method or resolver `:#{method}`", object
     end
   end
 
@@ -66,5 +66,17 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
 
     type_obj = type.new(value)
     from_input ? type_obj.coerce_input : type_obj.coerce_response
+  rescue Taro::ValidationError => e
+    reraise_recursively_with_path_info(e)
+  end
+
+  def reraise_recursively_with_path_info(error)
+    msg =
+      error
+      .message
+      .sub(/ at `\K/, "#{name}.")
+      .sub(/(is not valid as [^`]+)(?=: )/, "\\1 at `#{name}`")
+
+    raise error.class.new(msg, error.object, error.origin)
   end
 end

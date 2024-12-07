@@ -15,9 +15,9 @@ module Taro::Types::Shared::CustomFieldResolvers
     end
 
     def method_added(name)
-      if [:object, :pattern].include?(name)
+      if %i[input_error object pattern response_error].include?(name)
         raise(Taro::ArgumentError, "##{name} is a reserved, internally used method name")
-      elsif ![:coerce_input, :coerce_response].include?(name) &&
+      elsif !%i[coerce_input coerce_response].include?(name) &&
             !self.name.to_s.start_with?('Taro::Types::')
         custom_resolvers[name] = true
       end

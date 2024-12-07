@@ -9,4 +9,8 @@ module Taro::StatusCode
     ::Rack::Utils::SYMBOL_TO_STATUS_CODE[arg] ||
       raise(Taro::ArgumentError, "Invalid status: #{arg.inspect}")
   end
+
+  def self.coerce_to_message(arg)
+    ::Rack::Utils::HTTP_STATUS_CODES.fetch(coerce_to_int(arg))
+  end
 end

@@ -7,11 +7,6 @@ describe Taro::Rails::NormalizedRoute do
     expect(example.openapi_path).to eq('/{a}/b/{c}')
   end
 
-  it 'extracts #path_params from the Journey::Route path spec' do
-    allow(rails_route.path.spec).to receive(:to_s).and_return('/:a/b/:c(.:format)')
-    expect(example.path_params).to eq [:a, :c]
-  end
-
   it 'normalizes the verb for multi-matched routes' do
     allow(rails_route).to receive(:verb).and_return('POST|GET')
     expect(example.verb).to eq 'post'
@@ -36,9 +31,5 @@ describe Taro::Rails::NormalizedRoute do
   it 'is ignored if the route has no verb (e.g. rails internal route)' do
     allow(rails_route).to receive(:verb).and_return(nil)
     expect(example).to be_ignored
-  end
-
-  it 'has non-spammy inspect output' do
-    expect(example.inspect).to eq '#<Taro::Rails::NormalizedRoute "put /users/{id}">'
   end
 end

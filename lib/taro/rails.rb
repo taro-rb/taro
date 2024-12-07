@@ -10,8 +10,7 @@ module Taro::Rails
 
   def self.reset
     buffered_declarations.clear
-    declarations_map.clear
     RouteFinder.clear_cache
-    Taro::Types::BaseType.last_render = nil
+    Taro.reset
   end
 end

@@ -30,7 +30,7 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
   end
 
   def fail_with(message)
-    raise Taro::ResponseError, <<~MSG
+    raise Taro::ResponseError.new(<<~MSG, rendered, self)
       Response validation error for
       #{controller.class}##{controller.action_name}, code #{controller.status}":
       #{message}
@@ -49,7 +49,7 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
     end
   end
 
-  def check(type = declared_return_type, value = rendered)
+  def check(type, value)
     if type < Taro::Types::ScalarType
       check_scalar(type, value)
     elsif type < Taro::Types::ListType &&
@@ -97,7 +97,7 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
 
   def strict_check_custom_type(type, value)
     used_type, rendered_object_id = type.last_render
-    used_type&.<=(type) || fail_with(<<~MSG)
+    used_type == type || used_type&.<(type) || fail_with(<<~MSG)
       Expected to use #{type}.render, but the last type rendered
       was: #{used_type || 'no type'}.
     MSG

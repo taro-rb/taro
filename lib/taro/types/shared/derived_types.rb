@@ -9,7 +9,11 @@ module Taro::Types::Shared::DerivedTypes
   end
 
   def derived_types
-    @derived_types ||= {}
+    Taro::Types::Shared::DerivedTypes.map[self] ||= {}
+  end
+
+  def self.map
+    @map ||= {}
   end
 
   private
@@ -33,9 +37,8 @@ module Taro::Types::Shared::DerivedTypes
       derived_types[type] ||= begin
         type_class = Taro::Types::Coercion.call(type:)
         new_type = Class.new(type_class)
+        new_type.define_name("#{self.name}.#{method_name}")
         new_type.derive_from(self)
-        name = "#{self.name}.#{method_name}"
-        new_type.define_singleton_method(:name) { name }
         new_type
       end
     end

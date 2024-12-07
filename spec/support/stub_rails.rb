@@ -22,3 +22,9 @@ def mock_user_route(verb: 'PUT', action: 'update')
     verb:,
   )
 end
+
+def stub_declaration_routes(declaration, *routes)
+  allow(declaration)
+    .to receive(:routes)
+    .and_return(routes.map { |r| Taro::Rails::NormalizedRoute.new(r) })
+end

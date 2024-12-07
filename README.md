@@ -32,15 +32,21 @@ This is how type classes can be used in a Rails controller:
 class BikesController < ApplicationController
   # This adds an endpoint summary, description, and tags to the docs (all optional)
   api     'Update a bike', desc: 'My longer text', tags: ['Bikes']
-  # Params can come from the path, e.g. /bike/:id)
+
+  # Params can come from the path, e.g. /bike/:id.
+  # Some types, like UUID in this case, are predefined. See below for more.
   param   :id, type: 'UUID', null: false, desc: 'ID of the bike to update'
-  # They can also come from the query string or request body.
+
+  # Params can also come from the query string or request body.
   # This describes a Hash param:
   param   :bike, type: 'BikeInputType', null: false
-  # Return types can differ by status code and can be nested as in this case:
-  returns :bike, code: :ok, type: 'BikeType', desc: 'update success'
-  # This one is not nested:
-  returns code: :unprocessable_content, type: 'MyErrorType', desc: 'failure'
+
+  # Return types can differ by status code:
+  returns code: :ok, type: 'BikeType', desc: 'update success'
+
+  # Return types can also be nested (in this case in an "error" key):
+  returns :error, code: :unprocessable_content, type: 'MyErrorType'
+
   def update
     # Declared params are available as @api_params
     bike = Bike.find(@api_params[:id])
@@ -48,9 +54,9 @@ class BikesController < ApplicationController
 
     # Types are also used to render responses.
     if success
-      render json: { bike: BikeType.render(bike) }, status: :ok
+      render json: BikeType.render(bike), status: :ok
     else
-      render json: MyErrorType.render(bike.errors.first), status: :unprocessable_entity
+      render json: { error: MyErrorType.render(bike.errors.first) }, status: :unprocessable_entity
     end
   end
 
@@ -69,12 +75,12 @@ Here is an example of the `BikeType` from the controller above:
 
 ```ruby
 class BikeType < ObjectType
-  # Optional description of BikeType (for API docs and the OpenAPI export)
+  # Optional description of BikeType (for the OpenAPI export)
   self.desc = 'A bike and all relevant information about it'
 
   # Object types have fields. Each field has a name, its own type,
   # and a `null:` setting to indicate if it can be nil.
-  # Providing a desc is optional.
+  # Providing a description is optional.
   field :brand, type: 'String', null: true, desc: 'The brand name'
 
   # Fields can reference other types and arrays of values
@@ -259,7 +265,7 @@ If you do:
 - extract complex response declarations into ObjectTypes or ResponseTypes
 - replace `required: true` with `null: false` and `required: false` with `null: true`
 
-For a step-by-step migration, you might want to make `taro` use a different DSL then `apipie`:
+Taro uses some of the same DSL as `apipie`, so for a step-by-step migration, you might want to make `taro` use a different one:
 
 ```ruby
 # config/initializers/taro.rb
@@ -330,7 +336,6 @@ end
 - rspec matchers for testing
 - sum types
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
-- maybe make `type:` optional for path params as they're always strings anyway
 - various openapi features
   - non-JSON content types (e.g. for file uploads)
   - [examples](https://swagger.io/specification/#example-object)

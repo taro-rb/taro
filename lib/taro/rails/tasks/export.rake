@@ -3,17 +3,18 @@ task 'taro:export' => :environment do
   # make sure all declarations have been seen
   Rails.application.eager_load!
 
+  title = Taro.config.api_name
+  version = Taro.config.api_version
+  format = Taro.config.export_format
+  path = Taro.config.export_path
   # the generator / openapi version might become a config option later
-  export = Taro::Export::OpenAPIv3.call(
-    declarations: Taro::Rails.declarations,
-    title: Taro.config.api_name,
-    version: Taro.config.api_version,
-  )
 
-  data = export.send("to_#{Taro.config.export_format}")
+  export = Taro::Export::OpenAPIv3.call(title:, version:)
 
-  FileUtils.mkdir_p(File.dirname(Taro.config.export_path))
-  File.write(Taro.config.export_path, data)
+  data = export.send("to_#{format}")
 
-  puts "Exported #{Taro.config.api_name} to #{Taro.config.export_path}"
+  FileUtils.mkdir_p(File.dirname(path))
+  File.write(path, data)
+
+  puts "Exported the API #{title} v#{version} to #{path}"
 end

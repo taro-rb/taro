@@ -6,11 +6,17 @@ describe Taro::Types::FieldValidation do
   end
 
   it 'raises if the object is missing' do
-    expect { field.validated_value(nil) }.to raise_error(Taro::InputError)
+    expect { field.validated_value(nil) }.to raise_error(
+      Taro::InputError,
+      'NilClass is not valid as StringType: field is not nullable',
+    )
   end
 
   it 'raises ResponseError if the object is missing for a response' do
-    expect { field.validated_value(nil, false) }.to raise_error(Taro::ResponseError)
+    expect { field.validated_value(nil, false) }.to raise_error(
+      Taro::ResponseError,
+      'NilClass is not valid as StringType: field is not nullable',
+    )
   end
 
   describe 'with null allowed' do
@@ -34,13 +40,17 @@ describe Taro::Types::FieldValidation do
     end
 
     it 'raises if the object is not matching the enum' do
-      expect { field.validated_value('C') }
-        .to raise_error(Taro::InputError, /expected one of/)
+      expect { field.validated_value('C') }.to raise_error(
+        Taro::InputError,
+        'String is not valid as StringType: field expects one of ["A", "B"], got "C"',
+      )
     end
 
     it 'raises if the object is not matching the enum for a response' do
-      expect { field.validated_value('C', false) }
-        .to raise_error(Taro::ResponseError, /expected one of/)
+      expect { field.validated_value('C', false) }.to raise_error(
+        Taro::ResponseError,
+        'String is not valid as StringType: field expects one of ["A", "B"], got "C"',
+      )
     end
   end
 end

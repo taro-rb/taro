@@ -12,16 +12,14 @@ module Taro::Types::FieldValidation
   def validate_null_and_ok?(value, for_input)
     return if null || !value.nil?
 
-    raise for_input ? Taro::InputError : Taro::ResponseError, <<~MSG
-      Field #{name} is not nullable (got #{value.inspect})
-    MSG
+    msg = 'field is not nullable'
+    for_input ? input_error(msg, value) : response_error(msg, value)
   end
 
   def validate_enum_inclusion(value, for_input)
     return if enum.nil? || null && value.nil? || enum.include?(value)
 
-    raise for_input ? Taro::InputError : Taro::ResponseError, <<~MSG
-      Field #{name} has an invalid value #{value.inspect} (expected one of #{enum.inspect})
-    MSG
+    msg = "field expects one of #{enum.inspect}, got #{value.inspect}"
+    for_input ? input_error(msg, value) : response_error(msg, value)
   end
 end

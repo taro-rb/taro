@@ -1,5 +1,5 @@
-# Relaxed Integer type for use with path & query params,
-# which Rails provides as Strings.
+# @api private – relaxed Integer type for use with path & query params,
+# which Rails provides as Strings in ActionController::Parameters.
 class Taro::Types::Scalar::IntegerParamType < Taro::Types::ScalarType
   self.openapi_type = :integer
 

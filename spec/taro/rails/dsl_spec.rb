@@ -20,11 +20,11 @@ describe Taro::Rails::DSL do
     controller.api 'My summary'
     allow(Taro::Rails::RouteFinder).to receive(:call).and_return([:route])
     expect { controller.define_method(:foo) { nil } }
-      .to change { Taro::Rails.declarations.count }.by(1)
+      .to change { Taro.declarations.count }.by(1)
   end
 
   it 'does not fail if actions are defined without buffered declarations' do
     expect { controller.define_method(:foo) { nil } }
-      .to change { Taro::Rails.declarations.count }.by(0)
+      .to change { Taro.declarations.count }.by(0)
   end
 end

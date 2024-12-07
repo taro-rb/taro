@@ -2,7 +2,7 @@ describe Taro::Rails::Declaration do
   describe '#initialize' do
     it 'adds common returns defined for the given class' do
       klass = Class.new
-      Taro::Rails::CommonReturns.define(klass, code: 200, type: 'String')
+      Taro::CommonReturns.define(klass, code: 200, type: 'String')
       expect(described_class.new(klass).returns).to eq(200 => S::StringType)
       expect(described_class.new(nil).returns).to eq({})
     end
@@ -122,32 +122,10 @@ describe Taro::Rails::Declaration do
     end
   end
 
-  describe '#routes=' do
-    it 'raises for invalid args' do
-      expect { subject.routes = :route_set }.to raise_error(Taro::ArgumentError)
-    end
-  end
-
-  require 'action_controller'
-
-  describe '#parse_params' do
-    before do
-      stub_const('UserInputType', Class.new(T::InputType) do
-        field :name, type: 'String', null: false
-      end)
-      subject.add_param :user, type: 'UserInputType', null: true
-    end
-
-    it 'coerces the params' do
-      params = ActionController::Parameters.new(user: { name: 'Alice' })
-      expect { subject.parse_params(params) }.not_to raise_error
-    end
-
-    it 'raises for invalid params' do
-      params = ActionController::Parameters.new(user: { name: nil })
-      expect do
-        subject.parse_params(params)
-      end.to raise_error(Taro::InputError, /NilClass is not valid as String/)
+  describe '#routes' do
+    it 'calls the RouteFinder' do
+      allow(Taro::Rails::RouteFinder).to receive(:call).and_return(:some_routes)
+      expect(subject.routes).to eq(:some_routes)
     end
   end
 end

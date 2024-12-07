@@ -48,7 +48,7 @@ describe 'Rails integration' do
   end
 
   it 'works' do
-    expect(Taro::Rails.declarations.count).to eq 1
+    expect(Taro.declarations.count).to eq 1
 
     put(:update, params: { user: { name: 'taro', id: '42' } })
 
@@ -57,7 +57,7 @@ describe 'Rails integration' do
   end
 
   it 'applies common returns' do
-    expect(Taro::Rails.declarations.last.returns)
+    expect(Taro.declarations.first.returns)
       .to include(404 => S::BooleanType)
   end
 

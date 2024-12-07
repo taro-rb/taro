@@ -7,7 +7,7 @@ describe Taro::Rails::RouteFinder do
     route = mock_user_route
     allow(described_class).to receive(:rails_routes).and_return([route])
     taro_routes = described_class.call(controller_class:, action_name: 'update')
-    expect(taro_routes.map(&:rails_route)).to eq([route])
+    expect(taro_routes.map(&:endpoint)).to eq(['users#update'])
   end
 
   it 'returns an empty Array when no routes are found' do
