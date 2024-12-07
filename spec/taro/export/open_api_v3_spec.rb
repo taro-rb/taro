@@ -110,7 +110,7 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      "$ref": "#/components/schemas/put_update_users_422_Response"
+                      "$ref": "#/components/schemas/Failure_List_in_errors"
       components:
         schemas:
           Failure:
@@ -130,6 +130,13 @@ describe Taro::Export::OpenAPIv3 do
             type: array
             items:
               "$ref": "#/components/schemas/Failure"
+          Failure_List_in_errors:
+            type: object
+            required:
+            - errors
+            properties:
+              errors:
+                "$ref": "#/components/schemas/Failure_List"
           MyEnum:
             type: integer
             enum:
@@ -139,13 +146,6 @@ describe Taro::Export::OpenAPIv3 do
             type: string
             description: A UUID v4 string
             pattern: "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
-          put_update_users_422_Response:
-            type: object
-            required:
-            - errors
-            properties:
-              errors:
-                "$ref": "#/components/schemas/Failure_List"
           put_update_users_Input:
             type: object
             properties:

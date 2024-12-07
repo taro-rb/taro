@@ -93,8 +93,7 @@ class Taro::Rails::Declaration
 
   def evaluate_return_def(nesting:, **kwargs)
     if nesting
-      # ad-hoc return type, requiring the actual return type to be nested
-      Class.new(Taro::Types::ObjectType).tap do |type|
+      Class.new(Taro::Types::AdHocResponseType).tap do |type|
         type.field(nesting, null: false, **kwargs)
       end
     else

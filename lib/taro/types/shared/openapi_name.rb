@@ -5,12 +5,6 @@ module Taro::Types::Shared::OpenAPIName
     @openapi_name ||= default_openapi_name
   end
 
-  def openapi_name?
-    !!openapi_name
-  rescue Taro::Error
-    false
-  end
-
   def openapi_name=(arg)
     arg.nil? || arg.is_a?(String) ||
       raise(Taro::ArgumentError, 'openapi_name must be a String')

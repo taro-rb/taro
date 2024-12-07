@@ -6,3 +6,5 @@ class Taro::Types::ResponseType < Taro::Types::ObjectType
     input_error "#{self.class.name} is a ResponseType and cannot be used as input type"
   end
 end
+
+class Taro::Types::AdHocResponseType < Taro::Types::ResponseType; end
