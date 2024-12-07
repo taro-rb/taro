@@ -110,7 +110,7 @@ describe Taro::Export::OpenAPIv3 do
                 content:
                   application/json:
                     schema:
-                      "$ref": "#/components/schemas/Failure_List_in_errors"
+                      "$ref": "#/components/schemas/Failure_List_in_errors_Response"
       components:
         schemas:
           Failure:
@@ -130,7 +130,7 @@ describe Taro::Export::OpenAPIv3 do
             type: array
             items:
               "$ref": "#/components/schemas/Failure"
-          Failure_List_in_errors:
+          Failure_List_in_errors_Response:
             type: object
             required:
             - errors
@@ -353,6 +353,14 @@ describe Taro::Export::OpenAPIv3 do
     subject.extract_component_ref(T1)
     expect { subject.extract_component_ref(T2) }
       .to raise_error('Duplicate openapi_name "foo" for types T1 and T2')
+  end
+
+  it 'does not raises if two NestedResponseTypes have the same openapi_name' do
+    # there can be duplicates of these, but the same name means an identical structure
+    stub_const('T1', Class.new(T::NestedResponseType) { self.openapi_name = 'foo' })
+    stub_const('T2', Class.new(T::NestedResponseType) { self.openapi_name = 'foo' })
+    subject.extract_component_ref(T1)
+    expect { subject.extract_component_ref(T2) }.not_to raise_error
   end
 
   it 'raises for not implemented types' do

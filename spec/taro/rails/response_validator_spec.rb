@@ -17,11 +17,6 @@ describe Taro::Rails::ResponseValidator do
     expect { test(nest: 'str') }.not_to raise_error
   end
 
-  it 'can pass for nested responses with string key' do
-    declaration.add_return(:nest, code: 200, type: 'String')
-    expect { test('nest' => 'str') }.not_to raise_error
-  end
-
   it 'can pass for array responses' do
     declaration.add_return(code: 200, array_of: 'String')
     expect { test(['str']) }.not_to raise_error
@@ -106,6 +101,12 @@ describe Taro::Rails::ResponseValidator do
   it 'fails when given a different than the declared nesting' do
     declaration.add_return(:nest, code: 200, type: 'String')
     expect { test(x: 'str') }.to raise_error(err, /Expected key :nest, got: \[:x\]/)
+  end
+
+  it 'fails when given the declared nesting with a string key' do
+    declaration.add_return(:nest, code: 200, type: 'String')
+    expect { test('nest' => 'str') }
+      .to raise_error(err, /Expected key :nest, got: \["nest"\]/)
   end
 
   it 'fails for enum types if given a non-enum value' do

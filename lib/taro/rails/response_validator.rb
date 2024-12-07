@@ -6,23 +6,16 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
   def call
     if declared_return_type.nil?
       fail_if_declaration_expected
-    elsif declared_return_type < Taro::Types::ScalarType
-      check_scalar
-    elsif declared_return_type < Taro::Types::ListType &&
-          declared_return_type.item_type < Taro::Types::ScalarType
-      check_scalar_array
-    elsif declared_return_type < Taro::Types::EnumType
-      check_enum
+    elsif declared_return_type < Taro::Types::NestedResponseType
+      field = declared_return_type.nesting_field
+      check(field.type, denest_rendered(field.name))
     else
-      check_custom_type
+      check(declared_return_type, rendered)
     end
   end
 
   def declared_return_type
-    @declared_return_type ||= begin
-      type = declaration.returns[controller.status]
-      type && nesting ? type.fields.fetch(nesting).type : type
-    end
+    @declared_return_type ||= declaration.returns[controller.status]
   end
 
   # Rack, Rails and gems commonly trigger rendering of 400, 404, 500 etc.
@@ -44,34 +37,34 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
     MSG
   end
 
-  # support `returns :some_nesting, type: 'SomeType'` (ad-hoc return type)
-  def nesting
-    @nesting ||= declaration.return_nestings[controller.status]
-  end
-
-  def denest_rendered
-    assert_rendered_is_a_hash
+  # support `returns :some_nesting, type: 'SomeType'`
+  # used like `render json: { some_nesting: SomeType.render(some_object) }`
+  def denest_rendered(nesting)
+    rendered.is_a?(Hash) || fail_with("Expected Hash, got #{rendered.class}.")
 
     if rendered.key?(nesting)
       rendered[nesting]
-    elsif rendered.key?(nesting.to_s)
-      rendered[nesting.to_s]
     else
-      fail_with_nesting_error
+      fail_with "Expected key :#{nesting}, got: #{rendered.keys}."
     end
   end
 
-  def assert_rendered_is_a_hash
-    rendered.is_a?(Hash) || fail_with("Expected Hash, got #{rendered.class}.")
-  end
-
-  def fail_with_nesting_error
-    fail_with "Expected key :#{nesting}, got: #{rendered.keys}."
+  def check(type = declared_return_type, value = rendered)
+    if type < Taro::Types::ScalarType
+      check_scalar(type, value)
+    elsif type < Taro::Types::ListType &&
+          type.item_type < Taro::Types::ScalarType
+      check_scalar_array(type, value)
+    elsif type < Taro::Types::EnumType
+      check_enum(type, value)
+    else
+      check_custom_type(type, value)
+    end
   end
 
   # For scalar and enum types, we want to support e.g. `render json: 42`,
   # and not require using the type as in `BeautifulNumbersEnum.render(42)`.
-  def check_scalar(type = declared_return_type, value = subject)
+  def check_scalar(type, value)
     case type.openapi_type
     when :integer, :number then value.is_a?(Numeric)
     when :string           then value.is_a?(String) || value.is_a?(Symbol)
@@ -79,18 +72,14 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
     end || fail_with("Expected a #{type.openapi_type}, got: #{value.class}.")
   end
 
-  def subject
-    @subject ||= nesting ? denest_rendered : rendered
+  def check_scalar_array(type, value)
+    value.is_a?(Array) || fail_with('Expected an Array.')
+    value.empty? || check_scalar(type.item_type, value.first)
   end
 
-  def check_scalar_array
-    subject.is_a?(Array) || fail_with('Expected an Array.')
-    subject.empty? || check_scalar(declared_return_type.item_type, subject.first)
-  end
-
-  def check_enum
+  def check_enum(type, value)
     # coercion checks non-emptyness + enum match
-    declared_return_type.new(subject).coerce_response
+    type.new(value).coerce_response
   rescue Taro::Error => e
     fail_with(e.message)
   end
@@ -98,23 +87,23 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
   # For complex/object types, we ensure conformance by checking whether
   # the type was used for rendering. This has performance benefits compared
   # to going over the structure a second time.
-  def check_custom_type
+  def check_custom_type(type, value)
     # Ignore types without a specified structure.
-    return if declared_return_type <= Taro::Types::ObjectTypes::FreeFormType
-    return if declared_return_type <= Taro::Types::ObjectTypes::NoContentType
+    return if type <= Taro::Types::ObjectTypes::FreeFormType
+    return if type <= Taro::Types::ObjectTypes::NoContentType
 
-    strict_check_custom_type
+    strict_check_custom_type(type, value)
   end
 
-  def strict_check_custom_type
-    used_type, rendered_object_id = declared_return_type.last_render
-    used_type&.<=(declared_return_type) || fail_with(<<~MSG)
-      Expected to use #{declared_return_type}.render, but the last type rendered
+  def strict_check_custom_type(type, value)
+    used_type, rendered_object_id = type.last_render
+    used_type&.<=(type) || fail_with(<<~MSG)
+      Expected to use #{type}.render, but the last type rendered
       was: #{used_type || 'no type'}.
     MSG
 
-    rendered_object_id == subject.__id__ || fail_with(<<~MSG)
-      #{declared_return_type}.render was called, but the result
+    rendered_object_id == value.__id__ || fail_with(<<~MSG)
+      #{type}.render was called, but the result
       of this call was not used in the response.
     MSG
   end

@@ -6,9 +6,10 @@
   - they previously raised response validation errors
   - this turned errors rendered from `rescue_from` blocks into 500s
 - deduplicated response schemas for ad-hoc nested returns in OpenAPI export
-  - this only affects nested returns e.g. `returns :foo, code: :ok, type: 'T'`
-  - e.g. no more `get_show_bars_200_Response` and `get_show_bazs_200_Response`
-  - instead both these operations would now reference schema `T_in_foo`
+  - this only affects nested returns e.g. `returns :x, code: :ok, type: 'YType'`
+  - old name: `get_show_ys_200_Response`, new_name: `Y_in_x_Response`
+- removed option to render nested returns with string keys
+  - e.g. `returns :foo, [...] render json: { 'foo' => [...] }` raises now
 
 ### Added
 

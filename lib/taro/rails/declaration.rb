@@ -1,11 +1,10 @@
 class Taro::Rails::Declaration
-  attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :return_nestings, :routes, :tags
+  attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :routes, :tags
 
   def initialize(for_klass = nil)
     @params = Class.new(Taro::Types::InputType)
     @return_defs = {}
     @return_descriptions = {}
-    @return_nestings = {}
 
     Taro::Rails::CommonReturns.for(for_klass).each { |cr| add_return(**cr) }
   end
@@ -34,9 +33,6 @@ class Taro::Rails::Declaration
     return_defs[status] = kwargs
 
     return_descriptions[status] = desc
-
-    # if a field name is provided, the response should be nested
-    return_nestings[status] = nesting if nesting
   end
 
   # Return types are evaluated lazily to avoid unnecessary autoloading
@@ -96,7 +92,7 @@ class Taro::Rails::Declaration
 
   def evaluate_return_def(nesting:, **kwargs)
     if nesting
-      Class.new(Taro::Types::AdHocResponseType).tap do |type|
+      Class.new(Taro::Types::NestedResponseType).tap do |type|
         type.field(nesting, null: false, **kwargs)
       end
     else

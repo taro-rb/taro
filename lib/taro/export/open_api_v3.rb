@@ -109,8 +109,6 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def responses(declaration)
-    name_ad_hoc_response_types(declaration)
-
     declaration.returns.sort.to_h do |code, type|
       [
         code.to_s,
@@ -120,18 +118,6 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
           content: { 'application/json': { schema: export_type(type) } },
         }
       ]
-    end
-  end
-
-  def name_ad_hoc_response_types(declaration)
-    declaration.returns.each do |code, type|
-      next unless ad_hoc_response_type?(type)
-
-      (fields = type.fields).size == 1 || raise(<<~MSG)
-        Expected return type for code #{code} to have 1 field, got #{fields}"
-      MSG
-      field = fields.values.last
-      type.openapi_name = "#{field.type.openapi_name}_in_#{field.name}"
     end
   end
 
@@ -249,16 +235,10 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
     @name_to_type_map ||= {}
     if (prev = @name_to_type_map[type.openapi_name]) &&
        type != prev &&
-       !(ad_hoc_response_type?(type) && ad_hoc_response_type?(prev))
+       ![type, prev].all? { |t| t < Taro::Types::NestedResponseType }
       raise("Duplicate openapi_name \"#{type.openapi_name}\" for types #{prev} and #{type}")
     else
       @name_to_type_map[type.openapi_name] = type
     end
-  end
-
-  # Ad-hoc return types don't need unique openapi names as their name is built
-  # from their structure, so they are equivalent if they have the same name.
-  def ad_hoc_response_type?(type)
-    type < Taro::Types::AdHocResponseType
   end
 end
