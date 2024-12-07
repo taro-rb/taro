@@ -18,6 +18,9 @@ class Taro::Rails::Declaration
   end
 
   def add_param(param_name, **kwargs)
+    if kwargs[:type] == 'Integer'
+      kwargs[:type] = 'Taro::Types::Scalar::IntegerParamType'
+    end
     @params.field(param_name, **kwargs)
   end
 

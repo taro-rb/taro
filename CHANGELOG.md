@@ -13,6 +13,9 @@
 ### Added
 
 - added `::common_return` to define common return types
+- added support for declaring path & query params as Integer
+  - e.g. `param :id, type: 'Integer', required: true` for `/users/1`
+  - e.g. `param :page, type: 'Integer', required: true` for `?page=1`
 
 ### Fixed
 

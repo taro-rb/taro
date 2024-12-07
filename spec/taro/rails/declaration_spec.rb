@@ -47,6 +47,11 @@ describe Taro::Rails::Declaration do
       expect(subject.params.fields[:foo].type).to eq(S::StringType.array)
     end
 
+    it 'uses the relaxed IntegerParamType for Integer params' do
+      subject.add_param :foo, type: 'Integer', null: false
+      expect(subject.params.fields[:foo].type).to eq(S::IntegerParamType)
+    end
+
     it 'raises for inexistent types (upon evaluation)' do
       expect do
         subject.add_param :foo, type: 'XType', null: false

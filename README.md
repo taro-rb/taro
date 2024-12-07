@@ -325,7 +325,6 @@ end
 
 ## Possible future features
 
-- int path/query params
 - warning/raising for undeclared input params (currently they are ignored)
 - usage without rails is possible but not convenient yet
 - rspec matchers for testing
