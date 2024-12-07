@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- added `::common_return` to define common return types
+
 ### Fixed
 
 - fixed unnecessary `$LOAD_PATH` searches at require time

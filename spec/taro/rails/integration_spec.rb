@@ -25,6 +25,8 @@ describe 'Rails integration' do
     stub_const('UsersController', Class.new(ActionController::API) do
       def self.name = 'UsersController'
 
+      common_return code: 404, type: 'Boolean'
+
       api 'my api'
       param :user, type: 'UserInputType', null: false
       returns type: 'UserResponseType', code: :ok
@@ -52,6 +54,16 @@ describe 'Rails integration' do
 
     expect(response.body).to eq('{"name":"TARO"}')
     expect(Taro::Types::BaseType.used_in_response).to eq(UserResponseType)
+  end
+
+  it 'applies common returns' do
+    expect(Taro::Rails.declarations.last.returns)
+      .to include(404 => S::BooleanType)
+  end
+
+  it 'raises when trying to override common returns' do
+    expect { UsersController.returns(code: 404, type: 'String') }
+      .to raise_error(Taro::ArgumentError, /already declared at .*#{__FILE__}/)
   end
 
   it 'can raise errors for invalid params' do

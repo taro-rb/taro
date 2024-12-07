@@ -1,11 +1,13 @@
 class Taro::Rails::Declaration
   attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :return_nestings, :routes, :tags
 
-  def initialize
+  def initialize(for_klass = nil)
     @params = Class.new(Taro::Types::InputType)
     @return_defs = {}
     @return_descriptions = {}
     @return_nestings = {}
+
+    Taro::Rails::CommonReturns.for(for_klass).each { |cr| add_return(**cr) }
   end
 
   def add_info(summary, desc: nil, tags: nil)
@@ -16,7 +18,6 @@ class Taro::Rails::Declaration
   end
 
   def add_param(param_name, **kwargs)
-    kwargs[:defined_at] = caller_locations(1..2)[1]
     @params.field(param_name, **kwargs)
   end
 
@@ -27,7 +28,6 @@ class Taro::Rails::Declaration
     kwargs[:nesting] = nesting
     check_return_kwargs(kwargs)
 
-    kwargs[:defined_at] = caller_locations(1..2)[1]
     return_defs[status] = kwargs
 
     return_descriptions[status] = desc
@@ -43,8 +43,9 @@ class Taro::Rails::Declaration
   end
 
   def raise_if_already_declared(status)
-    return_defs[status] &&
-      raise(Taro::ArgumentError, "response for status #{status} already declared")
+    (prev = return_defs[status]) && raise(Taro::ArgumentError, <<~MSG)
+      response for status #{status} already declared at #{prev[:defined_at]}
+    MSG
   end
 
   def parse_params(rails_params)
@@ -80,7 +81,7 @@ class Taro::Rails::Declaration
       MSG
     end
 
-    bad_keys = kwargs.keys - (Taro::Types::Coercion.keys + %i[code desc nesting])
+    bad_keys = kwargs.keys - (Taro::Types::Coercion.keys + %i[code defined_at desc nesting])
     return if bad_keys.empty?
 
     raise Taro::ArgumentError, "Invalid `returns` options: #{bad_keys.join(', ')}"

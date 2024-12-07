@@ -139,6 +139,20 @@ Responses are automatically validated to have used the correct type for renderin
 Taro.config.validate_responses = false
 ```
 
+### Common error declarations
+
+`::common_return` can be used to add a return declaration to all actions in a controller and its subclasses, and all related OpenAPI exports.
+
+```ruby
+class AuthenticatedApiBaseController < ApiBaseController
+  common_return code: :unauthorized, type: 'MyErrorType', desc: 'Log in first'
+
+  rescue_from 'MyAuthError' do
+    render json: MyErrorType.render(something), status: :unauthorized
+  end
+end
+```
+
 ### Included type options
 
 The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
@@ -183,34 +197,9 @@ end
 
 ### FAQ
 
-#### How do I avoid repeating common error declarations?
+#### How do I render API docs?
 
-Hook into the DSL in your base controller(s):
-
-```ruby
-class ApiBaseController < ApplicationController
-  def self.api(...)
-    super
-    returns code: :not_found, type: 'MyErrorType', desc: 'The record was not found'
-  end
-
-  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
-
-  def render_not_found
-    render json: MyErrorType.render(something), status: :not_found
-  end
-end
-```
-
-```ruby
-class AuthenticatedApiController < ApiBaseController
-  def self.api(...)
-    super
-    returns code: :unauthorized, type: 'MyErrorType'
-  end
-  # ... rescue_from ... render ...
-end
-```
+Rendering docs is outside of the scope of this project. You can use the OpenAPI export to generate docs with tools such as RapiDoc, ReDoc, or Swagger UI.
 
 #### How do I use context in my types?
 
@@ -307,7 +296,6 @@ end
 - usage without rails is possible but not convenient yet
 - rspec matchers for testing
 - sum types
-- api doc rendering based on export (e.g. rails engine with web ui)
 - [query logs metadata](https://github.com/rmosolgo/graphql-ruby/blob/dcaaed1cea47394fad61fceadf291ff3cb5f2932/lib/generators/graphql/install_generator.rb#L48-L52)
 - maybe make `type:` optional for path params as they're always strings anyway
 - various openapi features

@@ -1,4 +1,13 @@
 describe Taro::Rails::Declaration do
+  describe '#initialize' do
+    it 'adds common returns defined for the given class' do
+      klass = Class.new
+      Taro::Rails::CommonReturns.define(klass, code: 200, type: 'String')
+      expect(described_class.new(klass).returns).to eq(200 => S::StringType)
+      expect(described_class.new(nil).returns).to eq({})
+    end
+  end
+
   describe '#add_info=' do
     it 'sets the summary attribute' do
       subject.add_info 'My text'
@@ -98,6 +107,13 @@ describe Taro::Rails::Declaration do
       expect do
         subject.add_return code: 200, type: 'String', foobar: true
       end.to raise_error(Taro::ArgumentError, /foobar/)
+    end
+
+    it 'raises for double declarations' do
+      expect do
+        subject.add_return code: 200, type: 'String'
+        subject.add_return code: 200, type: 'String'
+      end.to raise_error(Taro::ArgumentError, /already declared/)
     end
   end
 

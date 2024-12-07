@@ -2,7 +2,8 @@
 # until the next action method is defined (e.g. `def create`).
 module Taro::Rails::DeclarationBuffer
   def buffered_declaration(controller_class)
-    buffered_declarations[controller_class] ||= Taro::Rails::Declaration.new
+    buffered_declarations[controller_class] ||=
+      Taro::Rails::Declaration.new(controller_class)
   end
 
   def buffered_declarations
