@@ -133,7 +133,40 @@ Taro.config.parse_params = false
 
 #### Response validation
 
-Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration. This can be disabled:
+Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration.
+
+An error is also raised if a documented endpoint renders an undocumented status code, e.g.:
+
+```ruby
+returns code: :ok, type: 'BikeType'
+def create
+  render json: BikeType.render(bike), status: :created
+  # => undeclared 201 response, raises response validation error
+end
+```
+
+However, all HTTP error codes except 422 can be rendered without prior declaration. E.g.:
+
+```ruby
+returns code: :ok, type: 'BikeType'
+def show
+  render json: something, status: :not_found # works
+end
+```
+
+The reason for this is that Rack and Rails commonly render codes like 400, 404, 500 and various others, but you might not want to have that fact documented on every single endpoint.
+
+However, if you do declare an error code, responses with this code are validated:
+
+```ruby
+returns code: :not_found, type: 'ExpectedType'
+def show
+  render json: WrongType.render(foo), status: :not_found
+  # => type mismatch, raises response validation error
+end
+```
+
+Response validation can be disabled:
 
 ```ruby
 Taro.config.validate_responses = false
@@ -292,6 +325,7 @@ end
 
 ## Possible future features
 
+- int path/query params
 - warning/raising for undeclared input params (currently they are ignored)
 - usage without rails is possible but not convenient yet
 - rspec matchers for testing

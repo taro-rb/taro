@@ -4,7 +4,9 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
   end
 
   def call
-    if declared_return_type < Taro::Types::ScalarType
+    if declared_return_type.nil?
+      fail_if_declaration_expected
+    elsif declared_return_type < Taro::Types::ScalarType
       check_scalar
     elsif declared_return_type < Taro::Types::ListType &&
           declared_return_type.item_type < Taro::Types::ScalarType
@@ -18,10 +20,20 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
 
   def declared_return_type
     @declared_return_type ||= begin
-      return_type = declaration.returns[controller.status] ||
-                    fail_with('No return type declared for this status.')
-      nesting ? return_type.fields.fetch(nesting).type : return_type
+      type = declaration.returns[controller.status]
+      type && nesting ? type.fields.fetch(nesting).type : type
     end
+  end
+
+  # Rack, Rails and gems commonly trigger rendering of 400, 404, 500 etc.
+  # Declaring these codes should be optional. Otherwise the api schema would get
+  # bloated as there are no "global" return declarations in OpenAPI v3, and we'd
+  # need to export all of these for every single endpoint. v4 might change this.
+  # https://github.com/OAI/OpenAPI-Specification/issues/521
+  def fail_if_declaration_expected
+    controller.status.to_s.match?(/^[123]|422/) && fail_with(<<~MSG)
+      No return type declared for this status.
+    MSG
   end
 
   def fail_with(message)

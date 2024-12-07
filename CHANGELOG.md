@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+### Changed
+
+- rendering undeclared http error codes (except 422) is now allowed
+  - they previously raised response validation errors
+  - this turned errors rendered from rescue_from blocks into 500s
+
 ### Added
 
 - added `::common_return` to define common return types
