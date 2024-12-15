@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.0.0] - 2024-12-15
+
 ### Changed
 
 - rendering undeclared http error codes (except 422) is now allowed
