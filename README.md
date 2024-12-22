@@ -1,5 +1,8 @@
 # Taro - Typed Api using Ruby Objects
 
+[![Gem Version](https://badge.fury.io/rb/taro.svg)](https://rubygems.org/gems/taro)
+[![Build Status](https://github.com/taro-rb/taro/actions/workflows/main.yml/badge.svg)](https://github.com/taro-rb/taro/actions)
+
 This library provides an object-based type system for RESTful Ruby APIs, with built-in parameter parsing, response rendering, and OpenAPI schema export.
 
 It is inspired by [`apipie-rails`](https://github.com/Apipie/apipie-rails) and [`graphql-ruby`](https://github.com/rmosolgo/graphql-ruby).
@@ -34,7 +37,7 @@ class BikesController < ApplicationController
   api     'Update a bike', desc: 'My longer text', tags: ['Bikes']
 
   # Params can come from the path, e.g. /bike/:id.
-  # Some types, like UUID in this case, are predefined. See below for more.
+  # Some types, like UUID in this case, are predefined. See below for more types.
   param   :id, type: 'UUID', null: false, desc: 'ID of the bike to update'
 
   # Params can also come from the query string or request body.
@@ -139,7 +142,14 @@ Taro.config.parse_params = false
 
 #### Response validation
 
-Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration.
+Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration. This means you have to use the types to render complex responses, and manually building a Hash that conforms to the schema will raise an error. Primitive/scalar types are an exception, e.g. you *can* do:
+
+```ruby
+returns code: :ok, array_of: 'String', desc: 'Bike names'
+def index
+  render json: ['Super bike', 'Slow bike']
+end
+```
 
 An error is also raised if a documented endpoint renders an undocumented status code, e.g.:
 
@@ -151,7 +161,7 @@ def create
 end
 ```
 
-However, all HTTP error codes except 422 can be rendered without prior declaration. E.g.:
+HTTP error codes, except 422, are an exception. They can be rendered without prior declaration. E.g.:
 
 ```ruby
 returns code: :ok, type: 'BikeType'
@@ -162,12 +172,12 @@ end
 
 The reason for this is that Rack and Rails commonly render codes like 400, 404, 500 and various others, but you might not want to have that fact documented on every single endpoint.
 
-However, if you do declare an error code, responses with this code are validated:
+However, if you do declare an error code, responses with this code *are* validated:
 
 ```ruby
-returns code: :not_found, type: 'ExpectedType'
+returns code: :not_found, type: 'ExpectedErrorType'
 def show
-  render json: WrongType.render(foo), status: :not_found
+  render json: WrongErrorType.render(foo), status: :not_found
   # => type mismatch, raises response validation error
 end
 ```
@@ -194,7 +204,7 @@ end
 
 ### Included type options
 
-The following type names are available by default and can be used as `type:`/`array_of:`/`page_of:` arguments:
+The following type names are available by default and can be used as `type:`, `array_of:`, or `page_of:` arguments:
 
 - `'Boolean'` - accepts and renders `true` or `false`
 - `'Date'` - accepts and renders a date string in ISO8601 format
@@ -208,7 +218,7 @@ The following type names are available by default and can be used as `type:`/`ar
 - `'Timestamp'` - renders a `Time` as unix timestamp integer and turns incoming integers into a `Time`
 - `'UUID'` - accepts and renders UUIDs
 
-Also, when using the generator, `ErrorsType` and `ErrorDetailsType` are generated as a starting point for unified error presentation. `ErrorsType` can render invalid `ActiveRecord` instances, `ActiveModel::Errors` and other data structures.
+Also, when using the rails generator, `ErrorsType` and `ErrorDetailsType` are generated as a starting point for unified error presentation. `ErrorsType` can render invalid `ActiveRecord` instances, `ActiveModel::Errors` and other data structures.
 
 ### Enums
 
@@ -234,13 +244,13 @@ class ErrorType < ObjectType
 end
 ```
 
-### FAQ
+## FAQ
 
-#### How do I render API docs?
+### How do I render API docs?
 
 Rendering docs is outside of the scope of this project. You can use the OpenAPI export to generate docs with tools such as RapiDoc, ReDoc, or Swagger UI.
 
-#### How do I use context in my types?
+### How do I use context in my types?
 
 Use [ActiveSupport::CurrentAttributes](https://api.rubyonrails.org/classes/ActiveSupport/CurrentAttributes.html).
 
@@ -254,7 +264,7 @@ class BikeType < ObjectType
 end
 ```
 
-#### How do I migrate from apipie-rails?
+### How do I migrate from apipie-rails?
 
 First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, or less repetitive definitions, it might not be worth it.
 
@@ -280,7 +290,7 @@ Taro uses some of the same DSL as `apipie`, so for a step-by-step migration, you
 end
 ```
 
-#### How do I keep lengthy API descriptions out of my controller?
+### How do I keep lengthy API descriptions out of my controller?
 
 ```ruby
 module BikeUpdateDesc
@@ -298,13 +308,13 @@ class BikesController < ApplicationController
 end
 ```
 
-#### Why do I have to use type name strings instead of the type constants?
+### Why do I have to use type name strings instead of the type constants?
 
 Why e.g. `field :id, type: 'UUID'` instead of `field :id, type: UUID`?
 
 The purpose of this is to reduce unnecessary autoloading of the whole type dependency tree in dev and test environments.
 
-#### Can I define my own derived types like `page_of` or `array_of`?
+### Can I define my own derived types like `page_of` or `array_of`?
 
 Yes.
 
