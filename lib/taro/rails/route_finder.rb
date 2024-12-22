@@ -17,13 +17,11 @@ module Taro::Rails::RouteFinder
 
     def build_cache
       # Build a Hash like
-      # { 'users#show' } => [#<NormalizedRoute>, #<NormalizedRoute>] }
-      rails_routes.each_with_object({}) do |rails_route, hash|
-        route = Taro::Rails::NormalizedRoute.new(rails_route)
-        next if route.ignored?
-
-        (hash[route.endpoint] ||= []) << route
-      end
+      # { 'users#show' => [#<NormalizedRoute>, #<NormalizedRoute>] }
+      rails_routes
+        .map { |r| Taro::Rails::NormalizedRoute.new(r) }
+        .reject(&:ignored?)
+        .group_by(&:endpoint)
     end
 
     def rails_routes
