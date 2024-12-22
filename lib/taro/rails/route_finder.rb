@@ -21,7 +21,7 @@ module Taro::Rails::RouteFinder
       rails_routes
         .map { |r| Taro::Rails::NormalizedRoute.new(r) }
         .reject(&:ignored?)
-        .group_by { |r| r.endpoint }
+        .group_by(&:endpoint)
     end
 
     def rails_routes
