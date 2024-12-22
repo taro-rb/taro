@@ -258,9 +258,14 @@ end
 
 First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, or less repetitive definitions, it might not be worth it.
 
-If you do:
+Please also note the following:
 
-- note that `taro` currently only supports the latest OpenAPI standard (instead of v2 like `apipie-rails`)
+- `taro` currently only supports the latest OpenAPI standard (instead of v2 like `apipie-rails`)
+- `taro` does not support arbitrary validations - only those that can be expressed in the OpenAPI schema
+- `taro` does not render API docs, as mentioned above
+
+If you want to migrate anyway:
+
 - extract complex param declarations into InputTypes
 - extract complex response declarations into ObjectTypes or ResponseTypes
 - replace `required: true` with `null: false` and `required: false` with `null: true`
