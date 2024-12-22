@@ -280,7 +280,7 @@ If you want to migrate anyway:
 - extract complex response declarations into ObjectTypes or ResponseTypes
 - replace `required: true` with `null: false` and `required: false` with `null: true`
 
-Taro uses some of the same DSL as `apipie`, so for a step-by-step migration, you might want to make `taro` use a different one:
+Taro uses some of the same DSL as `apipie`, so for a step-by-step migration, you might want to make `taro` use a different one. This initializer will change the `taro` DSL to `taro_api`, `taro_param`, and `taro_returns` and leave `api`, `param`, and `returns` to `apipie`:
 
 ```ruby
 # config/initializers/taro.rb
