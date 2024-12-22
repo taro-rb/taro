@@ -12,7 +12,7 @@ class Taro::Rails::Generators::InstallGenerator < ::Rails::Generators::Base
   def create_type_files
     Dir["#{self.class.source_root}/**/*.erb"].each do |tmpl|
       dest_dir = options[:dir].chomp('/')
-      template tmpl, "#{dest_dir}/#{File.basename(tmpl).sub('erb', 'rb')}"
+      template tmpl, "#{dest_dir}/#{File.basename(tmpl, '.erb')}.rb"
     end
   end
   # :nocov:
