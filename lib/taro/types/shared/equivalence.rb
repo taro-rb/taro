@@ -8,8 +8,7 @@ module Taro::Types::Shared::Equivalence
 
     # @fields is lazy-loaded. Comparing @field_defs suffices.
     ignored = %i[@fields]
-    props = instance_variables - ignored
-    props == (other.instance_variables - ignored) &&
-      props.all? { |p| instance_variable_get(p) == other.instance_variable_get(p) }
+    (instance_variables - ignored).to_h { |i| [i, instance_variable_get(i)] } ==
+      (other.instance_variables - ignored).to_h { |i| [i, other.instance_variable_get(i)] }
   end
 end
