@@ -17,7 +17,7 @@ class Taro::Types::ListType < Taro::Types::BaseType
     object.respond_to?(:map) || response_error('must be an Enumerable')
 
     item_type = self.class.item_type
-    object.map { |el| item_type.new(el).coerce_response }
+    object.map { |el| item_type.new(el).cached_coerce_response }
   end
 
   def self.default_openapi_name

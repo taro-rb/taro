@@ -25,6 +25,6 @@ class ErrorsType < Taro::Types::ListType
         response_error("must be an Enumerable or an object with errors")
       end
 
-    list.map { |el| self.class.item_type.new(el).coerce_response }
+    list.map { |el| self.class.item_type.new(el).cached_coerce_response }
   end
 end

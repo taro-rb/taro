@@ -1,6 +1,6 @@
 Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered) do
-  def self.call(*args)
-    new(*args).call
+  def self.call(controller, declaration, rendered)
+    new(controller, declaration, rendered).call
   end
 
   def call
@@ -79,7 +79,7 @@ Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered
 
   def check_enum(type, value)
     # coercion checks non-emptyness + enum match
-    type.new(value).coerce_response
+    type.new(value).cached_coerce_response
   rescue Taro::Error => e
     fail_with(e.message)
   end
