@@ -9,6 +9,10 @@ class Taro::Rails::Railtie < ::Rails::Railtie
     app.reloader.to_prepare do
       Taro::Rails.reset
     end
+
+    app.config.after_initialize do
+      Taro::Cache.cache_instance = Rails.cache
+    end
   end
 
   rake_tasks { Dir["#{__dir__}/tasks/**/*.rake"].each { |f| load f } }
