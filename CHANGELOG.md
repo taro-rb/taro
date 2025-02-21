@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [2.1.0] - 2025-02-21
+
+### Added
+
+- added support for caching on type level and when calling render
+  - default cache will be set to Rails.cache in the railtie
+  - cache_key can be a string, an array, a hash or a proc
+
 ## [2.0.0] - 2024-12-15
 
 ### Changed

@@ -81,4 +81,38 @@ describe 'Rails integration' do
       put(:update, params: { user: { name: 'taro', id: '42' } })
     end.to raise_error(Taro::ResponseError)
   end
+
+  describe 'caching' do
+    before do
+      allow_any_instance_of(UsersController).to receive(:update) do |receiver|
+        receiver.render json: UserResponseType.with_cache(cache_key: 'x').render(name: 'whatever')
+      end
+    end
+
+    it 'works with an empty cache' do
+      expect do
+        put(:update, params: { user: { name: 'taro', id: '42' } })
+      end.not_to raise_error
+    end
+
+    it 'works with a cached type rendering' do
+      allow(DUMMY_CACHE).to receive(:fetch).and_return(name: 'cached name')
+
+      expect do
+        put(:update, params: { user: { name: 'taro', id: '42' } })
+      end.not_to raise_error
+
+      expect(response.body).to eq('{"name":"cached name"}')
+    end
+
+    it 'allows outdated cache values that do not match the latest return definition' do
+      allow(DUMMY_CACHE).to receive(:fetch).and_return(bad_key: 'cached value')
+
+      expect do
+        put(:update, params: { user: { name: 'taro', id: '42' } })
+      end.not_to raise_error
+
+      expect(response.body).to eq('{"bad_key":"cached value"}')
+    end
+  end
 end

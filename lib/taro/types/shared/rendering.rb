@@ -1,9 +1,11 @@
 module Taro::Types::Shared::Rendering
   # The `::render` method is intended for use in controllers.
   # Overrides of this method must call super.
-  def render(object)
-    result = new(object).coerce_response
-    self.last_render = [self, result.__id__]
+  def render(object, cache_attrs = {})
+    result = Taro::Cache.call(object, **cache_attrs) do
+      new(object).cached_coerce_response
+    end
+    self.last_render = [self.without_cache || self, result.__id__]
     result
   end
 

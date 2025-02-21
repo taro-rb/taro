@@ -1,11 +1,15 @@
 def stub_rails(with_routes: [])
   rails = Module.new { def self.name = 'Rails' }
+  config = instance_double(Rails::Application::Configuration)
+  allow(config).to receive(:after_initialize) { |&block| block.call }
+  allow(rails).to receive(:cache).and_return(DUMMY_CACHE)
   application = instance_double(
     Rails::Application,
     env_config: {},
     reloader: ActiveSupport::Reloader,
     reload_routes!: true,
     routes: instance_double(ActionDispatch::Routing::RouteSet, routes: with_routes),
+    config:,
   )
   rails.define_singleton_method(:application) { application }
   stub_const('Rails', rails)

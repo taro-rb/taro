@@ -64,7 +64,7 @@ module Taro::Types::Coercion
     require 'date'
     def shortcuts
       @shortcuts ||= {
-        # rubocop:disable Layout/HashAlignment - buggy cop
+        # rubocop:disable Layout/HashAlignment
         'Boolean'   => Taro::Types::Scalar::BooleanType,
         'Date'      => Taro::Types::Scalar::ISO8601DateType,
         'DateTime'  => Taro::Types::Scalar::ISO8601DateTimeType,
@@ -76,7 +76,7 @@ module Taro::Types::Coercion
         'Time'      => Taro::Types::Scalar::ISO8601DateTimeType,
         'Timestamp' => Taro::Types::Scalar::TimestampType,
         'UUID'      => Taro::Types::Scalar::UUIDv4Type,
-        # rubocop:enable Layout/HashAlignment - buggy cop
+        # rubocop:enable Layout/HashAlignment
       }.freeze
     end
   end

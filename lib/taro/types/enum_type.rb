@@ -24,7 +24,7 @@ class Taro::Types::EnumType < Taro::Types::BaseType
 
   def coerce_response
     self.class.raise_if_empty_enum
-    value = self.class.item_type.new(object).coerce_response
+    value = self.class.item_type.new(object).cached_coerce_response
     if self.class.values.include?(value)
       value
     else

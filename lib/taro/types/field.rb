@@ -65,7 +65,7 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     return default if value.nil? && default_specified?
 
     type_obj = type.new(value)
-    from_input ? type_obj.coerce_input : type_obj.coerce_response
+    from_input ? type_obj.coerce_input : type_obj.cached_coerce_response
   rescue Taro::ValidationError => e
     reraise_recursively_with_path_info(e)
   end
