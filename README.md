@@ -244,6 +244,27 @@ class ErrorType < ObjectType
 end
 ```
 
+### Caching
+
+Taro provides support for caching. The cache instance can be configured by setting `Taro::Cache.cache_instance`. By default, the railtie will set it to `Rails.cache`.
+
+It supports configuring an ad hoc cache when using a render call, e.g.
+
+```ruby
+bike = Bike.find(params[:id])
+BikeType.with_cache(cache_key: bike.cache_key, expires_in: 3.minutes).render(bike)
+```
+
+Or by configuring the cache rule on a per type basis, e.g.
+
+```ruby
+class BikeType < ObjectType
+  self.cache_key = ->(bike) { bike.cache_key_with_version }
+  self.expires_in = 1.hour
+  # ...
+end
+```
+
 ## FAQ
 
 ### How do I render API docs?
@@ -341,30 +362,6 @@ class MyController < ApplicationController
   def show
     render json: BikeType.preview.render(Bike.find(params[:id]))
   end
-end
-```
-
-## Caching
-
-Taro provides support for caching. The cache instance can be configured by setting `Taro::Cache.cache_instance`. By default, the railtie will set it to `Rails.cache`.
-
-It supports configuring an add hoc cache when using a render call, e.g.
-
-```ruby
-bike = Bike.find(params[:id])
-BikeType.with_cache(cache_key: bike.cache_key, expires_in: 3.minutes).render(bike)
-```
-
-Or by configuring the cache rule on a per type bases, e.g.
-
-```ruby
-class BikeType < ObjectType
-  # Optional description of BikeType (for the OpenAPI export)
-  self.desc = 'A bike and all relevant information about it'
-  self.cache_key = ->(bike) { bike.cache_key_with_version }
-  self.expires_in = 1.hour
-
-  ...
 end
 ```
 
