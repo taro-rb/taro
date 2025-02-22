@@ -38,6 +38,12 @@ describe Taro::Types::Shared::Caching do
     expect(type.with_cache(cache_key:).cache_key).to eq cache_key
   end
 
+  it 'raises when ::with_cache is followed by derivations' do
+    type = Class.new(Taro::Types::BaseType)
+    expect { type.array.with_cache(cache_key: ->(_) { 'foo' }) }
+      .to raise_error(Taro::ArgumentError, /Cannot derive/)
+  end
+
   it 'applies to scalar type rendering' do
     type = Class.new(S::StringType)
     type.cache_key = ->(_) { 42 }
