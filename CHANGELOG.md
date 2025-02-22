@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.2.0] - 2025-02-22
+
 ### Added
 
 - error message when incorrectly chaining `with_cache`
