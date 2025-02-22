@@ -7,7 +7,7 @@ module Taro::Types::Shared::Caching
 
   def self.included(klass)
     klass.extend(ClassMethods)
-    klass.singleton_class.attr_accessor :expires_in, :without_cache
+    klass.singleton_class.attr_accessor :expires_in
     klass.singleton_class.attr_reader :cache_key
   end
 
@@ -23,7 +23,8 @@ module Taro::Types::Shared::Caching
       klass = dup
       klass.cache_key = cache_key.is_a?(Proc) ? cache_key : ->(_) { cache_key }
       klass.expires_in = expires_in
-      klass.without_cache = self
+      this = self
+      klass.define_singleton_method(:type_class) { this }
       klass
     end
   end

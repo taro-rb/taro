@@ -5,7 +5,7 @@ module Taro::Types::Shared::Rendering
     result = Taro::Cache.call(object, **cache_attrs) do
       new(object).cached_coerce_response
     end
-    self.last_render = [self.without_cache || self, result.__id__]
+    self.last_render = [type_class, result.__id__]
     result
   end
 

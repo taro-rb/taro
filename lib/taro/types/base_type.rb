@@ -22,4 +22,5 @@ Taro::Types::BaseType = Struct.new(:object) do
   extend Taro::Types::Shared::Rendering
   include Taro::Types::Shared::Caching
   include Taro::Types::Shared::Errors
+  include Taro::Types::Shared::TypeClass
 end

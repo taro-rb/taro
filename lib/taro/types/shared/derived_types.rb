@@ -37,8 +37,8 @@ module Taro::Types::Shared::DerivedTypes
       derived_types[type] ||= begin
         name || raise(Taro::ArgumentError, 'Cannot derive from anonymous type')
 
-        type_class = Taro::Types::Coercion.call(type:)
-        new_type = Class.new(type_class)
+        coerced_type = Taro::Types::Coercion.call(type:)
+        new_type = Class.new(coerced_type)
         new_type.define_name("#{name}.#{method_name}")
         new_type.derive_from(self)
         new_type
