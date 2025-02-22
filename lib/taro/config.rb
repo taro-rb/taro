@@ -5,6 +5,7 @@ module Taro::Config
     :export_format,
     :export_path,
     :parse_params,
+    :raise_for_undeclared_params,
     :validate_response,
   )
 
@@ -14,6 +15,7 @@ module Taro::Config
   self.export_format = :yaml
   self.export_path = 'api.yml'
   self.parse_params = true
+  self.raise_for_undeclared_params = false
   self.validate_response = true
 end
 

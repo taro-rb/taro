@@ -140,6 +140,15 @@ Requests are automatically validated to match the declared input schema, unless 
 Taro.config.parse_params = false
 ```
 
+There is also an option to raise an error if any undeclared params are submitted:
+
+```ruby
+Taro.config.raise_for_undeclared_params = true
+```
+
+This option is similar to `action_on_unpermitted_parameters = :raise` in Rails and is most useful in dev and test environments.
+
+
 #### Response validation
 
 Responses are automatically validated to have used the correct type for rendering, which guarantees that they match the declaration. This means you have to use the types to render complex responses, and manually building a Hash that conforms to the schema will raise an error. Primitive/scalar types are an exception, e.g. you *can* do:
@@ -367,7 +376,6 @@ end
 
 ## Possible future features
 
-- warning/raising for undeclared input params (currently they are ignored)
 - usage without rails is possible but not convenient yet
 - rspec matchers for testing
 - sum types

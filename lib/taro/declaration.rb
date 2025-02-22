@@ -5,7 +5,7 @@ class Taro::Declaration
   attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :tags
 
   def initialize(for_klass = nil)
-    @params = Class.new(Taro::Types::InputType)
+    @params = Class.new(Taro::Types::RailsParamsType)
     @return_defs = {}
     @return_descriptions = {}
 
