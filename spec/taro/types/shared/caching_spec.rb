@@ -1,47 +1,51 @@
 describe Taro::Types::Shared::Caching do
-  it 'can set cache_key to a Proc with arity 1' do
-    type = Class.new(Taro::Types::BaseType)
-    type.cache_key = ->(object) { object }
-    expect(type.cache_key).to be_a(Proc)
+  describe '::cache_key' do
+    it 'can be set to a Proc with arity 1' do
+      type = Class.new(Taro::Types::BaseType)
+      type.cache_key = ->(object) { object }
+      expect(type.cache_key).to be_a(Proc)
+    end
+
+    it 'can be set to a Hash' do
+      type = Class.new(Taro::Types::BaseType)
+      type.cache_key = {}
+      expect(type.cache_key).to eq({})
+    end
+
+    it 'can be set to nil' do
+      type = Class.new(Taro::Types::BaseType)
+      type.cache_key = nil
+      expect(type.cache_key).to be_nil
+    end
+
+    it 'can not be set to a proc with arity != 1' do
+      type = Class.new(Taro::Types::BaseType)
+      expect { type.cache_key = -> {} }.to raise_error(Taro::ArgumentError)
+    end
+
+    it 'can not be set to a string' do
+      type = Class.new(Taro::Types::BaseType)
+      expect { type.cache_key = 'foo' }.to raise_error(Taro::ArgumentError)
+    end
   end
 
-  it 'can set cache_key to a Hash' do
-    type = Class.new(Taro::Types::BaseType)
-    type.cache_key = {}
-    expect(type.cache_key).to eq({})
-  end
+  describe '::with_cache' do
+    it 'allows string keys' do
+      type = Class.new(Taro::Types::BaseType)
+      expect(type.with_cache(cache_key: 'foo').cache_key).to be_a(Proc)
+    end
 
-  it 'can set cache_key to nil' do
-    type = Class.new(Taro::Types::BaseType)
-    type.cache_key = nil
-    expect(type.cache_key).to be_nil
-  end
+    it 'supports proc keys' do
+      type = Class.new(Taro::Types::BaseType)
+      cache_key = ->(_) { 'foo' }
+      expect(type.with_cache(cache_key:).cache_key).to eq cache_key
+    end
 
-  it 'fails for procs with arity != 1' do
-    type = Class.new(Taro::Types::BaseType)
-    expect { type.cache_key = -> {} }.to raise_error(Taro::ArgumentError)
-  end
-
-  it 'fails for strings' do
-    type = Class.new(Taro::Types::BaseType)
-    expect { type.cache_key = 'foo' }.to raise_error(Taro::ArgumentError)
-  end
-
-  it 'allows string keys for ::with_cache' do
-    type = Class.new(Taro::Types::BaseType)
-    expect(type.with_cache(cache_key: 'foo').cache_key).to be_a(Proc)
-  end
-
-  it 'supports proc keys for ::with_cache' do
-    type = Class.new(Taro::Types::BaseType)
-    cache_key = ->(_) { 'foo' }
-    expect(type.with_cache(cache_key:).cache_key).to eq cache_key
-  end
-
-  it 'raises when ::with_cache is followed by derivations' do
-    type = Class.new(Taro::Types::BaseType)
-    expect { type.array.with_cache(cache_key: ->(_) { 'foo' }) }
-      .to raise_error(Taro::ArgumentError, /Cannot derive/)
+    it 'raises when followed by derivations' do
+      type = Class.new(Taro::Types::BaseType)
+      expect { type.array.with_cache(cache_key: ->(_) { 'foo' }) }
+        .to raise_error(Taro::ArgumentError, /Cannot derive/)
+    end
   end
 
   it 'applies to scalar type rendering' do
