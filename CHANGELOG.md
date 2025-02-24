@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [2.3.0] - 2025-02-24
+
 ### Added
 
 - `Taro.config.raise_for_undeclared_params`
