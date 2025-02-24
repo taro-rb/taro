@@ -1,5 +1,5 @@
 def stub_rails(with_routes: [])
-  rails = Module.new { def self.name = 'Rails' }
+  rails = Module.new { def self.name = 'Rails'; def self.env = 'test' }
   config = instance_double(Rails::Application::Configuration)
   allow(config).to receive(:after_initialize) { |&block| block.call }
   allow(rails).to receive(:cache).and_return(DUMMY_CACHE)

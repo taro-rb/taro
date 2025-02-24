@@ -1,6 +1,6 @@
 describe Taro::Types::Shared::ObjectCoercion do
   describe '#coerce_input' do
-    it 'ignores undeclared hash keys by default' do
+    it 'can ignore undeclared hash keys', config: { raise_for_undeclared_params: false } do
       expect(T::ObjectType.new({ foo: 1 }).coerce_input).to eq({})
     end
 

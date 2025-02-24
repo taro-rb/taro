@@ -15,7 +15,7 @@ module Taro::Config
   self.export_format = :yaml
   self.export_path = 'api.yml'
   self.parse_params = true
-  self.raise_for_undeclared_params = false
+  self.raise_for_undeclared_params = false # may be overridden by railtie
   self.validate_response = true
 end
 

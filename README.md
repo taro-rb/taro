@@ -146,8 +146,7 @@ There is also an option to raise an error if any undeclared params are submitted
 Taro.config.raise_for_undeclared_params = true
 ```
 
-This option is similar to `action_on_unpermitted_parameters = :raise` in Rails and is most useful in dev and test environments.
-
+This option is similar to `action_on_unpermitted_parameters = :raise` in Rails and is most useful in dev and test environments. The railtie enables it automatically in these environments.
 
 #### Response validation
 

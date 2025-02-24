@@ -50,7 +50,7 @@ describe 'Rails integration' do
   it 'works' do
     expect(Taro.declarations.count).to eq 1
 
-    put(:update, params: { user: { name: 'taro', id: '42' } })
+    put(:update, params: { user: { name: 'taro' } })
 
     expect(response.body).to eq('{"name":"TARO"}')
     expect(Taro::Types::BaseType.used_in_response).to eq(UserResponseType)
@@ -78,7 +78,7 @@ describe 'Rails integration' do
     end
 
     expect do
-      put(:update, params: { user: { name: 'taro', id: '42' } })
+      put(:update, params: { user: { name: 'taro' } })
     end.to raise_error(Taro::ResponseError)
   end
 
@@ -91,7 +91,7 @@ describe 'Rails integration' do
 
     it 'works with an empty cache' do
       expect do
-        put(:update, params: { user: { name: 'taro', id: '42' } })
+        put(:update, params: { user: { name: 'taro' } })
       end.not_to raise_error
     end
 
@@ -99,7 +99,7 @@ describe 'Rails integration' do
       allow(DUMMY_CACHE).to receive(:fetch).and_return(name: 'cached name')
 
       expect do
-        put(:update, params: { user: { name: 'taro', id: '42' } })
+        put(:update, params: { user: { name: 'taro' } })
       end.not_to raise_error
 
       expect(response.body).to eq('{"name":"cached name"}')
@@ -109,7 +109,7 @@ describe 'Rails integration' do
       allow(DUMMY_CACHE).to receive(:fetch).and_return(bad_key: 'cached value')
 
       expect do
-        put(:update, params: { user: { name: 'taro', id: '42' } })
+        put(:update, params: { user: { name: 'taro' } })
       end.not_to raise_error
 
       expect(response.body).to eq('{"bad_key":"cached value"}')
