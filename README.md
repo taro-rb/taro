@@ -65,7 +65,7 @@ class BikesController < ApplicationController
 
   # Support for arrays and paginated lists is built-in.
   api     'List all bikes'
-  returns code: :ok, array_of: 'BikeType', desc: 'list of bikes'
+  returns code: :ok, array_of: 'BikeType', desc: 'List of bikes'
   def index
     render json: BikeType.array.render(Bike.all)
   end
@@ -88,9 +88,6 @@ class BikeType < ObjectType
 
   # Fields can reference other types and arrays of values
   field :users, array_of: 'UserType', null: false
-
-  # Pagination is built-in for big lists
-  field :parts, page_of: 'PartType', null: false
 
   # Custom methods can be chosen to resolve fields
   field :has_brand, type: 'Boolean', null: false, method: :brand?
@@ -273,6 +270,32 @@ class BikeType < ObjectType
 end
 ```
 
+### Pagination
+
+Use `page_of:` to declare a paginated response. Call `page.render` on a type to render a page of records.
+
+```ruby
+api     'List all bikes'
+param   :cursor, type: 'String', null: true, desc: 'Show bikes after this cursor'
+returns code: :ok, page_of: 'BikeType', desc: 'A page of bikes'
+def index
+  render json: BikeType.page.render(Bike.all, after: params[:cursor])
+end
+```
+
+By default, the response does not include a total count. To include it, use `page_with_total_count`:
+
+```ruby
+api     'List all bikes'
+param   :cursor, type: 'String', null: true, desc: 'Show bikes after this cursor'
+returns code: :ok, page_with_total_count_of: 'BikeType', desc: 'A page of bikes'
+def index
+  render json: BikeType.page_with_total_count.render(Bike.all, after: params[:cursor])
+end
+```
+
+See also: [Derived types](#derived-types).
+
 ## FAQ
 
 ### How do I render API docs?
@@ -343,6 +366,7 @@ Why e.g. `field :id, type: 'UUID'` instead of `field :id, type: UUID`?
 
 The purpose of this is to reduce unnecessary autoloading of the whole type dependency tree in dev and test environments.
 
+<a name="derived-types"></a>
 ### Can I define my own derived types like `page_of` or `array_of`?
 
 Yes.

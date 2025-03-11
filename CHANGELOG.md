@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- `PageWithTotalCountType` for paginated responses with a total count
+
 ## [2.3.0] - 2025-02-24
 
 ### Added

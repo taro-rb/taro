@@ -13,14 +13,16 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::ResponseType
     field(:page_info, type: 'Taro::Types::ObjectTypes::PageInfoType', null: false)
   end
 
-  def self.render(relation, after:, limit: 20, order_by: nil, order: nil)
+  def self.render(relation, **)
+    super(paginate(relation, **))
+  end
+
+  def self.paginate(relation, after:, limit: 20, order_by: nil, order: nil)
     result = RailsCursorPagination::Paginator.new(
       relation, limit:, order_by:, order:, after:
     ).fetch
-
     result[:page].map! { |el| el.fetch(:data) }
-
-    super(result)
+    result
   end
 
   def self.default_openapi_name
