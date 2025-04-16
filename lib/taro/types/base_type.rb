@@ -17,6 +17,7 @@ Taro::Types::BaseType = Struct.new(:object) do
   extend Taro::Types::Shared::Description
   extend Taro::Types::Shared::Equivalence
   extend Taro::Types::Shared::Name
+  extend Taro::Types::Shared::OpenAPIFormat
   extend Taro::Types::Shared::OpenAPIName
   extend Taro::Types::Shared::OpenAPIType
   extend Taro::Types::Shared::Rendering

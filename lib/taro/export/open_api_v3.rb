@@ -129,7 +129,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
 
   def export_type(type)
     if type < Taro::Types::ScalarType && !custom_scalar_type?(type)
-      { type: type.openapi_type }
+      { type: type.openapi_type, format: type.openapi_format }.compact
     else
       extract_component_ref(type)
     end
@@ -148,7 +148,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def export_scalar_field(field)
-    base = { type: field.openapi_type }
+    base = { type: field.openapi_type, format: field.openapi_format }.compact
     # Using oneOf seems more correct than an array of types
     # as it puts props like format together with the main type.
     # https://github.com/OAI/OpenAPI-Specification/issues/3148
