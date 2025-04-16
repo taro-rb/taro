@@ -30,6 +30,10 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
     type.openapi_type
   end
 
+  def openapi_format
+    type.openapi_format
+  end
+
   private
 
   def coerce_to_enum(arg)

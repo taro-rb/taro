@@ -410,7 +410,6 @@ end
   - mixed arrays
   - mixed enums
   - nullable enums
-  - string format specifications (e.g. binary, int64, password ...)
   - string minLength and maxLength (substitute: `self.pattern = /\A.{3,5}\z/`)
   - number minimum, exclusiveMinimum, maximum, multipleOf
   - readOnly, writeOnly
