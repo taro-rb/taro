@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [2.5.0] - 2025-04-16
+
+### Added
+
+- Support for setting `openapi_format` for types and during export
+
 ## [2.4.0] - 2025-03-11
 
 ### Added
