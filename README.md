@@ -59,7 +59,7 @@ class BikesController < ApplicationController
     if success
       render json: BikeType.render(bike), status: :ok
     else
-      render json: { error: MyErrorType.render(bike.errors.first) }, status: :unprocessable_entity
+      render json: { error: MyErrorType.render(bike.errors.first) }, status: :unprocessable_content
     end
   end
 
