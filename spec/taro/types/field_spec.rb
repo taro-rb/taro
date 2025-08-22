@@ -30,6 +30,11 @@ describe Taro::Types::Field do
       expect(field.value_for_response('low', object_is_hash: false)).to eq('LOW')
     end
 
+    it 'can use :method to call a custom proc' do
+      field = described_class.new(name: :foo, type: S::StringType, null: false, method: ->(v) { "Wrapped: #{v}" })
+      expect(field.value_for_response('low', object_is_hash: false)).to eq('Wrapped: low')
+    end
+
     it 'fetches value from context if defined directly on it' do
       context = Class.new(T::ObjectType).tap { |o| o.define_method(:upcase) { 'CTX' } }.new(nil)
       field = described_class.new(name: :upcase, type: S::StringType, null: false)

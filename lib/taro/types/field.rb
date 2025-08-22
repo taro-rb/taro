@@ -50,6 +50,8 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
       context.public_send(method)
     elsif object_is_hash
       retrieve_hash_value(object)
+    elsif method.is_a?(Proc)
+      method.call(object)
     elsif object.respond_to?(method, true)
       object.public_send(method)
     else
