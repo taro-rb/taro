@@ -410,7 +410,7 @@ end
   - mixed arrays
   - mixed enums
   - nullable enums
-  - string minLength and maxLength (substitute: `self.pattern = /\A.{3,5}\z/`)
+  - string minLength and maxLength (substitute: `MyType.pattern = /\A.{3,5}\z/`)
   - number minimum, exclusiveMinimum, maximum, multipleOf
   - readOnly, writeOnly
 
