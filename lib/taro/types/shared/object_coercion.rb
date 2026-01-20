@@ -2,7 +2,8 @@
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
     validate_no_undeclared_params
-    self.class.fields.transform_values do |field|
+    fields = self.class.fields.select { |key, definition| object.to_h.keys.include?(key) || definition.null == false || definition.default_specified? }
+    fields.transform_values do |field|
       field.value_for_input(object)
     end
   end

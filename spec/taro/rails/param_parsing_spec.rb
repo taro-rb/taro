@@ -23,7 +23,7 @@ describe Taro::Rails::ParamParsing do
       stub_const('UserInputType', Class.new(T::InputType) do
         field :name, type: 'String', null: false
       end)
-      declaration.add_param :user, type: 'UserInputType', null: true
+      declaration.add_param :user, type: 'UserInputType', null: true, default: nil
       allow(Taro::Rails).to receive(:declaration_for).and_return(declaration)
       described_class.install(controller_class:, action_name: :index)
 

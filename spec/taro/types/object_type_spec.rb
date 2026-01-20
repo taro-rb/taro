@@ -2,7 +2,8 @@ describe Taro::Types::ObjectType do
   before do
     stub_const('ExampleObjectType', Class.new(Taro::Types::ObjectType) do
       field :foo, type: 'String', null: false
-      field :bar, type: 'String', null: true
+      field :bar, type: 'String', null: true, default: nil # adds a null value if not passed one
+      field :baz, type: 'String', null: true # allows null if passed but doesn't add it if not
     end)
   end
 
@@ -11,18 +12,18 @@ describe Taro::Types::ObjectType do
   end
 
   it 'coerces response data' do
-    expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_response).to eq(foo: 'FOO', bar: nil)
+    expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_response).to eq(foo: 'FOO', bar: nil, baz: nil)
   end
 
   it 'can coerce input data differently than response data (e.g. more strictly)' do
     expect { ExampleObjectType.new({ foo: :FOO }).coerce_input }
       .to raise_error(Taro::InputError, /must be a String/)
-    expect(ExampleObjectType.new({ foo: :FOO }).coerce_response).to eq(foo: 'FOO', bar: nil)
+    expect(ExampleObjectType.new({ foo: :FOO }).coerce_response).to eq(foo: 'FOO', bar: nil, baz: nil)
   end
 
   it 'coerces objects as response data' do
-    obj = Struct.new(:foo, :bar).new('FOO', nil)
-    expect(ExampleObjectType.new(obj).coerce_response).to eq(foo: 'FOO', bar: nil)
+    obj = Struct.new(:foo, :bar, :baz).new('FOO', nil, nil)
+    expect(ExampleObjectType.new(obj).coerce_response).to eq(foo: 'FOO', bar: nil, baz: nil)
   end
 
   it 'works recursively' do
@@ -30,6 +31,6 @@ describe Taro::Types::ObjectType do
       field :qux, type: 'ExampleObjectType', null: false
     end
 
-    expect(nested.new({ qux: { foo: 'FOO' } }).coerce_response).to eq(qux: { foo: 'FOO', bar: nil })
+    expect(nested.new({ qux: { foo: 'FOO' } }).coerce_response).to eq(qux: { foo: 'FOO', bar: nil, baz: nil })
   end
 end
