@@ -2,10 +2,13 @@
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
     validate_no_undeclared_params
-    fields = self.class.fields.select { |key, definition| object.to_h.keys.include?(key) || definition.null == false || definition.default_specified? }
-    fields.transform_values do |field|
-      field.value_for_input(object)
+    result = {}
+    self.class.fields.each do |key, field|
+      next if field.null && !field.default_specified? && !object.key?(key)
+
+      result[key] = field.value_for_input(object)
     end
+    result
   end
 
   # Render the object into a hash.
