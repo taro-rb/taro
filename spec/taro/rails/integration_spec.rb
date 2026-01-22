@@ -12,6 +12,7 @@ describe 'Rails integration' do
 
     # do all the things needed to run the controller, phew ...
     extend ActionController::TestCase::Behavior
+
     allow(self.class).to receive(:controller_class).and_return(users_controller)
     @routes = ::ActionDispatch::Routing::RouteSet.new
     @routes.draw { put '/users', to: 'users#update' }
