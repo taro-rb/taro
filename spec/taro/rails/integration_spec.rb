@@ -12,6 +12,7 @@ describe 'Rails integration' do
 
     # do all the things needed to run the controller, phew ...
     extend ActionController::TestCase::Behavior
+
     allow(self.class).to receive(:controller_class).and_return(users_controller)
     @routes = ::ActionDispatch::Routing::RouteSet.new
     @routes.draw { put '/users', to: 'users#update' }
@@ -28,7 +29,7 @@ describe 'Rails integration' do
       common_return code: 404, type: 'Boolean'
 
       api 'my api'
-      param :user, type: 'UserInputType', null: false
+      param :user, type: 'UserInputType'
       returns type: 'UserResponseType', code: :ok
       def update
         render json: UserResponseType.render(name: @api_params[:user][:name].upcase),
@@ -38,12 +39,12 @@ describe 'Rails integration' do
   end
   let!(:user_response_type) do
     stub_const('UserResponseType', Class.new(T::ObjectType) do
-      field :name, type: 'String', null: false
+      field :name, type: 'String'
     end)
   end
   let!(:user_input_type) do
     stub_const('UserInputType', Class.new(T::InputType) do
-      field :name, type: 'String', null: false
+      field :name, type: 'String'
     end)
   end
 

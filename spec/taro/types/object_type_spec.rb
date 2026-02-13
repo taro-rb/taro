@@ -1,13 +1,13 @@
 describe Taro::Types::ObjectType do
   before do
     stub_const('ExampleObjectType', Class.new(Taro::Types::ObjectType) do
-      field :foo, type: 'String', null: false
-      field :bar, type: 'String', null: true
+      field :foo, type: 'String'
+      field :bar, type: 'String', null: true, required: false
     end)
   end
 
   it 'coerces input' do
-    expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_input).to eq(foo: 'FOO', bar: nil)
+    expect(ExampleObjectType.new({ foo: 'FOO' }).coerce_input).to eq(foo: 'FOO')
   end
 
   it 'coerces response data' do
@@ -27,7 +27,7 @@ describe Taro::Types::ObjectType do
 
   it 'works recursively' do
     nested = Class.new(described_class) do
-      field :qux, type: 'ExampleObjectType', null: false
+      field :qux, type: 'ExampleObjectType'
     end
 
     expect(nested.new({ qux: { foo: 'FOO' } }).coerce_response).to eq(qux: { foo: 'FOO', bar: nil })

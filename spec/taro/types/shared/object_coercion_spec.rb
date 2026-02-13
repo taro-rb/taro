@@ -13,10 +13,10 @@ describe Taro::Types::Shared::ObjectCoercion do
   describe '#coerce_response' do
     it 'raises instructive errors for nested fields' do
       stub_const('InnerType', Class.new(T::ObjectType) do
-        field(:str_field, type: 'String', null: false)
+        field(:str_field, type: 'String')
       end)
       outer_type = stub_const('OuterType', Class.new(T::ObjectType) do
-        field(:obj_field, type: 'InnerType', null: false)
+        field(:obj_field, type: 'InnerType')
       end)
 
       object = double(

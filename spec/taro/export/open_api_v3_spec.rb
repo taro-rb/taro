@@ -2,18 +2,18 @@ describe Taro::Export::OpenAPIv3 do
   it 'handles Declarations' do
     stub_const('FailureType', Class.new(T::ObjectType) do
       self.deprecated = true
-      field :message, type: 'String', null: true, deprecated: true
-      field :code, type: 'Integer', null: false
+      field :message, type: 'String', null: true, required: false, deprecated: true
+      field :code, type: 'Integer', required: true
     end)
 
     update_decl = Taro::Rails::Declaration.new
     update_decl.add_info 'My endpoint description for PUT'
-    update_decl.add_param :id, type: 'Integer', enum: [1, 2, 3], null: false, desc: 'The ID'
-    update_decl.add_param :foo, type: 'String', null: true, deprecated: true
-    update_decl.add_param :bar, type: 'Boolean', null: false
+    update_decl.add_param :id, type: 'Integer', enum: [1, 2, 3], desc: 'The ID'
+    update_decl.add_param :foo, type: 'String', null: true, required: false, deprecated: true
+    update_decl.add_param :bar, type: 'Boolean', required: true
     update_decl.add_return type: 'Integer', code: 200, desc: 'okay'
-    update_decl.add_return :errors, array_of: 'FailureType', code: 422, null: false, desc: 'bad'
-    update_decl.add_return :errors, array_of: 'FailureType', code: 403, null: false
+    update_decl.add_return :errors, array_of: 'FailureType', code: 422, desc: 'bad'
+    update_decl.add_return :errors, array_of: 'FailureType', code: 403
     stub_declaration_routes(update_decl, mock_user_route)
 
     stub_const('MyEnumType', Class.new(T::EnumType) do
@@ -23,14 +23,14 @@ describe Taro::Export::OpenAPIv3 do
 
     delete_decl = Taro::Rails::Declaration.new
     delete_decl.add_info 'My endpoint description for DELETE'
-    delete_decl.add_param :id, type: 'MyEnumType', null: false
+    delete_decl.add_param :id, type: 'MyEnumType'
     delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     stub_declaration_routes(delete_decl, mock_user_route(verb: 'DELETE', action: 'destroy'))
 
     show_decl = Taro::Rails::Declaration.new
     show_decl.add_info 'My endpoint description for GET'
-    show_decl.add_param :id, type: 'Integer', null: false
-    show_decl.add_param :utm_foo, type: 'String', null: false
+    show_decl.add_param :id, type: 'Integer'
+    show_decl.add_param :utm_foo, type: 'String'
     show_decl.add_return type: 'UUID', code: 200
     stub_declaration_routes(show_decl, mock_user_route(verb: 'GET', action: 'show'))
 
@@ -183,7 +183,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'does not render requestBody if there are no body params' do
     declaration = Taro::Rails::Declaration.new
-    declaration.add_param :id, type: 'Integer', null: false
+    declaration.add_param :id, type: 'Integer'
     stub_declaration_routes(declaration, mock_user_route)
 
     result = described_class.call(declarations: [declaration]).result
@@ -191,7 +191,7 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles scalar fields' do
-    field = F.new(type: S::StringType, name: 'foo', null: false)
+    field = F.new(type: S::StringType, name: 'foo')
     expect(subject.export_field(field)).to eq(type: :string)
   end
 
@@ -201,25 +201,25 @@ describe Taro::Export::OpenAPIv3 do
   end
 
   it 'handles field defaults' do
-    field = F.new(type: S::StringType, default: '!', name: 'foo', null: false)
+    field = F.new(type: S::StringType, default: '!', name: 'foo')
     expect(subject.export_field(field)).to eq(type: :string, default: '!')
   end
 
   it 'handles field descriptions' do
-    field = F.new(type: S::StringType, name: 'foo', null: false, desc: 'bar')
+    field = F.new(type: S::StringType, name: 'foo', desc: 'bar')
     expect(subject.export_field(field)).to eq(type: :string, description: 'bar')
   end
 
   it 'handles fields with inline enums' do
-    field = F.new(type: S::StringType, name: 'foo', null: false, enum: ['bar', 'baz'])
+    field = F.new(type: S::StringType, name: 'foo', enum: ['bar', 'baz'])
     expect(subject.export_field(field)).to eq(type: :string, enum: ['bar', 'baz'])
   end
 
   it 'handles object fields' do
     stub_const('ThingType', Class.new(T::ObjectType) do
-      field :inner, type: 'String', null: false
+      field :inner, type: 'String', required: true
     end)
-    field = F.new(type: ThingType, name: 'foo', null: false)
+    field = F.new(type: ThingType, name: 'foo')
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/Thing")
@@ -237,9 +237,9 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'handles object fields with description' do
     stub_const('ThingType', Class.new(T::ObjectType) do
-      field :inner, type: 'String', null: false
+      field :inner, type: 'String'
     end)
-    field = F.new(type: ThingType, name: 'foo', null: false, desc: 'bar')
+    field = F.new(type: ThingType, name: 'foo', desc: 'bar')
 
     expect(subject.export_field(field)).to eq(
       description: 'bar',
@@ -249,7 +249,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'handles nullable object fields with description' do
     stub_const('ThingType', Class.new(T::ObjectType) do
-      field :inner, type: 'String', null: false
+      field :inner, type: 'String'
     end)
     field = F.new(type: ThingType, name: 'foo', null: true, desc: 'bar')
 
@@ -261,7 +261,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'handles nullable object fields without description' do
     stub_const('ThingType', Class.new(T::ObjectType) do
-      field :inner, type: 'String', null: false
+      field :inner, type: 'String'
     end)
     field = F.new(type: ThingType, name: 'foo', null: true)
 
@@ -275,7 +275,7 @@ describe Taro::Export::OpenAPIv3 do
       value 'foo'
       value 'bar'
     end)
-    field = F.new(type: MyEnumType, name: 'foo', null: false)
+    field = F.new(type: MyEnumType, name: 'foo')
 
     expect(subject.export_field(field))
       .to eq(:$ref => "#/components/schemas/MyEnum")
@@ -350,7 +350,7 @@ describe Taro::Export::OpenAPIv3 do
 
   it 'uses inline request body for polymorphic routes' do
     stub_const('InputType', Class.new(T::InputType) do
-      field :inner, type: 'String', null: false
+      field :inner, type: 'String'
     end)
     expect(subject.request_body_schema(InputType, use_refs: false)).to eq(
       properties: { inner: { type: :string } },

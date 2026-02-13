@@ -70,7 +70,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
       name: field.name,
       deprecated: field.deprecated,
       description: field.desc,
-      required: !field.null,
+      required: field.required,
       schema: export_field(field).except(:deprecated, :description),
     }.compact
   end
@@ -199,7 +199,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   end
 
   def object_type_details(type)
-    required = type.fields.values.reject(&:null).map(&:name)
+    required = type.fields.values.select(&:required).map(&:name)
     {
       type: type.openapi_type,
       deprecated: type.deprecated,

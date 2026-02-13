@@ -5,6 +5,6 @@
 # You can customize these files to fit your needs, or delete them.
 class ErrorType < ObjectType
   field :attribute, type: 'String', null: true, desc: 'Attribute name'
-  field :code, type: 'String', null: false, method: :type, desc: 'Error code'
+  field :code, type: 'String', method: :type, desc: 'Error code'
   field :message, type: 'String', null: true, desc: 'Error message'
 end

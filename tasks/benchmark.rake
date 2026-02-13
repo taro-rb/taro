@@ -6,11 +6,11 @@ task :benchmark do
   data = JSON.load_file("#{__dir__}/benchmark_1kb.json", symbolize_names: true)
 
   item_type = Class.new(Taro::Types::ObjectType) do
-    field :name, type: 'String', null: false
-    field :language, type: 'String', null: false
-    field :id, type: 'String', null: false
-    field :bio, type: 'String', null: false
-    field :version, type: 'Float', null: false
+    field :name, type: 'String'
+    field :language, type: 'String'
+    field :id, type: 'String'
+    field :bio, type: 'String'
+    field :version, type: 'Float'
   end
 
   type = item_type.array

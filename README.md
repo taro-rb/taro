@@ -37,12 +37,13 @@ class BikesController < ApplicationController
   api     'Update a bike', desc: 'My longer text', tags: ['Bikes']
 
   # Params can come from the path, e.g. /bike/:id.
-  # Some types, like UUID in this case, are predefined. See below for more types.
-  param   :id, type: 'UUID', null: false, desc: 'ID of the bike to update'
+  # Some types, like UUID in this case, are predefined.
+  # See below for a list of all included types.
+  param   :id, type: 'UUID', desc: 'ID of the bike to update'
 
   # Params can also come from the query string or request body.
-  # This describes a Hash param:
-  param   :bike, type: 'BikeInputType', null: false
+  # This is a Hash param, implemented below.
+  param   :bike, type: 'BikeInputType'
 
   # Return types can differ by status code:
   returns code: :ok, type: 'BikeType', desc: 'update success'
@@ -56,6 +57,7 @@ class BikesController < ApplicationController
     success = bike.update(@api_params[:bike])
 
     # Types are also used to render responses.
+    # Taro validates that the correct type is used for the declared status code.
     if success
       render json: BikeType.render(bike), status: :ok
     else
@@ -72,29 +74,30 @@ class BikesController < ApplicationController
 end
 ```
 
-Notice the multiple roles of types: They are used to describe the structure of API requests and responses, and render the response. Both the input and output of the API are validated against the schema by default (see below).
+Notice the multiple roles of types: They are used to describe the structure of API requests and responses, as well as to render the response. Both the input and output of the API are validated against the schema by default (see below).
 
-Here is an example of the `BikeType` from the controller above:
+Here is an example of the `BikeType` that is used to render the success response of the controller above:
 
 ```ruby
 class BikeType < ObjectType
-  # Optional description of BikeType (for the OpenAPI export)
+  # Optional description of the type (for the OpenAPI export)
   self.desc = 'A bike and all relevant information about it'
 
-  # Object types have fields. Each field has a name, its own type,
-  # and a `null:` setting to indicate if it can be nil.
-  # Providing a description is optional.
+  # Object types have fields. Each field has a name and its own type
+  field :wheels, type: 'Integer'
+
+  # Fields can be made nullable and can have a description
   field :brand, type: 'String', null: true, desc: 'The brand name'
 
-  # Fields can reference other types and arrays of values
-  field :users, array_of: 'UserType', null: false
+  # Fields can reference other custom types and arrays of values
+  field :users, array_of: 'UserType'
 
   # Custom methods can be chosen to resolve fields
-  field :has_brand, type: 'Boolean', null: false, method: :brand?
+  field :has_brand, type: 'Boolean', method: :brand?
 
   # Field resolvers can also be implemented or overridden on the type.
   # The object passed in to `BikeType.render` is available as `object`.
-  field :fancy_info, type: 'String', null: false
+  field :fancy_info, type: 'String'
   def fancy_info
     "A bike named #{object.name} with #{object.parts.count} parts."
   end
@@ -103,14 +106,14 @@ end
 
 ### Input and response types
 
-You can use object types for input and output. However, if you want added control, you can also define dedicated input and response types.
+You can use object types for both input and output. However, if you want added control, you can also define dedicated input and response types.
 
 Note the use of `BikeInputType` in the `param` declaration above? It could look like so:
 
 ```ruby
 class BikeInputType < InputType
-  field :brand,  type: 'String',  null: true,  desc: 'The brand name'
-  field :wheels, type: 'Integer', null: false, default: 2
+  field :brand,  type: 'String',  null: true, desc: 'The brand name'
+  field :wheels, type: 'Integer', default: 2
 end
 ```
 
@@ -121,7 +124,7 @@ Likewise, there is a special type for responses, which can't be used in input de
 ```ruby
 class BikeSearchResponseType < ResponseType
   field :bike, type: 'BikeType', null: true, desc: 'The found bike'
-  field :search_duration, type: 'Integer', null: false
+  field :search_duration, type: 'Integer'
 end
 ```
 
@@ -193,7 +196,7 @@ Response validation can be disabled:
 Taro.config.validate_responses = false
 ```
 
-### Common error declarations
+#### Common error declarations
 
 `::common_return` can be used to add a return declaration to all actions in a controller and its subclasses, and all related OpenAPI exports.
 
@@ -205,6 +208,53 @@ class AuthenticatedApiBaseController < ApiBaseController
     render json: MyErrorType.render(something), status: :unauthorized
   end
 end
+```
+
+#### Nullable and required fields
+
+By default, all fields are required and non-nullable. "Required" means the field must be part of the input/output, and "non-nullable" means it can't be set to null.
+
+To make a field nullable, use `null: true`. This goes for both input and output fields, e.g.:
+
+```ruby
+param :brand, type: 'String', null: true
+```
+
+This means that the `brand` param can be set to null. If you want to allow the param to be omitted entirely in requests, set `required: false`.
+
+```ruby
+param :brand, type: 'String', null: true, required: false
+```
+
+If you want to support partial updates of an attribute, but not setting it to null, you would only specify `required: false`. This will allow the param to be omitted, but submitting null for it will raise an error.
+
+```ruby
+param :brand, type: 'String', required: false
+def update
+  bike.update!(@api_params)
+  # ...
+end
+```
+
+The `required` option is only relevant for input fields. When rendering output, taro automatically inserts null values for missing but nullable fields, e.g.
+
+```ruby
+BikeType.render(wheels: 2)
+# => { "wheels": 2, "brand": null }
+```
+
+It is also possible to change the default values for `null` and `required`:
+
+```ruby
+Taro.config.default_value_for_null = true
+Taro.config.default_value_for_required = false
+```
+
+Set defaults to nil to enforce explicit declaration on every param and field:
+
+```ruby
+Taro.config.default_value_for_null = nil
+param :foo, type: 'String' # => error: null has to be specified
 ```
 
 ### Included type options
@@ -237,7 +287,7 @@ class SeverityEnumType < EnumType
 end
 
 class ErrorType < ObjectType
-  field :severity, type: 'SeverityEnumType', null: false
+  field :severity, type: 'SeverityEnumType'
 end
 ```
 
@@ -245,7 +295,7 @@ Inline enums are also possible. Unlike EnumType classes, these are inlined in th
 
 ```ruby
 class ErrorType < ObjectType
-  field :severity, type: 'String', enum: %w[info warning debacle], null: false
+  field :severity, type: 'String', enum: %w[info warning debacle]
 end
 ```
 
@@ -330,7 +380,6 @@ If you want to migrate anyway:
 
 - extract complex param declarations into InputTypes
 - extract complex response declarations into ObjectTypes or ResponseTypes
-- replace `required: true` with `null: false` and `required: false` with `null: true`
 
 Taro uses some of the same DSL as `apipie`, so for a step-by-step migration, you might want to make `taro` use a different one. This initializer will change the `taro` DSL to `taro_api`, `taro_param`, and `taro_returns` and leave `api`, `param`, and `returns` to `apipie`:
 

@@ -1,5 +1,36 @@
 ## [Unreleased]
 
+### Changed
+
+- there is a new `required:` property for input / param fields that defaults to `true`
+  - this is a major breaking change!
+  - `null: true` previously also allowed completely omitting a parameter
+  - now `null: true` only allows the parameter to be `null`, but it still has to be submitted
+  - set `required: false` to make parameters optional
+  - your requests will now fail by default if parameters are missing, even with `null: true`
+  - to exactly preserve the previous behavior:
+    - replace `null: true` with `null: true, required: false` in all your definitions
+    - replace `null: false` with `required: true` in all your definitions
+  - `required:` also defines which fields are marked as required in the OpenAPI export
+    - previously, all nullable fields were exported as non-required and vice versa
+  - if a `default:` is given, `required:` becomes `false` automatically
+- missing parameters are no longer added to `@api_params` with `nil` values
+  - this is a minor breaking change
+  - previously, if a nullable param `foo` was omitted, taro added `foo: nil` to `@api_params`
+  - now, if the param is not required and not sent, it will simply be missing from `@api_params`
+  - if you relied on the previous behavior, you can set `default: nil` for the param
+
+### Added
+
+- there is now a default for `null` - all fields (input & output) now default to `null: false`
+  - this is a non-breaking change because `null:` was previously a required keyword argument
+  - as a result, `null:` is now an optional argument and setting `null: false` is now redundant
+- config options `Taro.config.default_value_for_null` and `Taro.config.default_value_for_required`
+
+### Fixed
+
+- improved some error messages by ensuring the field name and type are mentioned
+
 ## [2.5.0] - 2025-04-16
 
 ### Added

@@ -1,5 +1,5 @@
-describe Taro::Types::FieldValidation do
-  let(:field) { F.new(name: :upcase, type: S::StringType, null: false) }
+describe Taro::Types::FieldValueValidation do
+  let(:field) { F.new(name: :upcase, type: S::StringType) }
 
   it 'does not raise if the object is valid' do
     expect(field.validated_value('FOO')).to eq('FOO')
@@ -28,7 +28,7 @@ describe Taro::Types::FieldValidation do
   end
 
   describe 'with enum' do
-    let(:field) { F.new(name: :upcase, type: S::StringType, null: false, enum: %w[A B]) }
+    let(:field) { F.new(name: :upcase, type: S::StringType, enum: %w[A B]) }
 
     it 'does not raise if the object is valid' do
       expect { field.validated_value('A') }.not_to raise_error

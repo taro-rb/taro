@@ -2,9 +2,12 @@
 module Taro::Types::Shared::ObjectCoercion
   def coerce_input
     validate_no_undeclared_params
-    self.class.fields.transform_values do |field|
-      field.value_for_input(object)
+    result = {}
+    self.class.fields.each do |name, field|
+      value = field.value_for_input(object)
+      result[name] = value unless value.equal?(Taro::None)
     end
+    result
   end
 
   # Render the object into a hash.

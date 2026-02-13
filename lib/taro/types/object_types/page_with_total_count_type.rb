@@ -11,7 +11,7 @@
 class Taro::Types::ObjectTypes::PageWithTotalCountType < Taro::Types::ObjectTypes::PageType
   def self.derive_from(from_type)
     super
-    field(:total_count, type: 'Integer', null: false)
+    field(:total_count, type: 'Integer')
   end
 
   def self.paginate(relation, **)
