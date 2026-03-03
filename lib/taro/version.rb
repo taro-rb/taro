@@ -1,4 +1,4 @@
 # :nocov:
 module Taro
-  VERSION = "2.5.0"
+  VERSION = "3.0.0"
 end

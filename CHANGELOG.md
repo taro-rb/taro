@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [3.0.0] - 2026-03-03
+
 ### Changed
 
 - there is a new `required:` property for input / param fields that defaults to `true`
