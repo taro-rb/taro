@@ -1,4 +1,4 @@
-module Taro::Types::FieldValidation
+module Taro::Types::FieldValueValidation
   # Validate the value against the field properties. This method will raise
   # a Taro::InputError or Taro::ResponseError if the value is not matching.
   def validated_value(value, for_input = true)
@@ -21,5 +21,9 @@ module Taro::Types::FieldValidation
 
     msg = "field expects one of #{enum.inspect}, got #{value.inspect}"
     for_input ? input_error(msg, value) : response_error(msg, value)
+  end
+
+  def fail_if_required
+    required && input_error('field is required but key is missing', nil)
   end
 end

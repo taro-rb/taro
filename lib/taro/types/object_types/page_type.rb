@@ -9,8 +9,8 @@ class Taro::Types::ObjectTypes::PageType < Taro::Types::ResponseType
 
   def self.derive_from(from_type)
     super
-    field(:page, array_of: from_type.name, null: false)
-    field(:page_info, type: 'Taro::Types::ObjectTypes::PageInfoType', null: false)
+    field(:page, array_of: from_type.name)
+    field(:page_info, type: 'Taro::Types::ObjectTypes::PageInfoType')
   end
 
   def self.render(relation, **)

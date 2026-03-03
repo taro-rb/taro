@@ -14,7 +14,7 @@ class Taro::ReturnDef
   def evaluate
     if nesting
       Class.new(Taro::Types::NestedResponseType).tap do |type|
-        type.field(nesting, defined_at:, null: false, **params)
+        type.field(nesting, defined_at:, **params)
       end
     else
       Taro::Types::Coercion.call(params)

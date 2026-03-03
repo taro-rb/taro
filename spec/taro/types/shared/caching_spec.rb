@@ -70,7 +70,7 @@ describe Taro::Types::Shared::Caching do
 
   it 'applies to object type rendering' do
     type = Class.new(T::ObjectType)
-    type.field(:my_field, type: 'String', null: false)
+    type.field(:my_field, type: 'String')
     type.cache_key = ->(_) { 42 }
     allow(DUMMY_CACHE)
       .to receive(:fetch).with(42, expires_in: nil)

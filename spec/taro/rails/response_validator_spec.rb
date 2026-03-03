@@ -56,7 +56,7 @@ describe Taro::Rails::ResponseValidator do
 
   it 'can pass for object types' do
     stub_const('MyObj', Class.new(T::ObjectType))
-    MyObj.field(:bar, type: 'String', null: false)
+    MyObj.field(:bar, type: 'String')
     declaration.add_return(code: 200, type: 'MyObj')
     result = MyObj.render(bar: 'baz')
 
@@ -65,7 +65,7 @@ describe Taro::Rails::ResponseValidator do
 
   it 'can pass for nested object types' do
     stub_const('MyObj', Class.new(T::ObjectType))
-    MyObj.field(:bar, type: 'String', null: false)
+    MyObj.field(:bar, type: 'String')
     declaration.add_return(:nest, code: 200, type: 'MyObj')
     result = MyObj.render(bar: 'baz')
 
@@ -138,7 +138,7 @@ describe Taro::Rails::ResponseValidator do
 
   it 'fails for object types if render was not called' do
     stub_const('MyObj', Class.new(T::ObjectType))
-    MyObj.field(:bar, type: 'String', null: false)
+    MyObj.field(:bar, type: 'String')
     declaration.add_return(code: 200, type: 'MyObj')
 
     expect { test(bar: 'baz') }.to raise_error(err, /Expected to use MyObj.render/)
@@ -146,7 +146,7 @@ describe Taro::Rails::ResponseValidator do
 
   it 'fails for object types if render was called on another type' do
     stub_const('MyObj', Class.new(T::ObjectType))
-    MyObj.field(:bar, type: 'String', null: false)
+    MyObj.field(:bar, type: 'String')
     declaration.add_return(code: 200, type: 'MyObj')
     S::StringType.render('baz')
 
@@ -155,7 +155,7 @@ describe Taro::Rails::ResponseValidator do
 
   it 'fails for object types if the render result was not used' do
     stub_const('MyObj', Class.new(T::ObjectType))
-    MyObj.field(:bar, type: 'String', null: false)
+    MyObj.field(:bar, type: 'String')
     declaration.add_return(code: 200, type: 'MyObj')
     _result = MyObj.render(bar: 'baz')
 

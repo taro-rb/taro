@@ -1,25 +1,44 @@
-require_relative 'field_validation'
+require_relative 'field_value_validation'
 
-Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, :defined_at, :desc, :deprecated) do
-  include Taro::Types::FieldValidation
+Taro::Types::Field = Data.define(:name, :type, :null, :required, :resolver, :default, :enum, :defined_at, :desc, :deprecated) do
+  include Taro::Types::FieldValueValidation
   include Taro::Types::Shared::Errors
   include Taro::Types::Shared::TypeClass
 
-  def initialize(name:, type:, null:, method: name, default: Taro::None, enum: nil, defined_at: nil, desc: nil, deprecated: nil)
+  def initialize(
+    name:,
+    type:,
+    method: name, # note: `method` is stored as #resolver to avoid overriding Object#method
+    null: Taro.config.default_value_for_null,
+    default: Taro::None,
+    required: default == Taro::None ? Taro.config.default_value_for_required : false,
+    enum: nil,
+    defined_at: nil,
+    desc: nil,
+    deprecated: nil
+  )
     enum = coerce_to_enum(enum)
-    super(name:, type:, null:, method:, default:, enum:, defined_at:, desc:, deprecated:)
+    super(name:, type:, null: !!null, required: !!required, resolver: method, default:, enum:, defined_at:, desc:, deprecated:)
   end
 
   def value_for_input(object)
-    value = object[name] if object
+    unless object&.key?(name)
+      fail_if_required
+      return default_specified? ? default : Taro::None
+    end
+    value = object[name]
     value = coerce_value(value, true)
     validated_value(value)
+  rescue Taro::ValidationError => e
+    reraise_recursively_with_path_info(e)
   end
 
   def value_for_response(object, context: nil, object_is_hash: true)
     value = retrieve_response_value(object, context, object_is_hash)
     value = coerce_value(value, false)
     validated_value(value, false)
+  rescue Taro::ValidationError => e
+    reraise_recursively_with_path_info(e)
   end
 
   def default_specified?
@@ -46,22 +65,22 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
   end
 
   def retrieve_response_value(object, context, object_is_hash)
-    if context&.resolve?(method)
-      context.public_send(method)
+    if context&.resolve?(resolver)
+      context.public_send(resolver)
     elsif object_is_hash
       retrieve_hash_value(object)
-    elsif object.respond_to?(method, true)
-      object.public_send(method)
+    elsif object.respond_to?(resolver, true)
+      object.public_send(resolver)
     else
-      response_error "No such method or resolver `:#{method}`", object
+      response_error "No such method or resolver `:#{resolver}`", object
     end
   end
 
   def retrieve_hash_value(object)
-    if object.key?(method.to_s)
-      object[method.to_s]
+    if object.key?(resolver.to_s)
+      object[resolver.to_s]
     else
-      object[method]
+      object[resolver]
     end
   end
 
@@ -71,8 +90,6 @@ Taro::Types::Field = Data.define(:name, :type, :null, :method, :default, :enum, 
 
     type_obj = type.new(value)
     from_input ? type_obj.coerce_input : type_obj.cached_coerce_response
-  rescue Taro::ValidationError => e
-    reraise_recursively_with_path_info(e)
   end
 
   def reraise_recursively_with_path_info(error)

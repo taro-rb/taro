@@ -12,12 +12,12 @@ describe Taro::Types::Shared::Equivalence do
 
   it 'is true for equivalent object types' do
     # see field_def_spec.rb for detailed field equality specs
-    type1 = Class.new(T::ObjectType) { field :foo, type: 'String', null: false }
-    type2 = Class.new(T::ObjectType) { field :foo, type: 'String', null: false }
+    type1 = Class.new(T::ObjectType) { field :foo, type: 'String' }
+    type2 = Class.new(T::ObjectType) { field :foo, type: 'String' }
     expect(type1.equivalent?(type2)).to be true
 
-    type3 = Class.new(T::ObjectType) { field :foo, type: 'String', null: false }
-    type4 = Class.new(T::ObjectType) { field :foo, type: 'Integer', null: false }
+    type3 = Class.new(T::ObjectType) { field :foo, type: 'String' }
+    type4 = Class.new(T::ObjectType) { field :foo, type: 'Integer' }
     expect(type3.equivalent?(type4)).to be false
   end
 
