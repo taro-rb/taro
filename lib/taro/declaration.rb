@@ -2,7 +2,7 @@
 # Descendants must implement #endpoint and (only for openapi export) #routes.
 # See Taro::Rails::Declaration for an example.
 class Taro::Declaration
-  attr_reader :desc, :summary, :params, :return_defs, :return_descriptions, :tags
+  attr_reader :deprecated, :desc, :summary, :params, :return_defs, :return_descriptions, :tags
 
   def initialize(for_klass = nil)
     @params = Class.new(Taro::Types::RailsParamsType)
@@ -12,9 +12,10 @@ class Taro::Declaration
     Taro::CommonReturns.for(for_klass).each { |rd| add_return_def(rd) }
   end
 
-  def add_info(summary, desc: nil, tags: nil)
+  def add_info(summary, deprecated: nil, desc: nil, tags: nil)
     summary.is_a?(String) || raise(Taro::ArgumentError, 'api summary must be a String')
     @summary = summary
+    @deprecated = true if deprecated
     @desc = desc
     @tags = Array(tags) if tags
   end

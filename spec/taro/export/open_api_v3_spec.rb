@@ -22,7 +22,7 @@ describe Taro::Export::OpenAPIv3 do
     end)
 
     delete_decl = Taro::Rails::Declaration.new
-    delete_decl.add_info 'My endpoint description for DELETE'
+    delete_decl.add_info 'My endpoint description for DELETE', deprecated: 'Too dangerous'
     delete_decl.add_param :id, type: 'MyEnumType'
     delete_decl.add_return type: 'Integer', code: 200, desc: 'okay'
     stub_declaration_routes(delete_decl, mock_user_route(verb: 'DELETE', action: 'destroy'))
@@ -30,7 +30,7 @@ describe Taro::Export::OpenAPIv3 do
     show_decl = Taro::Rails::Declaration.new
     show_decl.add_info 'My endpoint description for GET'
     show_decl.add_param :id, type: 'Integer'
-    show_decl.add_param :utm_foo, type: 'String'
+    show_decl.add_param :utm_foo, type: 'String', deprecated: 'Tracking is bad'
     show_decl.add_return type: 'UUID', code: 200
     stub_declaration_routes(show_decl, mock_user_route(verb: 'GET', action: 'show'))
 
@@ -45,6 +45,7 @@ describe Taro::Export::OpenAPIv3 do
       paths:
         "/users/{id}":
           delete:
+            deprecated: true
             summary: My endpoint description for DELETE
             operationId: delete_destroy_users
             parameters:
@@ -70,6 +71,7 @@ describe Taro::Export::OpenAPIv3 do
                 type: integer
               in: path
             - name: utm_foo
+              deprecated: true
               required: true
               schema:
                 type: string

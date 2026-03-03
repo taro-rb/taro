@@ -14,6 +14,11 @@ describe Taro::Rails::Declaration do
       expect(subject.summary).to eq('My text')
     end
 
+    it 'can add a deprecated flag' do
+      subject.add_info('...', deprecated: true)
+      expect(subject.deprecated).to eq true
+    end
+
     it 'can add a description' do
       subject.add_info('...', desc: 'My long text')
       expect(subject.desc).to eq('My long text')

@@ -26,6 +26,7 @@
   - this is a non-breaking change because `null:` was previously a required keyword argument
   - as a result, `null:` is now an optional argument and setting `null: false` is now redundant
 - config options `Taro.config.default_value_for_null` and `Taro.config.default_value_for_required`
+- option to mark whole endpoints as deprecated (`api 'My endpoint', deprecated: true`)
 
 ### Fixed
 

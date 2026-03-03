@@ -366,6 +366,16 @@ class BikeType < ObjectType
 end
 ```
 
+### Can I mark things as deprecated?
+
+Yes. Endpoints, params, fields, and types can all be marked as deprecated.
+
+```ruby
+api 'Legacy bike index, to be removed in 2043', deprecated: true
+
+PennyFarthingType.deprecated = true
+```
+
 ### How do I migrate from apipie-rails?
 
 First of all, if you don't need a better OpenAPI export, or better support for hashes and arrays, or less repetitive definitions, it might not be worth it.

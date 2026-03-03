@@ -1,6 +1,9 @@
 require_relative 'field_value_validation'
 
-Taro::Types::Field = Data.define(:name, :type, :null, :required, :resolver, :default, :enum, :defined_at, :desc, :deprecated) do
+Taro::Types::Field = Data.define(
+  :name, :type,
+  :default, :defined_at, :deprecated, :desc, :enum, :null, :required, :resolver,
+) do
   include Taro::Types::FieldValueValidation
   include Taro::Types::Shared::Errors
   include Taro::Types::Shared::TypeClass
@@ -8,17 +11,28 @@ Taro::Types::Field = Data.define(:name, :type, :null, :required, :resolver, :def
   def initialize(
     name:,
     type:,
+    default: Taro::None,
+    defined_at: nil,
+    deprecated: nil,
+    desc: nil,
+    enum: nil,
     method: name, # note: `method` is stored as #resolver to avoid overriding Object#method
     null: Taro.config.default_value_for_null,
-    default: Taro::None,
-    required: default == Taro::None ? Taro.config.default_value_for_required : false,
-    enum: nil,
-    defined_at: nil,
-    desc: nil,
-    deprecated: nil
+    required: default == Taro::None ? Taro.config.default_value_for_required : false
   )
     enum = coerce_to_enum(enum)
-    super(name:, type:, null: !!null, required: !!required, resolver: method, default:, enum:, defined_at:, desc:, deprecated:)
+    super(
+      name:,
+      type:,
+      default:,
+      defined_at:,
+      deprecated: (true if deprecated),
+      desc:,
+      enum:,
+      null: !!null,
+      required: !!required,
+      resolver: method,
+    )
   end
 
   def value_for_input(object)

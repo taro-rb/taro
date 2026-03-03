@@ -26,6 +26,7 @@ class Taro::Export::OpenAPIv3 < Taro::Export::Base # rubocop:disable Metrics/Cla
   def export_route(route, declaration)
     {
       route.verb.to_sym => {
+        deprecated: declaration.deprecated,
         description: declaration.desc,
         summary: declaration.summary,
         tags: declaration.tags,
