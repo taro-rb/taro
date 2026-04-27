@@ -7,7 +7,8 @@
 # The object is a parameter hash for inputs and a manually passed hash
 # or object when rendering a response.
 #
-# Using Struct instead of Data here for performance reasons:
+# The type initializer is a hot path for param parsing and response rendering,
+# so we are using Struct instead of Data here for performance reasons:
 # https://bugs.ruby-lang.org/issues/19693
 Taro::Types::BaseType = Struct.new(:object) do
   require_relative "shared"

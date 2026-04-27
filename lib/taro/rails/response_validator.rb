@@ -1,3 +1,6 @@
+# This runs on for every response,
+# so we are using Struct instead of Data here for performance reasons:
+# https://bugs.ruby-lang.org/issues/19693
 Taro::Rails::ResponseValidator = Struct.new(:controller, :declaration, :rendered) do
   def self.call(controller, declaration, rendered)
     new(controller, declaration, rendered).call

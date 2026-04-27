@@ -1,8 +1,14 @@
 class Taro::Export::Base
   attr_reader :result
 
-  def self.call(declarations: Taro.declarations, title: Taro.config.api_name, version: Taro.config.api_version, **)
+  def self.call(declarations: Taro.declarations.eager_load, title: Taro.config.api_name, version: Taro.config.api_version, **)
     new.call(declarations:, title:, version:, **)
+  end
+
+  def write_to_file(path: Taro.config.export_path, format: Taro.config.export_format)
+    data = __send__("to_#{format}") # e.g. to_json, to_yaml
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, data)
   end
 
   def to_json(*)

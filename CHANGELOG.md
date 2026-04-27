@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- `Taro::Export::Base#write_to_file` for writing schema files without the rake task
+- `Taro.declarations.eager_load` for ensuring all declarations are loaded in Rails
+
 ## [3.0.0] - 2026-03-03
 
 ### Changed
